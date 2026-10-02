@@ -1,0 +1,35 @@
+name: Competition escrow
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'programs/competition-escrow/**'
+      - 'scripts/competition-chain-e2e.mjs'
+      - '.github/workflows/competition-program.yml'
+permissions:
+  contents: read
+jobs:
+  chain:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Install pinned official Agave tooling
+        run: |
+          curl -fL --retry 3 https://github.com/anza-xyz/agave/releases/download/v4.3.0/solana-release-x86_64-unknown-linux-gnu.tar.bz2 -o /tmp/agave.tar.bz2
+          tar -xjf /tmp/agave.tar.bz2 -C /tmp
+          echo /tmp/solana-release/bin >> "$GITHUB_PATH"
+      - name: Compile competition program
+        run: cargo-build-sbf --manifest-path programs/competition-escrow/Cargo.toml
+      - name: Record bytecode identity
+        run: sha256sum programs/competition-escrow/target/deploy/competition_escrow.so
+      - name: Install existing JavaScript dependencies
+        run: npm ci
+      - name: Test real three-wallet transfers and adversarial instructions
+        run: node scripts/competition-chain-e2e.mjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: competition-escrow-${{ github.sha }}
+          path: programs/competition-escrow/target/deploy/competition_escrow.so
+          if-no-files-found: error
+          retention-days: 7
