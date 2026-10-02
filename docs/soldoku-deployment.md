@@ -8,7 +8,7 @@ The Worker reports its bound manifest at `/api/release` with `Cache-Control: no-
 
 Browser verification scripts are `scripts/refinement-check.mjs`, `scripts/competition-check.mjs`, and `scripts/laptop-check.mjs`; set `QA_ORIGIN` to the production origin or the local preview. Their signed synthetic wallets exercise free leaderboard entry and never fund a room.
 
-## Live deployment — 2026-10-02
+## Initial deployment — 2026-10-02
 
 Published at https://soldoku.com/ and https://www.soldoku.com/ with HTTPS. Worker `soldoku` uses D1 `soldoku-matches` (`ce2b7609-384c-404f-8524-b96f59508b54`). Version `682f2689-d18e-4db8-84bd-23b0b633cbba` serves both hostnames through Worker routes. Namecheap delegates to `itzel.ns.cloudflare.com` and `kai.ns.cloudflare.com`; Cloudflare reports the zone active. Existing mail MX and SPF records were preserved. All 11 live competition checks and eight live refinement checks pass.
 
@@ -24,7 +24,7 @@ The full app is configured in `wrangler.soldoku.jsonc`. It uses the competition 
 - Cloudflare deployment bundle passes `wrangler deploy --dry-run`.
 - Competition browser checks pass against the local Cloudflare Worker and D1 runtime.
 - All 23 browser checks pass, including classic play, private Practice, Quick Match, and token selection. The local-file URL initialization that broke Practice in Workers is fixed.
-- Unit tests: 215 passed, four optional integration tests skipped.
+- Unit tests: 216 passed, four optional integration tests skipped.
 - Token search remains broad and Solana-only; Star Atlas ATLAS and POLIS are pinned to issuer mints.
 - Public deployment completed after signing in using device authorization.
 
