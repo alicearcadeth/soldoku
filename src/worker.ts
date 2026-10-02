@@ -52,6 +52,16 @@ function loadApi(env: Env) {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    if (url.pathname === "/api/release") {
+      if (request.method !== "GET") return Response.json({ error: "Use GET for release information." }, { status: 405 });
+      const manifest = await env.ASSETS.fetch(new Request(new URL("/release.json", url)));
+      if (!manifest.ok || !manifest.headers.get("content-type")?.includes("json")) {
+        return Response.json({ error: "Release manifest unavailable. Rebuild the app before deploying." }, { status: 503 });
+      }
+      const headers = new Headers(manifest.headers);
+      headers.set("cache-control", "no-store");
+      return new Response(manifest.body, { status: manifest.status, headers });
+    }
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
     if (url.pathname === "/api/tokens" || url.pathname.startsWith("/api/competitions")) return competitions(request, env);
     if (url.pathname === "/api/coach") return coach(request, env);

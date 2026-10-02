@@ -1,5 +1,13 @@
 # Soldoku deployment
 
+## Keep releases aligned
+
+Commit and push completed source changes to `alicearcadeth/soldoku` on `main` before creating a production build. Run `npm run build`, then deploy only with `npx wrangler deploy --config wrangler.soldoku.jsonc`. After deployment, run `npm run verify:release` and repeat with `QA_ORIGIN=https://www.soldoku.com/`. The verifier requires a clean checkout, matching local/GitHub commit, matching Worker release manifest, and identical SHA-256 hashes for every shipped file. It fails for old builds or uncommitted changes. The build generates `dist/release.json`; never edit it manually.
+
+The Worker reports its bound manifest at `/api/release` with `Cache-Control: no-store`. The HTML entry point and service worker revalidate rather than retaining an unchecked cached entry point. The existing service worker continues to fetch from the network first and preserves offline fallback.
+
+Browser verification scripts are `scripts/refinement-check.mjs`, `scripts/competition-check.mjs`, and `scripts/laptop-check.mjs`; set `QA_ORIGIN` to the production origin or the local preview. Their signed synthetic wallets exercise free leaderboard entry and never fund a room.
+
 ## Live deployment — 2026-10-02
 
 Published at https://soldoku.com/ and https://www.soldoku.com/ with HTTPS. Worker `soldoku` uses D1 `soldoku-matches` (`ce2b7609-384c-404f-8524-b96f59508b54`). Version `682f2689-d18e-4db8-84bd-23b0b633cbba` serves both hostnames through Worker routes. Namecheap delegates to `itzel.ns.cloudflare.com` and `kai.ns.cloudflare.com`; Cloudflare reports the zone active. Existing mail MX and SPF records were preserved. All 11 live competition checks and eight live refinement checks pass.
