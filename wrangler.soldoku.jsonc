@@ -1,0 +1,29 @@
+{
+  "name": "soldoku",
+  "account_id": "33b9f269261c9c7b77479a830536335b",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "routes": [
+    { "pattern": "soldoku.com/*", "zone_name": "soldoku.com" },
+    { "pattern": "www.soldoku.com/*", "zone_name": "soldoku.com" }
+  ],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "soldoku-matches",
+      "database_id": "ce2b7609-384c-404f-8524-b96f59508b54"
+    }
+  ],
+  "vars": {
+    "SOLANA_CLUSTER": "devnet",
+    "SOLANA_RPC": "https://api.devnet.solana.com"
+  }
+}

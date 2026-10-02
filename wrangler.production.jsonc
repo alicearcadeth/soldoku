@@ -1,0 +1,13 @@
+{
+  "name": "sudoku-mainnet",
+  "main": "src/productionWorker.ts",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "sudoku-mainnet",
+      "database_id": "41854498-3ee5-4268-b6ae-5c04c28502ff"
+    }
+  ]
+}

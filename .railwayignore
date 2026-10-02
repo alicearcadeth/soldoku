@@ -1,0 +1,8 @@
+node_modules
+dist
+output
+data
+target
+programs/**/target
+.playwright-cli
+*.local

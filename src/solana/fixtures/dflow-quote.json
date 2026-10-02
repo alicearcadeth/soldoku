@@ -1,0 +1,14 @@
+{
+  "inputMint": "So11111111111111111111111111111111111111112",
+  "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "inAmount": "10000000",
+  "outAmount": "1185900",
+  "minOutAmount": "1179971",
+  "otherAmountThreshold": "1179971",
+  "slippageBps": 50,
+  "priceImpactPct": "0",
+  "executionMode": "sync",
+  "routeHops": 1,
+  "capturedOn": "2026-09-28",
+  "broadcast": false
+}

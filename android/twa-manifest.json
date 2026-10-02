@@ -1,0 +1,13 @@
+{
+  "fallbackType": "webview",
+  "generatorApp": "solana-mobile",
+  "host": "sudoku.jamesbitarcade.workers.dev",
+  "launcherName": "Sudoku",
+  "name": "Sudoku",
+  "packageId": "com.sudoku.game",
+  "startUrl": "/",
+  "signingKey": {
+    "alias": "android",
+    "path": ""
+  }
+}

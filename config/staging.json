@@ -1,0 +1,9 @@
+{
+  "label": "STAGING / DEVNET / NO CASH VALUE",
+  "cluster": "devnet",
+  "cashValue": false,
+  "programId": "GTJ68bR2Fwkc9JcYefH9Eas9gvHnR6AkZ3TincmJsst4",
+  "upgradeAuthority": "HKKoVMjmA4X8FgQBZhq3a5iz1TYdRu1zVzWDHKT3GiP9",
+  "matchAuthority": "HKKoVMjmA4X8FgQBZhq3a5iz1TYdRu1zVzWDHKT3GiP9",
+  "mint": "7VaC5xJULHGQzsZsyUCaZ7BbLGNDENLjXiPbfbbRY84j"
+}

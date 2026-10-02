@@ -1,0 +1,34 @@
+import { enterStaked, hostedRoom, joinRoom, launch, loadPlayers, openPlayer, url, watchDeposits } from "./hosted-browser.mjs";
+
+const { playerA, playerB } = loadPlayers();
+const browser = await launch();
+const host = await openPlayer(browser, playerA);
+const guest = await openPlayer(browser, playerB);
+const signatures = [];
+watchDeposits(host, signatures);
+watchDeposits(guest, signatures);
+await enterStaked(host);
+await enterStaked(guest);
+const code = await hostedRoom(host);
+await joinRoom(guest, code);
+await host.getByText(/\d+ filled/).waitFor({ timeout: 30_000 });
+await host.getByRole("button", { name: "Deposit stake" }).click();
+await host.getByText("Waiting for the other deposit").waitFor({ timeout: 90_000 });
+await guest.getByRole("button", { name: "Deposit stake" }).click();
+await host.getByText(/^\d+:\d+$/).waitFor({ timeout: 90_000 });
+await browser.close();
+
+const funds = await fetch(`${url}api/rooms/funds?code=${code}`).then((response) => response.json());
+const waitMs = Math.max(0, funds.settleDeadline * 1000 - Date.now()) + 20_000;
+await new Promise((resolve) => setTimeout(resolve, waitMs));
+const late = await launch();
+const page = await openPlayer(late, playerA);
+watchDeposits(page, signatures);
+await enterStaked(page);
+await page.locator("input.code").fill(code);
+await page.getByRole("button", { name: "Resume with this wallet" }).click();
+await page.getByRole("button", { name: "Refund stake" }).click();
+await page.getByText(/Refund confirmed on-chain|already confirmed/).waitFor({ timeout: 90_000 });
+const after = await fetch(`${url}api/rooms/funds?code=${code}`).then((response) => response.json());
+console.log(JSON.stringify({ kind: "hosted-ui-deadline-refund", code, signatures, before: funds, after, page: await page.locator("body").innerText() }));
+await late.close();

@@ -1,0 +1,16 @@
+{
+  "armed": false,
+  "approval": "",
+  "cluster": "mainnet-beta",
+  "workerName": "sudoku-mainnet",
+  "d1Name": "sudoku-mainnet",
+  "d1Id": "41854498-3ee5-4268-b6ae-5c04c28502ff",
+  "programId": "4GqmVjmNLwfJ8UrtGTV9C2RZAqNqRiaGGmCsKRX7EKMH",
+  "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "matchAuthority": "AeUkKyCEV8KJxK16s6U3X9tC6HLN2kjwrLxjN7x1RbXa",
+  "upgradeAuthority": "7pxUUSe4jNiN4bwV6a4gtaLwfpz5JBseHGC9j2mvwzW7",
+  "rpcHost": "api.mainnet-beta.solana.com",
+  "backupRpcHost": "solana-rpc.publicnode.com",
+  "genesis": "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d",
+  "expectedArtifactSha256": "fd04aac9cea91ee40dc98ab61b6c00c5b3d527229dad04487878c7c3c8a3aa14"
+}

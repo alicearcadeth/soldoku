@@ -1,0 +1,24 @@
+import { chromium } from "playwright";
+
+const base = "http://127.0.0.1:5173";
+const browser = await chromium.launch({ channel: "chrome", headless: true });
+const page = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+await page.goto(base);
+await page.evaluate(() => localStorage.clear());
+await page.reload();
+await page.getByRole("button", { name: "Compete" }).click();
+await page.getByRole("button", { name: "For tokens" }).click();
+await page.getByRole("button", { name: "Create test wallet" }).click();
+await page.getByRole("button", { name: /ready/ }).waitFor({ timeout: 60_000 });
+const slider = page.locator(".slider");
+const box = await slider.boundingBox();
+const style = await page.locator(".notch").getAttribute("style");
+const percent = Number(style?.match(/[\d.]+/)?.[0] ?? "0") / 100;
+await page.mouse.click(box.x + box.width * percent, box.y + box.height / 2);
+await page.getByRole("button", { name: "easy" }).click();
+await page.getByRole("button", { name: "Create room" }).click();
+await page.getByRole("button", { name: "Deposit stake" }).click();
+await page.getByText("Waiting for the other deposit").waitFor({ timeout: 60_000 });
+const seat = await page.evaluate(() => localStorage.getItem("sudoku.seat"));
+console.log(`FUNDED ${seat}`);
+await browser.close();

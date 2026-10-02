@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#14F195" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <script>
+      try {
+    const query = new URLSearchParams(location.search).get("theme");
+    const saved = localStorage.getItem("sudoku.theme");
+    const theme = query || saved;
+    if (theme && theme !== "light") document.documentElement.dataset.theme = theme;
+    const prefs = JSON.parse(localStorage.getItem("sudoku.prefs") || "{}");
+    if (prefs.font === "modern" || prefs.font === "readable") document.documentElement.dataset.font = prefs.font;
+    if (prefs.text === "large") document.documentElement.dataset.text = "large";
+      } catch (e) {}
+    </script>
+    <title>Soldoku · Sudoku</title>
+    <link rel="icon" href="/brand/soldoku-logo.png" sizes="any" />
+    <link rel="icon" href="/brand/soldoku-logo.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/brand/soldoku-logo.png" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

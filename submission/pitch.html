@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Sudoku — CLOCK IN</title>
+  <style>
+    body { margin: 0; font-family: Georgia, "Times New Roman", serif; color: #1c1915; background: #f4f0e6; }
+    section { min-height: 100vh; padding: 64px 72px; box-sizing: border-box; border-bottom: 1px solid #ddd4c4; }
+    h1 { font-size: 64px; line-height: 1; margin: 0 0 16px; }
+    h2 { font-size: 40px; margin: 0 0 20px; }
+    p, li { font-size: 24px; line-height: 1.4; max-width: 900px; }
+    .kicker { letter-spacing: 0.14em; text-transform: uppercase; font-family: "Segoe UI", sans-serif; font-size: 14px; color: #6d6458; }
+    img { max-width: 320px; border: 1px solid #ddd4c4; border-radius: 12px; }
+    @media print { section { break-after: page; } }
+  </style>
+</head>
+<body>
+  <section>
+    <p class="kicker">Solana Mobile · CLOCK IN</p>
+    <h1>Sudoku</h1>
+    <p>A two-player race on one puzzle. The stake sits in a Solana vault that neither player can rewrite.</p>
+  </section>
+  <section>
+    <h2>The problem</h2>
+    <p>People already play Sudoku. A wager between two players usually means one of them holds the money. That fails with a stranger, on a phone, or when someone walks away.</p>
+  </section>
+  <section>
+    <h2>The match</h2>
+    <p>Both players see the same givens. The first correct finish wins. At the clock, the fuller correct board wins. A tie splits the vault.</p>
+  </section>
+  <section>
+    <h2>Free, then staked</h2>
+    <p>Classic is a solo puzzle. Practice is a free race. Neither asks for a wallet. Compete is the separate choice, and the screen says the tokens have no cash value.</p>
+    <img src="screenshots/home-current.png" alt="Current Sudoku home with Classic, Practice, and Compete" />
+  </section>
+  <section>
+    <h2>The vault</h2>
+    <p>Each player signs a deposit into a program account. The server can submit the result. It cannot change the mint, the stake, the players, or the deadlines after the room opens. Payouts go only to the two players.</p>
+  </section>
+  <section>
+    <h2>The phone wallet</h2>
+    <p>The Android app is a Web Shell. It hands wallet requests to the Mobile Wallet Adapter. The app does not keep the key. A desktop browser can be the second player.</p>
+  </section>
+  <section>
+    <h2>Devnet, today</h2>
+    <p>The public beta uses Devnet test tokens. A physical Seeker has opened the app, connected Seed Vault Wallet, and signed a message. A physical deposit was blocked by that wallet before any signature, with the warning “Scam site detected.” No deposit was broadcast. The cause of that warning is unknown. New deposits are paused in the public app until wallet support identifies the check. Refunds for a room that already has a deposit still work.</p>
+    <p>Earlier Devnet escrow tests, including a staging program, have completed a winner, a draw, an unmatched refund, a deadline refund, and close. Those runs are not the blocked physical deposit. The close screenshot is a real staging transaction, not a mock and not a physical Seeker deposit.</p>
+    <img src="screenshots/compete-paused.png" alt="Compete on Devnet with new deposits paused" />
+    <img src="screenshots/staging-close.png" alt="Staging close confirmed" />
+  </section>
+  <section>
+    <h2>Working now</h2>
+    <p>The Android APK loads the public site, so a later web deploy is what the installed app shows. Classic, Practice, and Settings have been used on a physical Seeker. Seed Vault Wallet has connected and signed a message there. A complete free Practice match was played by two clients on the public site: both received the same puzzle, one finish decided the race, and a refresh kept the result. Escrow, refund, and settlement have run in Devnet test environments other than the blocked physical deposit. DFlow can return a quote and an unsigned swap. None of this moves Mainnet value.</p>
+  </section>
+  <section>
+    <h2>Not live yet</h2>
+    <p>The physical Seeker deposit and refund are not verified. Seed Vault Wallet blocked the attempt. The latest Classic clock was checked in the browser, not on the phone, because the Seeker was not attached for that pass. The Mainnet financial program is not deployed. No Mainnet DFlow swap has been broadcast. Real-value staking is off. The app is not published on the Solana dApp Store. Card funding through MoonPay stays paused.</p>
+  </section>
+  <section>
+    <h2>Mainnet, later</h2>
+    <p>The production program is built to accept only Mainnet USDC. A player could deposit USDC, or swap SOL to USDC through DFlow and then deposit. That program is not deployed. No real swap has been sent. The production site refuses financial calls.</p>
+  </section>
+  <section>
+    <h2>When something breaks</h2>
+    <p>A missed opponent or an unfinished match refunds after the deadline. If a send is uncertain, the app looks up that signature instead of sending a second transaction. New paid rooms can be paused without freezing a refund of a room that is already open.</p>
+  </section>
+  <section>
+    <h2>What it does not claim</h2>
+    <p>An outside solver can still be used. A fast finish is flagged for review and is not grounds to take the stake. A physical Seeker deposit has not succeeded. Test tokens are not money. The scam-site warning has not been classified as a false positive.</p>
+  </section>
+  <section>
+    <h2>From here</h2>
+    <p>Public Devnet now. Then, only with the owner's approval: deploy the USDC program, one real swap, one real match, an external review, and a published fair-play rule before anyone can stake real value.</p>
+  </section>
+</body>
+</html>

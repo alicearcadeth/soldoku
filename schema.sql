@@ -1,0 +1,53 @@
+CREATE TABLE IF NOT EXISTS matches (
+  id INTEGER PRIMARY KEY,
+  body TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS play_daily (
+  day TEXT PRIMARY KEY,
+  classic_started INTEGER NOT NULL DEFAULT 0,
+  classic_completed INTEGER NOT NULL DEFAULT 0,
+  completed_with_hint INTEGER NOT NULL DEFAULT 0,
+  completed_with_reveal INTEGER NOT NULL DEFAULT 0,
+  hint_stage1 INTEGER NOT NULL DEFAULT 0,
+  hint_stage2 INTEGER NOT NULL DEFAULT 0,
+  coach_requests INTEGER NOT NULL DEFAULT 0,
+  coach_gemini INTEGER NOT NULL DEFAULT 0,
+  coach_fallback INTEGER NOT NULL DEFAULT 0,
+  coach_cache INTEGER NOT NULL DEFAULT 0,
+  gemini_errors INTEGER NOT NULL DEFAULT 0,
+  gemini_ms INTEGER NOT NULL DEFAULT 0,
+  gemini_calls INTEGER NOT NULL DEFAULT 0,
+  hint_sum INTEGER NOT NULL DEFAULT 0,
+  mistake_sum INTEGER NOT NULL DEFAULT 0,
+  second_sum INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS profiles (
+  wallet TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  updated INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS results (
+  wallet TEXT NOT NULL,
+  code TEXT NOT NULL,
+  mode TEXT NOT NULL,
+  level TEXT NOT NULL,
+  outcome TEXT NOT NULL,
+  seconds INTEGER,
+  chain TEXT,
+  at INTEGER NOT NULL,
+  PRIMARY KEY (wallet, code)
+);
+
+CREATE TABLE IF NOT EXISTS settle_signatures (
+  code TEXT PRIMARY KEY,
+  signature TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS coach_usage (
+  day TEXT PRIMARY KEY,
+  calls INTEGER NOT NULL,
+  errors INTEGER NOT NULL
+);
