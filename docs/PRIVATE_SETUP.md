@@ -12,7 +12,7 @@ Expected secure file, outside the repository:
 
 `~/.config/solana/<release-keystore>`
 
-The file that signed `submission/sudoku-clockin.apk` is the one whose certificate matches `docs/CURRENT_RELEASE.md`. Two local filenames have been used in tooling (`sudoku-release.keystore` with alias `sudoku-release`, and `sudoku-android.keystore` with alias `android`). Use the file that matches the submitted certificate. Do not guess.
+The keystore that matches `docs/CURRENT_RELEASE.md` is `~/.config/solana/sudoku-android.keystore`, alias `android`. `sudoku-release.keystore` alias `sudoku-release` does not match. Do not sign with the other file.
 
 Required configuration names:
 
@@ -45,6 +45,7 @@ Typical filenames, all secret:
 - `sudoku-staging-program.json`
 - `sudoku-staging-upgrade.json`
 - `sudoku-devnet-mint.txt`
+- `soldoku-competition-test-mint.json` (TEST mint authority; Worker secret `SUDOKU_COMPETITION_FAUCET_KEY`)
 
 Public addresses for these roles are in `docs/escrow-v2.md`. The JSON contents are not public.
 

@@ -1,6 +1,6 @@
 # Mainnet path
 
-Public real-value staking stays off. The hosted app remains Devnet. This is an internal review of the current program and worker, not an independent audit.
+Public real-value staking stays off. The current public app is https://soldoku.com/, Worker `soldoku`, on Devnet. Funded competitions use program `6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs` and TEST mint `BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4`. This file reviews the older two-player Devnet programs. It is not the current competition release. See [CURRENT_RELEASE.md](CURRENT_RELEASE.md).
 
 ## What the Devnet program actually does
 
@@ -18,7 +18,7 @@ New Devnet rooms store 1, 2, or 5 test tokens (6 decimals). Escrow V2 already re
 
 | | Devnet, live now | Mainnet, not created |
 |---|---|---|
-| Worker | `sudoku` on jamesbitarcade | A new Worker and a new D1 database |
+| Worker | Older two-player shell `sudoku` on jamesbitarcade. The current public Worker is `soldoku` at https://soldoku.com/ | A new Worker and a new D1 database |
 | Cluster check | Devnet genesis `EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG` | Mainnet genesis `5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d` |
 | Program | V2 `937BAWX...` for new rooms. Legacy `HUkhJi8...` for old rooms | A new deployment. Do not reuse either Devnet program id |
 | Mint | The Devnet test mint in the Worker secret | An allowlisted SPL mint, recommended USDC |

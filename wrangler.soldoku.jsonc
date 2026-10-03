@@ -22,6 +22,9 @@
       "database_id": "ce2b7609-384c-404f-8524-b96f59508b54"
     }
   ],
+  "triggers": {
+    "crons": ["*/5 * * * *"]
+  },
   "vars": {
     "SOLANA_CLUSTER": "devnet",
     "SOLANA_RPC": "https://api.devnet.solana.com",

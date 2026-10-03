@@ -2,7 +2,7 @@
 
 A Sudoku app with Classic, Practice, leaderboard competitions and legacy two-player races. Funded competitions now use a separate multi-player Devnet escrow: players deposit TEST, play the same grid after registration closes, and the unique fastest server-verified finish receives the full pool. Ties and no valid finishes refund entrants.
 
-The public app is a **Devnet** beta. The stake is a test token. It has **no cash value**. Mainnet staking is not enabled.
+The public app is a **Devnet** beta. The stake is a test token. It has **no cash value**. Mainnet staking is not enabled. New testers request Devnet SOL and TEST from the Compete screen. See [docs/testers.md](docs/testers.md).
 
 The new funded competition flow passed a three-wallet browser test with real Devnet deposits, settlement and winner payout. Public receipts are recorded in [the browser evidence](docs/evidence/competition-devnet-browser.json). The implementation is pushed and deployed to the public Soldoku Worker. The production three-wallet test passed deposits, shared-grid competition, ranking, finalized settlement and full 3 TEST winner payout with an empty vault. See [production receipts](docs/evidence/competition-production-devnet.json). Local, GitHub and both public-domain assets match. See [competition setup and verification](docs/competition-devnet-build.md) for configuration, current limits and live refund tests. Funded creation stays disabled without its separate program and server authority configuration.
 
@@ -65,7 +65,7 @@ node scripts/start-staging-server.mjs
 
 ## Android
 
-The Web Shell lives in `android/`, package `com.sudoku.game`. The submission APK loads the public Devnet site. Build it with JDK 17 (`JAVA_HOME` set to that JDK) and an Android SDK (`ANDROID_HOME`):
+The Web Shell lives in `android/`, package `com.sudoku.game`. The release shell loads https://soldoku.com/. Build it with JDK 17 (`JAVA_HOME` set to that JDK) and an Android SDK (`ANDROID_HOME`):
 
 ```powershell
 cd android
@@ -84,7 +84,9 @@ The production worker returns 403 for financial routes until the owner sets the 
 
 ## Test tokens
 
-Devnet stakes of 1, 2, or 5 are test tokens. A desktop staging session can create a disposable key in the browser. That key is not a personal wallet. Fund it only from the staging authority on Devnet. The public site expects a normal Devnet wallet.
+Devnet stakes are TEST. A new tester connects a wallet on https://soldoku.com/ and uses **Get Devnet SOL and TEST**. That requests 1 SOL when the fee balance is under 0.05 SOL, and 20 TEST when the TEST balance is under 5. Each wallet can do this once per day. If Devnet refuses the airdrop, use https://faucet.solana.com for the same wallet. Details are in [docs/testers.md](docs/testers.md).
+
+A desktop staging session can create a disposable key in the browser. That key is not a personal wallet. Fund it only from the staging authority on Devnet. The public site expects a normal Devnet wallet.
 
 ## Legacy two-player limits
 

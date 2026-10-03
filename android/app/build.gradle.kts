@@ -9,7 +9,7 @@ val webShellUrl =
     (findProperty("SOLANA_MOBILE_URL") as String?)
         ?.trim()
         ?.ifBlank { null }
-        ?: "https://example.com/"
+        ?: "https://soldoku.com/"
 val webShellApplicationId =
     (findProperty("SOLANA_MOBILE_APPLICATION_ID") as String?)
         ?.trim()
@@ -80,6 +80,7 @@ android {
                 storePassword = webShellSigningStorePassword
                 keyAlias = webShellSigningKeyAlias
                 keyPassword = webShellSigningKeyPassword ?: webShellSigningStorePassword
+                enableV3Signing = true
             }
         }
     }

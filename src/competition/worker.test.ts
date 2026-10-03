@@ -12,6 +12,7 @@ function database() {
   return {
     conflict: () => { conflicts++; },
     snapshot: () => saved,
+    seed(body: string) { saved = body; },
     prepare(sql: string) {
       let args: unknown[] = [];
       const statement = {
@@ -65,7 +66,8 @@ describe("Worker leaderboard persistence", () => {
       expect(stored.rooms[0].funded.confirmedParticipants).toBe(1);
       return "finalized-later";
     });
-    const chain = { config, cluster: "devnet", verify: async () => {}, read, submit: vi.fn(), transaction: vi.fn(), settle } as CompetitionChain;
+    const chain = { config, cluster: "devnet", verify: async () => {}, read, submit: vi.fn(), transaction: vi.fn(), settle,
+      faucetConfigured: false, testerBalances: async () => ({ solLamports: 0, testUnits: 0n }), fundTester: async () => ({ solSignature: null, testSignature: null, note: null }) } as CompetitionChain;
     vi.mocked(competitionChain).mockReturnValue(chain);
     const env = { DB: db, ASSETS: { fetch: async () => new Response("asset") } };
     const request = async (path: string, body: Record<string, unknown>) => worker.fetch(new Request(`https://sudoku.example/api/competitions${path}`,
@@ -88,6 +90,53 @@ describe("Worker leaderboard persistence", () => {
       observation.chainTime += 1000;
       for (let index = 0; index < 4; index++) db.conflict();
       expect((await request("/settle", { code: room.code, actor: auth.actor })).status).toBe(409);
+      expect(settle).toHaveBeenCalledTimes(1);
+    } finally { vi.mocked(competitionChain).mockReset(); }
+  });
+  it("grants tester funds once, releases the reservation when the send fails, and settles only due rooms from the cron", async () => {
+    const db = database();
+    const fundTester = vi.fn(async (): Promise<{ solSignature: string | null; testSignature: string | null; note: string | null }> => ({ solSignature: "sol-sig", testSignature: "test-sig", note: null }));
+    const settle = vi.fn(async () => "auto-signature");
+    const chain = { config: { program: "program", authority: "authority", mint: "mint", decimals: 6, playMs: 60000, graceMs: 60000 },
+      cluster: "devnet", verify: async () => {}, read: vi.fn(), submit: vi.fn(), transaction: vi.fn(), settle, faucetConfigured: true,
+      testerBalances: async () => ({ solLamports: 0, testUnits: 0n }), fundTester } as CompetitionChain;
+    vi.mocked(competitionChain).mockReturnValue(chain);
+    const env = { DB: db, ASSETS: { fetch: async () => new Response("asset") } };
+    const request = (path: string, body?: Record<string, unknown>) => worker.fetch(new Request(`https://soldoku.test/api/competitions${path}`,
+      body ? { method: "POST", body: JSON.stringify(body) } : undefined), env);
+    try {
+      const key = nacl.sign.keyPair(); const wallet = bs58.encode(key.publicKey);
+      const proof = await (await request("/proof", { wallet })).json() as { id: string; message: string };
+      const auth = await (await request("/authorize", { id: proof.id, signature: bs58.encode(nacl.sign.detached(new TextEncoder().encode(proof.message), key.secretKey)) })).json() as { actor: string };
+      const granted = await request("/faucet", { actor: auth.actor });
+      expect(granted.status).toBe(200);
+      expect(await granted.json()).toMatchObject({ solSignature: "sol-sig", testSignature: "test-sig" });
+      expect(fundTester).toHaveBeenCalledTimes(1);
+      expect((await request("/faucet", { actor: auth.actor })).status).toBe(400);
+      expect(fundTester).toHaveBeenCalledTimes(1);
+      fundTester.mockRejectedValueOnce(new Error("airdrop refused"));
+      const other = nacl.sign.keyPair(); const otherWallet = bs58.encode(other.publicKey);
+      const otherProof = await (await request("/proof", { wallet: otherWallet })).json() as { id: string; message: string };
+      const otherAuth = await (await request("/authorize", { id: otherProof.id, signature: bs58.encode(nacl.sign.detached(new TextEncoder().encode(otherProof.message), other.secretKey)) })).json() as { actor: string };
+      expect((await request("/faucet", { actor: otherAuth.actor })).status).toBe(400);
+      fundTester.mockResolvedValueOnce({ solSignature: "sol-2", testSignature: null, note: null });
+      expect((await request("/faucet", { actor: otherAuth.actor })).status).toBe(200);
+      expect(fundTester).toHaveBeenCalledTimes(3);
+      const at = Date.now();
+      db.seed(JSON.stringify({ rooms: [
+        { code: "DUE00001", owner: wallet, createdAt: at - 120000, endsAt: at - 1000, puzzle: { level: "easy", givens: [], solution: [] },
+          entrants: [
+            { actor: wallet, name: "a", startedAt: at - 80000, completedMs: 20000, values: [], sequence: 1, lastMoveAt: 0 },
+            { actor: otherWallet, name: "b", startedAt: at - 80000, completedMs: 30000, values: [], sequence: 1, lastMoveAt: 0 },
+          ],
+          funded: { program: "program", authority: "authority", mint: "mint", decimals: 6, playMs: 60000, graceMs: 3600000, id: "1", stakeUnits: "1000000", startsAt: at - 61000, refundAt: at + 3600000, chainStatus: "open", confirmedParticipants: 2, chainTime: at - 1000, winner: null } },
+        { code: "EARLY001", owner: wallet, createdAt: at, endsAt: at + 60000, puzzle: { level: "easy", givens: [], solution: [] }, entrants: [],
+          funded: { program: "program", authority: "authority", mint: "mint", decimals: 6, playMs: 60000, graceMs: 3600000, id: "2", stakeUnits: "1000000", startsAt: at + 30000, refundAt: at + 3600000, chainStatus: "open", confirmedParticipants: 1, chainTime: at, winner: null } },
+      ], gates: [], proofs: [], sessions: [], grants: [] }));
+      await worker.scheduled({}, env);
+      expect(settle).toHaveBeenCalledTimes(1);
+      expect(JSON.parse(db.snapshot()!).rooms.find((item: { code: string }) => item.code === "DUE00001").funded.settlementSignature).toBe("auto-signature");
+      await worker.scheduled({}, env);
       expect(settle).toHaveBeenCalledTimes(1);
     } finally { vi.mocked(competitionChain).mockReset(); }
   });

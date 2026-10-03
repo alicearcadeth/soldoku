@@ -39,7 +39,7 @@ Leave privileged values empty for ordinary development. Real values belong in `.
 npm run dev
 ```
 
-Classic and Practice work without a wallet key. The hosted site is already at `https://sudoku.jamesbitarcade.workers.dev`.
+Classic and Practice work without a wallet key. The current public site is https://soldoku.com/. `https://sudoku.jamesbitarcade.workers.dev` is an earlier host.
 
 ## Run tests
 

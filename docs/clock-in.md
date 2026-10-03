@@ -1,4 +1,8 @@
-# CLOCK IN submission
+# CLOCK IN
+
+Historical record of the 30 September 2026 submission. The current public release is [CURRENT_RELEASE.md](CURRENT_RELEASE.md) at https://soldoku.com/.
+
+This file records that submission.
 
 Checked against the Solana Mobile post [Clock In](https://solanamobile.com/blog/clock-in-the-solana-mobile-hackathon) on 2026-09-28.
 

@@ -1,5 +1,7 @@
 # Demo
 
+Historical CLOCK IN recording. The current public app is https://soldoku.com/. See `docs/CURRENT_RELEASE.md`.
+
 `submission/sudoku-clockin-final.mp4` is the finished CLOCK IN demo. It is 75 seconds, 400×890, H.264, and it was recorded from https://sudoku.jamesbitarcade.workers.dev on 30 September 2026.
 
 It shows Home, Classic (including notes, a hint, and pause), a theme change, a free Practice room that ends with "You won" and "Practice match. No tokens moved.", and Compete with new deposits paused. It does not show a wallet deposit. The earlier short clip is still `submission/sudoku-clockin.mp4`.

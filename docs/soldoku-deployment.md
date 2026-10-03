@@ -34,6 +34,10 @@ The current source implements multiplayer Devnet escrow. The latest deployed Dev
 
 The private `SUDOKU_COMPETITION_RPC` and `SUDOKU_COMPETITION_AUTHORITY_KEY` are configured as Worker secrets. Keep credentials outside Git. Preserve the existing D1 database and follow the release alignment instructions above.
 
+`wrangler.soldoku.jsonc` schedules settlement every five minutes. The cron loads funded rooms whose play deadline has passed and whose refund deadline has not, broadcasts the authority settlement once, and stores the signature so the next run does not send it again. Players can still use Finalize result. A room that is still inside its play window, already settled, or past the refund deadline is left alone.
+
+`SUDOKU_COMPETITION_FAUCET_KEY` is set on the live Worker. It is the TEST mint authority and stays outside Git. Worker version `fd515ede-227e-426d-8188-0e2ad81fecd1` serves the grant control and the five-minute settlement cron. See [tester funds](testers.md) and [the current release](CURRENT_RELEASE.md).
+
 ## Publish the Worker
 
 From the project directory, sign into the Cloudflare account that will own Soldoku:

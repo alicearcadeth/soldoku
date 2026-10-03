@@ -27,7 +27,8 @@ function fixture() {
   const adapter: CompetitionChain = { config, cluster: "localnet", verify: async () => {}, read: async () => chain,
     transaction: async () => ({ transaction: "prepared", action: "deposit", wallet: owner.wallet, cluster: "localnet", room: "pda", mint: config.mint,
       stakeUnits: "1000000", startsAt: chain.startsAt, endsAt: chain.endsAt, refundAt: chain.refundAt, expiresAtBlockHeight: 100 }),
-    settle: async () => { sends++; return "settlement-signature"; }, submit: async () => { sends++; return "submitted-signature"; } };
+    settle: async () => { sends++; return "settlement-signature"; }, submit: async () => { sends++; return "submitted-signature"; },
+    faucetConfigured: false, testerBalances: async () => ({ solLamports: 0, testUnits: 0n }), fundTester: async () => { throw new Error("unused"); } };
   const prepare = (path: string, body: Record<string, unknown>) => prepareCompetitionRequest(store, adapter, "POST", url(path), body);
   return { store, call, auth, owner, b, c, created, chain, adapter, prepare, setTime: (at: number) => { time = at; }, sends: () => sends };
 }

@@ -1,6 +1,6 @@
 # Five-minute playtest
 
-No outside tester has played this build. Automated browser checks are not a substitute for this script. This is the handoff for the owner, on a phone and then a desktop browser. Use the hosted site. Do not use a real-value wallet.
+No outside tester has played this build. Automated browser checks are not a substitute for this script. This is the handoff for the owner, on a phone and then a desktop browser. Use https://soldoku.com/. Do not use a real-value wallet. Test SOL and TEST come from **Get Devnet SOL and TEST**, described in [testers.md](testers.md).
 
 ## Path
 
@@ -8,7 +8,7 @@ No outside tester has played this build. Automated browser checks are not a subs
 2. Turn the network off after the first load and reload Classic once. The board should return. Turn the network back on.
 3. Compete, stay on Practice, and create a private room. Join that code from a second browser. Confirm no token wording appears.
 4. From the public list, join a waiting practice room, or use Quick Match if the list is empty. Leave before either player finishes.
-5. Open Compete, then For tokens. The screen should say test tokens and no cash value, and offer 1, 2, and 5. It should offer Connect wallet, not Create test wallet. Practice should not show the slider. Pause should say the puzzle is paused, and theme choices should be in Settings.
+5. Open Compete, then For tokens. The screen should say test tokens and no cash value, offer 1, 2, and 5, and show **Get Devnet SOL and TEST** with a link to https://faucet.solana.com. It should offer Connect wallet, not Create test wallet. Practice should not show the slider. Pause should say the puzzle is paused, and theme choices should be in Settings.
 6. Connect only if a Seeker is available. Stop there if it is not. Do not deposit.
 
 ## Write down

@@ -1,7 +1,8 @@
 import { Connection, Keypair, PublicKey, SystemProgram, SYSVAR_CLOCK_PUBKEY, Transaction, type TransactionInstruction } from "@solana/web3.js";
-import { createAssociatedTokenAccountIdempotentInstruction, getAssociatedTokenAddressSync, getMint } from "@solana/spl-token";
+import { createAssociatedTokenAccountIdempotentInstruction, createMintToInstruction, getAssociatedTokenAddressSync, getMint } from "@solana/spl-token";
 import { CLUSTER_GENESIS } from "../solana/rpc";
 import { competitionInstructions, COMPETITION_TEST_MINT, COMPETITION_DEVNET_MINT, readCompetitionEntry, readCompetitionRoom } from "./escrow";
+import { missingTesterTokenAccount, TESTER_SOL_AIRDROP, TESTER_SOL_FAUCET, TESTER_TOKEN_GRANT, type TesterPlan } from "./testerFunds";
 import type { FundedConfig, VerifiedChainRoom } from "./types";
 import type { createCompetitionStore } from "./store";
 
@@ -9,7 +10,7 @@ export type CompetitionEnvironment = {
   SUDOKU_COMPETITION_PROGRAM_ID?: string; SUDOKU_COMPETITION_AUTHORITY_KEY?: string;
   SUDOKU_COMPETITION_RPC?: string; SUDOKU_COMPETITION_LOCALNET?: string;
   SUDOKU_COMPETITION_PLAY_MS?: string; SUDOKU_COMPETITION_GRACE_MS?: string;
-  SUDOKU_COMPETITION_MINT?: string;
+  SUDOKU_COMPETITION_MINT?: string; SUDOKU_COMPETITION_FAUCET_KEY?: string;
 };
 type Context = ReturnType<ReturnType<typeof createCompetitionStore>["fundingContext"]>;
 export type PreparedCompetitionTransaction = { transaction: string; action: string; wallet: string; cluster: "devnet" | "localnet";
@@ -22,6 +23,9 @@ export type CompetitionChain = {
   transaction(context: Context, action: string, extraMs?: unknown): Promise<PreparedCompetitionTransaction>;
   settle(context: Context): Promise<string | null>;
   submit(raw: unknown, wallet: string): Promise<string>;
+  faucetConfigured: boolean;
+  testerBalances(wallet: string): Promise<{ solLamports: number; testUnits: bigint }>;
+  fundTester(wallet: string, plan: TesterPlan): Promise<{ solSignature: string | null; testSignature: string | null; note: string | null }>;
 };
 
 function milliseconds(raw: string | undefined, fallback: number, minimum: number) {
@@ -46,6 +50,12 @@ export function competitionChain(env: CompetitionEnvironment): CompetitionChain 
   }
   const supportedMint = new PublicKey(env.SUDOKU_COMPETITION_MINT ?? (cluster === "localnet" ? COMPETITION_TEST_MINT : COMPETITION_DEVNET_MINT));
   if (!supportedMint.equals(COMPETITION_TEST_MINT) && !supportedMint.equals(COMPETITION_DEVNET_MINT)) throw new Error("Unsupported competition mint configuration.");
+  let faucet: Keypair | null = null;
+  if (env.SUDOKU_COMPETITION_FAUCET_KEY) {
+    try { faucet = Keypair.fromSecretKey(Uint8Array.from(JSON.parse(env.SUDOKU_COMPETITION_FAUCET_KEY))); }
+    catch { throw new Error("Competition tester faucet key is not configured correctly."); }
+    if (!faucet.publicKey.equals(supportedMint)) throw new Error("Tester faucet key is not the TEST mint authority.");
+  }
   const config: FundedConfig = { program: program.toBase58(), authority: authority.publicKey.toBase58(), mint: supportedMint.toBase58(), decimals: 6,
     playMs: milliseconds(env.SUDOKU_COMPETITION_PLAY_MS, 1800000, 15000), graceMs: milliseconds(env.SUDOKU_COMPETITION_GRACE_MS, 3600000, 60000) };
   const connection = new Connection(endpoint, { commitment: "finalized", fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(12000) }) });
@@ -128,7 +138,7 @@ export function competitionChain(env: CompetitionEnvironment): CompetitionChain 
       const ata = getAssociatedTokenAddressSync(ix.mint, wallet);
       const account = await connection.getAccountInfo(ata);
       const balance = account ? await connection.getTokenAccountBalance(ata) : null;
-      if (!balance || BigInt(balance.value.amount) < BigInt(terms.stakeUnits)) throw new Error("Insufficient TEST token balance on Devnet. Fund this wallet before joining.");
+      if (!balance || BigInt(balance.value.amount) < BigInt(terms.stakeUnits)) throw new Error("Insufficient TEST token balance on Devnet. Use Get Devnet SOL and TEST, then join again.");
       instructions.push(ix.join(wallet));
     } else if (action === "extend") {
       if (!chain || chain.status !== "open" || chain.participants !== 1 || context.wallet !== context.owner || now >= chain.startsAt) throw new Error("Only the solo creator can extend registration before it closes.");
@@ -173,5 +183,43 @@ export function competitionChain(env: CompetitionEnvironment): CompetitionChain 
       && !instruction.programId.equals(new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")))) throw new Error("Unrelated instructions cannot be relayed by the competition API.");
     return connection.sendRawTransaction(bytes, { preflightCommitment: "finalized", maxRetries: 3 });
   }
-  return { config, cluster, verify, read, transaction, settle, submit };
+  async function testerBalances(wallet: string) {
+    const owner = new PublicKey(wallet);
+    const solLamports = await connection.getBalance(owner, "finalized");
+    let testUnits = 0n;
+    try {
+      const balance = await connection.getTokenAccountBalance(getAssociatedTokenAddressSync(supportedMint, owner), "finalized");
+      testUnits = BigInt(balance.value.amount);
+    } catch (error) {
+      if (!missingTesterTokenAccount(error)) throw error;
+    }
+    return { solLamports, testUnits };
+  }
+  async function fundTester(wallet: string, plan: TesterPlan) {
+    await verify();
+    const owner = new PublicKey(wallet);
+    let solSignature: string | null = null;
+    let note = plan.note;
+    if (plan.sol) {
+      try { solSignature = await connection.requestAirdrop(owner, TESTER_SOL_AIRDROP); }
+      catch {
+        note = `Devnet refused the SOL airdrop. Request SOL at ${TESTER_SOL_FAUCET} for this wallet, then return here for TEST.`;
+        if (!plan.test) throw new Error(note);
+      }
+    }
+    let testSignature: string | null = null;
+    if (plan.test) {
+      if (!faucet) throw new Error("TEST minting is not enabled on this server yet.");
+      const ata = getAssociatedTokenAddressSync(supportedMint, owner);
+      const latest = await connection.getLatestBlockhash("finalized");
+      const tx = new Transaction({ feePayer: authority.publicKey, recentBlockhash: latest.blockhash }).add(
+        createAssociatedTokenAccountIdempotentInstruction(authority.publicKey, ata, owner, supportedMint),
+        createMintToInstruction(supportedMint, ata, faucet.publicKey, TESTER_TOKEN_GRANT),
+      );
+      tx.sign(...(faucet.publicKey.equals(authority.publicKey) ? [authority] : [authority, faucet]));
+      testSignature = await connection.sendRawTransaction(tx.serialize(), { preflightCommitment: "finalized", maxRetries: 3 });
+    }
+    return { solSignature, testSignature, note };
+  }
+  return { config, cluster, verify, read, transaction, settle, submit, faucetConfigured: faucet !== null, testerBalances, fundTester };
 }

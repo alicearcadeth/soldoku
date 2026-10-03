@@ -11,6 +11,7 @@ type Room = { code: string; name?: string; owner: string; createdAt: number; end
 type Gate = { id: string; actor: string; target: number; expires: number; passed: boolean; tries: number };
 type Proof = { id: string; wallet: string; message: string; expires: number };
 type Session = { id: string; wallet: string; expires: number };
+type FaucetGrant = { wallet: string; at: number };
 export const MIN_COMPETITION_FINISH_MS = 15000;
 const secret = () => randomBytes(24).toString("hex");
 
@@ -19,14 +20,16 @@ export function createCompetitionStore(now = Date.now, onSave?: (raw: string) =>
   let gates: Gate[] = [];
   let proofs: Proof[] = [];
   let sessions: Session[] = [];
-  const snapshot = () => JSON.stringify({ rooms, gates, proofs, sessions });
+  let grants: FaucetGrant[] = [];
+  const snapshot = () => JSON.stringify({ rooms, gates, proofs, sessions, grants });
   const save = () => onSave?.(snapshot());
   function replace(raw: string | null) {
-    const parsed = raw ? JSON.parse(raw) as { rooms: Room[]; gates: Gate[]; proofs?: Proof[]; sessions?: Session[] } : { rooms: [], gates: [] };
+    const parsed = raw ? JSON.parse(raw) as { rooms: Room[]; gates: Gate[]; proofs?: Proof[]; sessions?: Session[]; grants?: FaucetGrant[] } : { rooms: [], gates: [] };
     rooms = parsed.rooms;
     gates = parsed.gates;
     proofs = parsed.proofs ?? [];
     sessions = parsed.sessions ?? [];
+    grants = parsed.grants ?? [];
   }
   function actor(value: unknown): string {
     const session = sessions.find(item => item.id === value && item.expires > now());
@@ -233,5 +236,33 @@ export function createCompetitionStore(now = Date.now, onSave?: (raw: string) =>
       outcome: competitionOutcome(item.entrants.map(entry => ({ wallet: entry.actor, startedAt: entry.startedAt, completedMs: entry.completedMs })), item.endsAt, now()) };
   }
   function rememberSettlement(code: unknown, signature: string) { room(code).funded!.settlementSignature = signature; save(); }
-  return { route, snapshot, replace, syncChain, fundingContext, rememberSettlement };
+  function dueSettlementCodes() {
+    const at = now();
+    return rooms.filter(item => {
+      const funded = item.funded;
+      return Boolean(funded && funded.chainStatus === "open" && !funded.settlementSignature && funded.confirmedParticipants >= 1 && at >= item.endsAt && at < funded.refundAt);
+    }).map(item => item.code);
+  }
+  function settlementContext(code: unknown) {
+    const item = room(code);
+    if (!item.funded) throw new Error("This room has no escrow.");
+    return { owner: item.owner, wallet: item.owner, wallets: [...new Set([item.owner, ...item.entrants.map(entry => entry.actor)])], endsAt: item.endsAt, terms: { ...item.funded },
+      outcome: competitionOutcome(item.entrants.map(entry => ({ wallet: entry.actor, startedAt: entry.startedAt, completedMs: entry.completedMs })), item.endsAt, now()) };
+  }
+  function faucetContext(session: unknown) {
+    const wallet = actor(session);
+    return { wallet, lastGrantAt: grants.find(item => item.wallet === wallet)?.at ?? null, now: now() };
+  }
+  function reserveFaucet(wallet: string, at: number) {
+    grants = grants.filter(item => item.wallet !== wallet);
+    grants.push({ wallet, at });
+    save();
+  }
+  function releaseFaucet(wallet: string, at: number) {
+    const next = grants.filter(item => !(item.wallet === wallet && item.at === at));
+    if (next.length === grants.length) return;
+    grants = next;
+    save();
+  }
+  return { route, snapshot, replace, syncChain, fundingContext, rememberSettlement, dueSettlementCodes, settlementContext, faucetContext, reserveFaucet, releaseFaucet };
 }

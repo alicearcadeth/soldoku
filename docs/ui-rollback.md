@@ -1,5 +1,7 @@
 # UI rollback
 
+Historical rollback notes for the earlier workers.dev host. The current public release is [CURRENT_RELEASE.md](CURRENT_RELEASE.md) at https://soldoku.com/.
+
 The promoted UI is the latest commit on `ui/seeker-polish`. The tag `ui-baseline-pre-seeker-polish` still points at the previous UI and must not be deleted.
 
 ## Pointers

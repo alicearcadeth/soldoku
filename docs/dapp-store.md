@@ -8,9 +8,9 @@ This is an owner checklist. It is not a submitted listing, and it is not Seeker 
 - Version name: `0.1.0`
 - Version code: `1`
 - Min SDK 28, target SDK 37
-- Hosted page: `https://sudoku.jamesbitarcade.workers.dev/`
+- Hosted page: `https://soldoku.com/`
 - Signing certificate SHA-256: `28e197708d1dc9de80f1e23939352bcd6a80e1171717055205f5394a622c5553`
-- The release APK is signed with the existing dev keystore alias `android`. Do not replace that keystore.
+- The release APK was signed with alias `android` from `~/.config/solana/sudoku-android.keystore`. On 3 October 2026 that alias matched the certificate above. `sudoku-release.keystore` alias `sudoku-release` hashed to `f16e0470a3b43bb6fd162f3613e4523953bf9efada7229d718deebd710532d29` and does not match. Do not replace the matching keystore. The rebuilt file is `submission/soldoku-clockin.apk`, file SHA-256 `bf4276273dc43f1609c464171180676dbf0f933c3da79f767eede8fb352a200c`, verified with APK Signature Scheme v3.
 - A debug build can use the same keystore when the store path, alias, and passwords are supplied at build time. The password is not stored in the project.
 
 ## Emulator result

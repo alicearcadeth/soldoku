@@ -1,6 +1,6 @@
 # Multi-player Devnet competitions
 
-Work in progress, 3 October 2026. The dedicated escrow is deployed on Devnet; GitHub push and production release parity remain incomplete.
+Deployed on Devnet and verified on https://soldoku.com/ on 3 October 2026. Production receipts are in [competition-production-devnet.json](evidence/competition-production-devnet.json). The later Worker `fd515ede-227e-426d-8188-0e2ad81fecd1` adds tester SOL/TEST grants and five-minute settlement. That grant was checked with a new wallet after a missing token account had blocked the first attempt. See [the current release](CURRENT_RELEASE.md).
 
 ## Rules and architecture
 

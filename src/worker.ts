@@ -8,7 +8,7 @@ import { applySettleSignatures, settledChainUpdate, settleSignaturesIn } from ".
 import { createCompetitionStore } from "./competition/store";
 import { marketTokens } from "./competition/market";
 import { competitionChain, type CompetitionEnvironment } from "./competition/chain";
-import { prepareCompetitionRequest } from "./competition/funded";
+import { prepareCompetitionRequest, type CompetitionRequest } from "./competition/funded";
 
 type Statement = {
   bind: (...values: unknown[]) => Statement;
@@ -52,6 +52,9 @@ function loadApi(env: Env) {
 }
 
 export default {
+  async scheduled(_event: { cron?: string }, env: Env): Promise<void> {
+    await settleDueCompetitions(env);
+  },
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     if (url.pathname === "/api/release") {
@@ -116,6 +119,43 @@ export default {
   },
 };
 
+async function finishCompetition(env: Env, store: { snapshot(): string }, prepared: CompetitionRequest, stored: string | null): Promise<Response> {
+  const headers = { "cache-control": "no-store" };
+  if (!prepared.afterCommit) return Response.json(prepared.result, { headers });
+  try {
+    const payload = await prepared.afterCommit();
+    await persistCompetitionSnapshot(env, store.snapshot(), stored);
+    return Response.json(payload, { headers });
+  } catch (error) {
+    await persistCompetitionSnapshot(env, store.snapshot(), stored);
+    throw error;
+  }
+}
+
+async function persistCompetitionSnapshot(env: Env, next: string, expected: string | null) {
+  if (next === expected) return;
+  await env.DB.prepare("INSERT INTO competition_state (id, body) VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET body = excluded.body WHERE body = ?").bind(next, expected ?? "").run();
+}
+
+async function settleDueCompetitions(env: Env): Promise<{ settled: string[] }> {
+  const chain = competitionChain(env);
+  if (!chain) return { settled: [] };
+  await env.DB.prepare("CREATE TABLE IF NOT EXISTS competition_state (id INTEGER PRIMARY KEY, body TEXT NOT NULL)").run();
+  const row = await env.DB.prepare("SELECT body FROM competition_state WHERE id = 1").first<{ body: string }>();
+  const store = createCompetitionStore(Date.now, undefined, chain.config);
+  store.replace(row?.body ?? null);
+  const settled: string[] = [];
+  for (const code of store.dueSettlementCodes()) {
+    let signature: string | null;
+    try { signature = await chain.settle(store.settlementContext(code)); }
+    catch { continue; }
+    store.rememberSettlement(code, signature ?? "chain-closed");
+    settled.push(code);
+  }
+  if (settled.length) await persistCompetitionSnapshot(env, store.snapshot(), row?.body ?? null);
+  return { settled };
+}
+
 async function competitions(request: Request, env: Env): Promise<Response> {
   try {
     const url = new URL(request.url);
@@ -134,9 +174,9 @@ async function competitions(request: Request, env: Env): Promise<Response> {
       store.replace(row?.body ?? null);
       const prepared = await prepareCompetitionRequest(store, chain, request.method, url, body);
       const next = store.snapshot();
-      if (request.method === "GET" || next === row?.body) return Response.json(prepared.afterCommit ? await prepared.afterCommit() : prepared.result, { headers: { "cache-control": "no-store" } });
+      if (request.method === "GET" || next === row?.body) return await finishCompetition(env, store, prepared, row?.body ?? null);
       const written = await env.DB.prepare("INSERT INTO competition_state (id, body) VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET body = excluded.body WHERE body = ?").bind(next, row?.body ?? "").run();
-      if ((written.meta?.changes ?? 0) > 0) return Response.json(prepared.afterCommit ? await prepared.afterCommit() : prepared.result, { headers: { "cache-control": "no-store" } });
+      if ((written.meta?.changes ?? 0) > 0) return await finishCompetition(env, store, prepared, next);
     }
     return Response.json({ error: "Room changed. Try the action again." }, { status: 409 });
   } catch (error) {

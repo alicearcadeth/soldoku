@@ -2,7 +2,9 @@
 
 Share this with people who want to try the website. Do not post it until you have read it. No support email is published, because none was supplied.
 
-Public site: https://sudoku.jamesbitarcade.workers.dev/
+Public site: https://soldoku.com/
+
+New players get Devnet SOL and TEST from **Get Devnet SOL and TEST** on Compete. See [tester funds](testers.md). The older host `https://sudoku.jamesbitarcade.workers.dev/` is not this release.
 
 ## Announcement
 
@@ -12,7 +14,7 @@ Play Classic on your own. It does not need a wallet, and the puzzle stays on you
 
 Race a friend for free in Practice. Share a room code, or use Quick Match. No tokens move.
 
-Compete is a Devnet beta. Each player deposits the same entry: 1, 2, or 5 test tokens. A custom amount is not offered. The app and the unapproved Mainnet proposal only accept those three amounts. The on-chain program would accept another positive amount, and that is not enabled here. Those tokens have no cash value. A Seeker uses the mobile wallet. A desktop browser can connect a Wallet Standard wallet. Classic and Practice do not need one. Practice does not show the slider. Compete still does, before a paid room opens.
+Compete is a Devnet beta. A funded room uses TEST, which has no cash value. Everyone plays the same grid after registration closes, and the unique fastest finish wins the pool. Ties and no valid finishes refund the entrants. New testers use **Get Devnet SOL and TEST** before they deposit. A Seeker uses the mobile wallet. A desktop browser can connect a Wallet Standard wallet. Classic and Practice do not need one. The older two-player race is still on the page and is not the current funded competition.
 
 This is not real-money play, not a store release, and not a security audit.
 
@@ -43,9 +45,9 @@ Do not install this over the development APK. From `android/`, set `SOLANA_MOBIL
 
 ```powershell
 cd android
-.\gradlew.bat assembleRelease -PSOLANA_MOBILE_KEYSTORE_PATH="$env:SOLANA_MOBILE_KEYSTORE_PATH" -PSOLANA_MOBILE_KEYSTORE_ALIAS=sudoku-release
+.\gradlew.bat assembleRelease -PSOLANA_MOBILE_KEYSTORE_PATH="$env:SOLANA_MOBILE_KEYSTORE_PATH" -PSOLANA_MOBILE_KEYSTORE_ALIAS=android
 ```
 
-`SOLANA_MOBILE_KEYSTORE_PATH` points at the release keystore on that machine. The submitted APK certificate is recorded in `docs/CURRENT_RELEASE.md`. Confirm a new APK matches that certificate before replacing `submission/sudoku-clockin.apk`.
+The submitted certificate is SHA-256 `28e197708d1dc9de80f1e23939352bcd6a80e1171717055205f5394a622c5553` in `docs/CURRENT_RELEASE.md`. `sudoku-android.keystore` alias `android` matches it. `sudoku-release.keystore` alias `sudoku-release` does not. The signed rebuild is `submission/soldoku-clockin.apk`.
 
 Store submission, KYC, and the publisher key stay owner actions. See `docs/dapp-store.md`.
