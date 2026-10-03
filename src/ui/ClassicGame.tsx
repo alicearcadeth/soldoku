@@ -1,3 +1,4 @@
+import { WinCelebration } from "./WinCelebration";
 import { Brand } from "./Brand";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { generatePuzzle } from "../engine/generate";
@@ -428,7 +429,7 @@ export function ClassicGame({ level, fresh = false, resume = false, onExit }: Pr
   const selectedValue = values[selected];
 
   return (
-    <main className="app game"><Brand />
+    <main className="app game"><Brand /><WinCelebration eventKey={won && puzzle ? `classic:${puzzle.givens.join("")}` : null} message="Sudoku solved!" feedback={false} />
       <div className={paused ? "concealed" : undefined} inert={paused || won}>
       <header className="bar">
         <button className="text" onClick={requestExit}>

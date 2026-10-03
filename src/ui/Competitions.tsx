@@ -1,3 +1,4 @@
+import { WinCelebration } from "./WinCelebration";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { Brand } from "./Brand";
 import bs58 from "bs58";
@@ -283,7 +284,13 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
     };
     window.addEventListener("keydown", key); return () => window.removeEventListener("keydown", key);
   });
+  const wonCompetition = Boolean(wallet.address && room?.you?.completedMs != null && (room.funded
+    ? room.funded.winner === wallet.address && ["awarded", "paid"].includes(room.funded.chainStatus)
+    : now >= room.endsAt && room.you.rank === 1));
+  const celebrationKey = wallet.address && room?.you?.completedMs != null
+    ? `competition-${wonCompetition ? "win" : "finish"}:${room.code}:${wallet.address}` : null;
   return <main className={`app competition-page ${playing ? "game" : "home"}`}>
+    <WinCelebration eventKey={celebrationKey} message={wonCompetition ? "You won!" : "Grid complete!"} />
     <Brand />
     <header className="home-top"><button className="text" onClick={onHome}>Home</button><button className="icon-btn" onClick={() => setSettings(true)}>Settings</button></header>
     <p className="eyebrow">One grid. Your fastest finish.</p><h1>{room ? room.name : "Compete"}</h1>

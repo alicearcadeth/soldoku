@@ -624,3 +624,16 @@ button:disabled { cursor: not-allowed; }
   }
 }
 .token-mint { overflow-wrap: anywhere; word-break: break-word; }
+
+.win-celebration { position: fixed; inset: 0; z-index: 100; pointer-events: none; overflow: hidden; }
+.win-burst { position: absolute; top: 35%; left: 50%; width: 0; height: 0; }
+.win-badge { position: absolute; width: 220px; left: -110px; top: -80px; display: grid; justify-items: center; gap: 6px; padding: 18px; border-radius: 24px; background: var(--paper); color: var(--ink); border: 2px solid #14f195; box-shadow: 0 12px 50px #14f19555; animation: win-pop 2.8s both; }
+.win-badge span { color: #14f195; font-size: 42px; line-height: 1; }
+.win-badge strong { font-size: 24px; }
+.win-badge small { color: var(--muted); }
+.win-ring { position: absolute; width: 270px; height: 270px; left: -135px; top: -135px; border: 3px solid #14f195; border-radius: 50%; animation: win-ring 800ms ease-out both; }
+.win-burst i { position: absolute; width: 8px; height: 14px; border-radius: 2px; background: var(--color); animation: win-confetti 1.8s cubic-bezier(.12,.6,.35,1) both; }
+@keyframes win-pop { 0% { opacity: 0; transform: scale(.5); } 12% { opacity: 1; transform: scale(1.08); } 20%, 82% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: translateY(-12px) scale(.97); } }
+@keyframes win-ring { from { opacity: .8; transform: scale(.2); } to { opacity: 0; transform: scale(1.5); } }
+@keyframes win-confetti { 0% { opacity: 0; transform: translate(0,0) rotate(0); } 8% { opacity: 1; } 65% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--x), calc(var(--y) + 90px)) rotate(var(--turn)); } }
+@media (prefers-reduced-motion: reduce) { .win-burst i, .win-ring { display: none; } .win-badge { animation: none; } }

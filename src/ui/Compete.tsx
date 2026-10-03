@@ -1,3 +1,4 @@
+import { WinCelebration } from "./WinCelebration";
 import { Brand } from "./Brand";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Keypair, Transaction } from "@solana/web3.js";
@@ -696,7 +697,7 @@ export function Compete({ onExit, initialMode = "practice" }: Props) {
   if (room && values) {
     const remaining = room.startedAt ? Math.max(0, room.limitMs - (now - room.startedAt)) : room.limitMs;
     return (
-      <main className="app game"><Brand />
+      <main className="app game"><Brand /><WinCelebration eventKey={room.verdict && room.youWon && room.verdict.outcome !== "draw" ? `race:${room.code}` : null} />
         <header className="bar">
           <button className="text" type="button" onClick={onExit}>Home</button>
           <div className="bar-mid">
