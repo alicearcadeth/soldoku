@@ -41,17 +41,17 @@ function Duration({ value, onChange, funded = false }: { value: number; onChange
       <button type="button" aria-pressed={custom} className={custom ? "on" : ""} onClick={() => { setCustom(true); onChange(Math.round(Number(amount) * unit)); }}>Custom Duration</button>
     </div>
     {custom && <div className="amount-fields"><label>Duration<input className="form-input" aria-label="Custom duration" type="number" min="1" value={amount} onChange={event => { setAmount(event.target.value); onChange(Math.round(Number(event.target.value) * unit)); }} /></label><label>Unit<select className="form-input" aria-label="Duration unit" value={unit} onChange={event => { const next = Number(event.target.value); setUnit(next); onChange(Math.round(Number(amount) * next)); }}><option value={60000}>Minutes</option><option value={3600000}>Hours</option><option value={DAY_MS}>Days</option></select></label></div>}
-    <p className="choice-note">{funded ? "Registration stays open for this period, plus 30 seconds for the creator's wallet approval. The grid and timer unlock for everyone together after registration closes." : "The room stays open for this period. Your timer starts separately when you start your game."}</p>
+    <p className="choice-note">{funded ? "Everyone starts together when registration closes." : "Your timer starts when you start your game."}</p>
   </section>;
 }
 function durationText(ms: number) { return ms % DAY_MS === 0 ? `${ms / DAY_MS} day${ms === DAY_MS ? "" : "s"}` : ms % 3600000 === 0 ? `${ms / 3600000} hours` : ms % 60000 === 0 ? `${ms / 60000} minutes` : `${Math.floor(ms / 60000)}m ${Math.round(ms % 60000 / 1000)}s`; }
 function TesterFunds({ busy, note, faucet, onRequest }: { busy: boolean; note: string | null; faucet: boolean; onRequest: () => void }) {
   return <section className="stack" aria-label="Get test funds">
-    <h2>Get Devnet SOL and TEST</h2>
-    <p className="choice-note">New testers need Devnet SOL for network fees and TEST for a stake. Neither has cash value. Connect a Devnet wallet, then request both. Each wallet can receive one grant per day: 1 SOL when the fee balance is under 0.05 SOL, and 20 TEST when the TEST balance is under 5.</p>
-    <p className="choice-note">If Devnet refuses the airdrop, request SOL at <a href="https://faucet.solana.com" target="_blank" rel="noreferrer">faucet.solana.com</a>, then request TEST here. This competition accepts only its configured TEST mint.</p>
+    <h2>Get test funds</h2>
+    <p className="choice-note">SOL covers fees; TEST covers your stake. Both have no cash value. One request per day.</p>
+    <p className="choice-note">Need SOL? Try <a href="https://faucet.solana.com" target="_blank" rel="noreferrer">faucet.solana.com</a>.</p>
     {!faucet && <p className="banner">TEST minting is not enabled on this server yet. A SOL request still runs.</p>}
-    <button type="button" className="secondary" disabled={busy} onClick={onRequest}>Get Devnet SOL and TEST</button>
+    <button type="button" className="secondary" disabled={busy} onClick={onRequest}>Get test funds</button>
     {note && <p role="status">{note}</p>}
   </section>;
 }
@@ -108,7 +108,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
   const latestRoom = useRef<CompetitionView | null>(null); latestRoom.current = room;
   const lastChainSync = useRef(0);
   const [fundingConfig, setFundingConfig] = useState<(FundedConfig & { cluster: "devnet" | "localnet"; testerFaucet?: boolean }) | null>(null);
-  const [fundingReason, setFundingReason] = useState("Checking Devnet competition availability…");
+  const [fundingReason, setFundingReason] = useState("Checking competition availability…");
   const [fundNote, setFundNote] = useState<string | null>(null);
   const [receipt, setReceipt] = useState<{ code: string; signature: string; cluster: string } | null>(() => {
     try { return JSON.parse(localStorage.getItem("sudoku.competitionReceipt") ?? "null"); } catch { return null; }
@@ -117,8 +117,8 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
     let stopped = false;
     void api<FundedConfig & { enabled: boolean; cluster: "devnet" | "localnet"; testerFaucet?: boolean; reason?: string }>("/api/competitions/config").then(result => {
       if (stopped) return;
-      if (result.enabled) setFundingConfig(result); else setFundingReason(result.reason ?? "Devnet competitions are unavailable.");
-    }).catch(err => { if (!stopped) setFundingReason(err instanceof Error ? err.message : "Devnet competitions are unavailable."); });
+      if (result.enabled) setFundingConfig(result); else setFundingReason(result.reason ?? "Token competitions are unavailable.");
+    }).catch(err => { if (!stopped) setFundingReason(err instanceof Error ? err.message : "Token competitions are unavailable."); });
     return () => { stopped = true; };
   }, []);
   const changeStake = useCallback((next: MarketToken | null, amount: string) => { setToken(next); setStake(amount); }, []);
@@ -178,7 +178,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
     return next;
   }
   async function requestTesterFunds() {
-    await action("Requesting Devnet SOL and TEST", async () => {
+    await action("Requesting test funds", async () => {
       const auth = await identity();
       if (!auth) return;
       const result = await api<{ solSignature: string | null; testSignature: string | null; note: string | null }>("/api/competitions/faucet", { actor: auth.actor });
@@ -199,7 +199,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
   async function prepareCreate() {
     await action("Preparing room", async () => {
       if (mode === "tokens" && !fundingConfig) throw new Error(fundingReason);
-      if (mode === "tokens") stakeBaseUnits(stake, fundingConfig!.decimals);
+      if (mode === "tokens") { if (token?.mint !== fundingConfig!.mint) throw new Error("Choose TEST to create a room. Other tokens are for exploring amounts."); stakeBaseUnits(stake, fundingConfig!.decimals); }
       if (!Number.isInteger(period) || period < 60000 || period > 365 * DAY_MS) throw new Error("Choose a duration between 1 minute and 365 days.");
       const auth = await identity(); if (!auth) return;
       const result = await api<{ id: string; target: number }>("/api/competitions/check", { actor: auth.actor });
@@ -320,21 +320,24 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
     <p className="eyebrow">One grid. Your fastest finish.</p><h1>{room ? room.name : "Compete"}</h1>
     {room && <><p className="choice-note" data-room-code={room.code}>Room code: <strong>{room.code}</strong></p><button className="secondary back-rooms" onClick={browse}>← Back to Rooms</button></>}
     {!roomCode && <>
-      <p className="lede">Join a leaderboard challenge. Everyone gets the same Sudoku; one timed attempt per wallet. Fastest correct completion wins when the competition closes.</p>
+      <p className="lede">Same Sudoku. One attempt per wallet. Fastest correct finish wins.</p>
       <div className="tools" role="group" aria-label="Competition navigation"><button className={tab === "browse" ? "on" : ""} aria-pressed={tab === "browse"} onClick={() => setTab("browse")}>Browse rooms</button><button className={tab === "create" ? "on" : ""} aria-pressed={tab === "create"} onClick={() => setTab("create")}>Create competition</button></div>
       {tab === "create" ? <section className="stack creation-form">
         <label>Room name<input className="form-input" aria-label="Room name" maxLength={60} value={roomName} onChange={event => setRoomName(event.target.value)} placeholder="e.g. Weekend Sudoku Sprint" /></label>
         <h2>1. Choose the mode</h2><div className="tools" role="group" aria-label="Entry mode"><button className={mode === "free" ? "on" : ""} aria-pressed={mode === "free"} onClick={() => setMode("free")}>Free competition</button><button className={mode === "tokens" ? "on" : ""} aria-pressed={mode === "tokens"} onClick={() => setMode("tokens")}>For tokens</button></div>
-        <p className="choice-note">A wallet verifies your identity and enforces one attempt. Connecting does not transfer tokens.</p>
+        <p className="choice-note">One attempt per wallet. Connecting is free.</p>
         <h3>Difficulty</h3><div className="tools" role="group" aria-label="Difficulty">{LEVELS.map(item => <button key={item} aria-pressed={item === level} className={item === level ? "on" : ""} onClick={() => setLevel(item)}>{item[0].toUpperCase() + item.slice(1)}</button>)}</div>
-        <h2>2. Set the stake</h2>{mode === "tokens" ? fundingConfig ? <section className="stack"><p className="banner">{fundingConfig.cluster === "localnet" ? "LOCAL VALIDATOR" : "DEVNET"} · TEST TOKENS · NO CASH VALUE</p><label>TEST stake per player<input className="form-input" aria-label="TEST stake" inputMode="decimal" value={stake} onChange={event => setStake(event.target.value)} /></label><div className="tools">{[1, 2, 5].map(amount => <button type="button" key={amount} onClick={() => setStake(String(amount))}>{amount} TEST</button>)}</div><p className="choice-note">Supported test mint: <span className="token-mint">{fundingConfig.mint}</span></p></section> : <TokenStake onChange={changeStake} /> : <p className="quote-total">Free entry · $0.00 · no token deposit</p>}
-        {mode === "tokens" && <p className="banner" role="status">{fundingConfig ? `Each confirmed entry adds to the escrow prize pool. Everyone starts together and has ${durationText(fundingConfig.playMs)} to finish. The unique fastest verified finish wins the full pool; a fastest tie or no finish refunds everyone. Refunds unlock if settlement fails for ${durationText(fundingConfig.graceMs)}.` : `${fundingReason} Token prices below are for planning.`}</p>}
-        {mode === "tokens" && fundingConfig && <TesterFunds busy={Boolean(busy)} note={fundNote} faucet={Boolean(fundingConfig.testerFaucet)} onRequest={() => void requestTesterFunds()} />}
+        <h2>2. Set the stake</h2>{mode === "tokens" ? <>
+          <TokenStake onChange={changeStake} supportedMint={fundingConfig?.mint} />
+          <p className="choice-note">Only Devnet transactions are available. Choose TEST to deposit; explore other tokens and amounts here.</p>
+          {!fundingConfig && <p className="choice-note" role="status">{fundingReason}</p>}
+          {fundingConfig && <details><summary>Rules & test funds</summary><p>Everyone starts together and has {durationText(fundingConfig.playMs)} to finish. The unique fastest finish wins the pool. Ties or no finishes refund everyone. Refunds unlock after {durationText(fundingConfig.graceMs)} if settlement fails.</p><TesterFunds busy={Boolean(busy)} note={fundNote} faucet={Boolean(fundingConfig.testerFaucet)} onRequest={() => void requestTesterFunds()} /></details>}
+        </> : <p className="quote-total">Free entry · no deposit</p>}
         <h2>3. Set the {mode === "tokens" && fundingConfig ? "registration" : "competition"} period</h2><Duration value={period} onChange={setPeriod} funded={mode === "tokens" && Boolean(fundingConfig)} />
         <p className="choice-note">Ends approximately {Number.isFinite(period) ? new Date(now + period + (mode === "tokens" && fundingConfig ? fundingConfig.playMs + 30000 : 0)).toLocaleString() : "—"}. The creator can extend it only before another player joins.</p>
-        {mode === "tokens" && !fundingConfig ? <button className="primary" disabled={Boolean(busy)} onClick={() => { setMode("free"); setError(null); }}>Switch to free competition</button> : <button className="primary" disabled={Boolean(busy)} onClick={() => void prepareCreate()}>Create room</button>}
+        {mode === "tokens" && !fundingConfig ? <button className="primary" disabled={Boolean(busy)} onClick={() => { setMode("free"); setError(null); }}>Switch to free competition</button> : <button className="primary" disabled={Boolean(busy) || (mode === "tokens" && (!token || token.mint !== fundingConfig?.mint || !stake))} onClick={() => void prepareCreate()}>Create room</button>}
       </section> : <section className="stack">
-        {fundingConfig && <TesterFunds busy={Boolean(busy)} note={fundNote} faucet={Boolean(fundingConfig.testerFaucet)} onRequest={() => void requestTesterFunds()} />}
+        {fundingConfig && <details><summary>Need test funds?</summary><TesterFunds busy={Boolean(busy)} note={fundNote} faucet={Boolean(fundingConfig.testerFaucet)} onRequest={() => void requestTesterFunds()} /></details>}
         <h2>Competition rooms</h2><label className="check-label"><input type="checkbox" checked={showEnded} onChange={event => setShowEnded(event.target.checked)} /> Include ended competitions</label>
         <label htmlFor="competition-code">Have a room code?</label><div className="room-code-row"><input id="competition-code" className="form-input" placeholder="Room code" value={code} onChange={event => setCode(event.target.value.toUpperCase())} maxLength={8} /><button className="secondary" disabled={Boolean(busy) || code.length !== 8} onClick={() => void action("Opening room", async () => visit(await api<CompetitionView>("/api/competitions/state", { code, ...(session ? { actor: session.actor } : {}) })))}>Find room</button></div>
         {listLoading && <p role="status">Loading competitions…</p>}{listError && <p role="alert" className="alert">{listError}</p>}
@@ -352,13 +355,13 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
         <RoomFacts room={{ ...room, status: active ? "active" : "ended" }} /><p className="choice-note">Ends {new Date(room.endsAt).toLocaleString()}. No fixed player limit.</p>
         {room.you?.completedMs != null && <p className="banner">Finished in {elapsedLabel(room.you.completedMs)} · rank {room.you.rank}{active ? " so far. Rankings can change until the room closes." : ". Competition ended."}</p>}
         {!active && <p className="banner">Competition ended. {room.bestMs === null ? "No player completed the grid in time." : room.funded ? "The unique fastest verified completion wins. Exact fastest ties refund all entrants." : "The fastest verified completion is the winning time. Equal times share first place."}</p>}
-        {room.funded && <section className="stack" aria-label="Escrow competition status"><p className="banner">{fundingConfig?.cluster === "localnet" ? "LOCAL VALIDATOR" : "DEVNET"} · TEST TOKENS · NO CASH VALUE</p>{fundingConfig && <TesterFunds busy={Boolean(busy)} note={fundNote} faucet={Boolean(fundingConfig.testerFaucet)} onRequest={() => void requestTesterFunds()} />}<p role="status">{escrowNotice(room, now)}</p><p className="choice-note">The shared grid stays hidden until registration closes. All players use the same start time; joining after that time is blocked. A unique fastest finish wins the pool. Exact fastest ties and no valid finishes refund everyone.</p>
+        {room.funded && <section className="stack" aria-label="Escrow competition status"><p className="choice-note">{fundingConfig?.cluster === "localnet" ? "Local validator" : "Devnet"} · TEST entry</p>{fundingConfig && <details><summary>Need test funds?</summary><TesterFunds busy={Boolean(busy)} note={fundNote} faucet={Boolean(fundingConfig.testerFaucet)} onRequest={() => void requestTesterFunds()} /></details>}<p role="status">{escrowNotice(room, now)}</p><p className="choice-note">Fastest unique finish wins the pool. Ties or no finishes refund everyone.</p>
           {room.you && <p className="banner">{room.you.claimed ? "Your claim is complete." : "Your stake is confirmed in escrow."}</p>}
           {room.participants === 1 && now >= room.funded.startsAt && <p className="banner">No opponent joined. The creator can claim a full stake refund.</p>}
           {room.funded.winner && <p>Winner wallet: <span className="token-mint">{room.funded.winner}</span></p>}
           {!active && room.you && room.funded.chainTime >= room.endsAt && room.funded.chainStatus === "open" && room.funded.chainTime < room.funded.refundAt && <button className="primary" disabled={Boolean(busy)} onClick={() => void settle()}>Finalize result</button>}
           {canClaim && <button className="primary" disabled={Boolean(busy)} onClick={() => void claim()}>{room.funded.chainStatus === "awarded" ? "Claim winner payout" : "Claim stake refund"}</button>}
-          {receipt?.code === room.code && <p className="choice-note">{receipt.cluster === "devnet" ? <a href={`https://explorer.solana.com/tx/${encodeURIComponent(receipt.signature)}?cluster=devnet`} target="_blank" rel="noreferrer">View transaction on Devnet Explorer</a> : "Local validator transaction submitted."}</p>}
+          {receipt?.code === room.code && <p className="choice-note">{receipt.cluster === "devnet" ? <a href={`https://explorer.solana.com/tx/${encodeURIComponent(receipt.signature)}?cluster=devnet`} target="_blank" rel="noreferrer">View transaction</a> : "Local validator transaction submitted."}</p>}
         </section>}
         {canJoin && !room.you && <button className="primary" disabled={Boolean(busy)} onClick={() => void join(room.code)}>{room.funded ? `Deposit ${room.stake} TEST to join` : "Join room"}</button>}
         {room.funded && !room.you && <button className="secondary" disabled={Boolean(busy)} onClick={() => void action("Checking your escrow entry", async () => {

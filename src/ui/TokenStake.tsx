@@ -4,9 +4,10 @@ import { usdLabel, type MarketToken } from "../competition/types";
 import { DialogFrame } from "./dialogFocus";
 import { multiplyDecimal, divideDecimal } from "../competition/decimal";
 
-export function TokenStake({ onChange }: { onChange: (token: MarketToken | null, amount: string) => void }) {
+export function TokenStake({ onChange, supportedMint }: { onChange: (token: MarketToken | null, amount: string) => void; supportedMint?: string }) {
   const [token, setToken] = useState<MarketToken | null>(null);
-  const [mint, setMint] = useState(SOL_MINT);
+  const [mint, setMint] = useState(supportedMint ?? SOL_MINT);
+  const isTest = Boolean(supportedMint && mint === supportedMint);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<MarketToken[]>([]);
@@ -23,6 +24,7 @@ export function TokenStake({ onChange }: { onChange: (token: MarketToken | null,
   const valid = input.trim() !== "" && Number.isFinite(entered) && entered > 0 && Number.isFinite(entered * price) && (price <= 0 || Number.isFinite(entered / price));
   let amountText = "", usdText = "";
   try {
+    if (valid && kind === "tokens") amountText = input;
     if (valid && price > 0) {
       amountText = kind === "tokens" ? input : divideDecimal(input, precisePrice);
       usdText = kind === "usd" ? input : multiplyDecimal(input, precisePrice);
@@ -33,6 +35,10 @@ export function TokenStake({ onChange }: { onChange: (token: MarketToken | null,
   useEffect(() => onChange(token, amountText), [token, amountText, onChange]);
   useEffect(() => {
     let stop = false;
+    if (mint === supportedMint) {
+      setToken({ mint, symbol: "TEST", name: "Test token", priceUsd: 0, updatedAt: 0 });
+      setError(null); setLoading(false); return;
+    }
     const controller = new AbortController();
     async function refresh() {
       setLoading(true);
@@ -49,7 +55,7 @@ export function TokenStake({ onChange }: { onChange: (token: MarketToken | null,
     void refresh();
     const timer = window.setInterval(() => void refresh(), 30000);
     return () => { stop = true; controller.abort(); clearInterval(timer); };
-  }, [mint]);
+  }, [mint, supportedMint]);
   useEffect(() => {
     if (!open) return;
     const controller = new AbortController();
@@ -67,22 +73,23 @@ export function TokenStake({ onChange }: { onChange: (token: MarketToken | null,
   }, [search, open]);
   function select(next: MarketToken) { setToken(next); setMint(next.mint); setOpen(false); setError(null); }
   return <section className="stack stake-section" aria-label="Token entry">
-    <button className="secondary token-picker" onClick={() => setOpen(true)}><span>Pick Your Token on Solana</span><strong>{token?.symbol ?? "Choose token"} ▾</strong></button>
-    {token && <div className="quote-line"><strong>{token.name} · {token.symbol}</strong><span>{price > 0 ? `${usdLabel(price)} per token` : "Price unavailable"}</span></div>}
-    <div className="tools stake-presets" role="group" aria-label="Entry amount">{[1, 2, 5].map(value => <button key={value} aria-pressed={kind === "tokens" && Number(input) === value} className={kind === "tokens" && Number(input) === value ? "on" : ""} onClick={() => { setKind("tokens"); setInput(String(value)); }}><strong>{value} {token?.symbol ?? "tokens"}</strong><span>{price > 0 ? `≈ ${usdLabel(value * price)}` : "USD unavailable"}</span></button>)}</div>
+    <button className="secondary token-picker" onClick={() => setOpen(true)}><span>Choose token</span><strong>{token?.symbol ?? "Choose token"} ▾</strong></button>
+    {token && <div className="quote-line"><strong>{token.name} · {token.symbol}</strong><span>{price > 0 ? `${usdLabel(price)} per token` : isTest ? "No cash value" : "Price unavailable"}</span></div>}
+    <div className="tools stake-presets" role="group" aria-label="Entry amount">{[1, 2, 5].map(value => <button key={value} aria-pressed={kind === "tokens" && Number(input) === value} className={kind === "tokens" && Number(input) === value ? "on" : ""} onClick={() => { setKind("tokens"); setInput(String(value)); }}><strong>{value} {token?.symbol ?? "tokens"}</strong><span>{price > 0 ? `≈ ${usdLabel(value * price)}` : isTest ? "No cash value" : "USD unavailable"}</span></button>)}</div>
     <div className="amount-fields">
       <label>Token amount<input type="number" inputMode="decimal" step="any" min="0" aria-label="Token amount" value={kind === "tokens" ? input : amount > 0 ? amountText : ""} onChange={event => { setKind("tokens"); setInput(event.target.value); }} /></label>
-      <label>USD value<input type="number" inputMode="decimal" step="any" min="0" aria-label="USD value" value={kind === "usd" ? input : usd > 0 ? usdText : ""} onChange={event => { setKind("usd"); setInput(event.target.value); }} /></label>
+      <label>USD value<input type="number" inputMode="decimal" step="any" min="0" aria-label="USD value" disabled={price <= 0} value={kind === "usd" ? input : usd > 0 ? usdText : ""} onChange={event => { setKind("usd"); setInput(event.target.value); }} /></label>
     </div>
-    <p className="quote-total" aria-live="polite">{price > 0 && amountText ? `${amountText} ${token?.symbol} ≈ ${usdLabel(usd)}` : "Enter a positive amount when a price is available."}</p>
-    <p className="choice-note">{loading ? "Updating price…" : token && price > 0 ? `DEX Screener · checked ${new Date(token.updatedAt).toLocaleTimeString()} · refreshes every 30 seconds` : "Waiting for a live market price."} Mainnet market estimates; prices can change. Token entry is not enabled for leaderboard rooms yet.</p>
+    <p className="quote-total" aria-live="polite">{price > 0 && amountText ? `${amountText} ${token?.symbol} ≈ ${usdLabel(usd)}` : amountText && token ? `${amountText} ${token.symbol}` : "Enter a positive amount."}</p>
+    {!isTest && <p className="choice-note">{loading ? "Updating price…" : "Approximate market value; prices may change."}</p>}
     {error && <p className="alert" role="alert">{error}</p>}
     {open && <DialogFrame id="token-title" onClose={() => setOpen(false)}>
-      <h2 id="token-title">Pick Your Token on Solana</h2>
+      <h2 id="token-title">Choose token</h2>
+      {supportedMint && <button onClick={() => { setMint(supportedMint); setToken({ mint: supportedMint, symbol: "TEST", name: "Test token", priceUsd: 0, updatedAt: 0 }); setKind("tokens"); setOpen(false); }}>TEST · available</button>}
       <label htmlFor="token-search">Search by name, symbol, or mint address</label>
       <input id="token-search" className="form-input" value={search} onChange={event => setSearch(event.target.value)} placeholder="BTC, BONK, POLIS, or Solana mint" />
       <div className="tools">{[["SOL", SOL_MINT], ["USDC", USDC_MINT], ["POLIS", POLIS_MINT]].map(([symbol, address]) => <button key={symbol} onClick={() => { if (mint !== address) { setMint(address); setToken(null); } setOpen(false); }}>{symbol}</button>)}</div>
-      <p className="choice-note">Solana network only. Search any token by name, symbol, or mint. BTC results are tokens on Solana, not native Bitcoin. Different mints may share a name; check the address. {registryEnabled ? "Registry verification is enabled." : "Market listings are not issuer verification."}</p>
+      <p className="choice-note">Solana tokens only. Check the mint address before selecting. {registryEnabled ? "Registry verification enabled." : "Market listings are not issuer verification."}</p>
       {searching && <p role="status">Searching tokens…</p>}
       {searchError && <p role="alert" className="alert">{searchError}</p>}
       {!searching && !searchError && !results.length && <p>No Solana token with a supported liquid-market quote found. Try its mint address.</p>}
