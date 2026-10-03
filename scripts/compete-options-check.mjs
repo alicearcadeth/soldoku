@@ -23,15 +23,21 @@ try {
   assert.equal(await page.getByLabel("USD value").isDisabled(), true);
   await page.getByRole("button", { name: /Choose token/ }).click();
   assert.equal(await page.getByLabel("Search by name, symbol, or mint address").isVisible(), true);
+  assert.equal(await page.evaluate(() => document.body.style.overflow), "hidden");
+  await page.getByRole("button", { name: "← Back", exact: true }).click();
+  assert.equal(await page.getByRole("dialog").count(), 0);
+  assert.notEqual(await page.evaluate(() => document.body.style.overflow), "hidden");
+  await page.getByRole("button", { name: /Choose token/ }).click();
   await page.getByRole("button", { name: "SOL", exact: true }).click();
   await page.waitForFunction(() => document.querySelector('[aria-label="USD value"]')?.disabled === false);
   await page.getByLabel("USD value").fill("250");
   assert.equal(await page.getByLabel("Token amount").inputValue(), "2.5");
   assert.equal(await page.getByRole("button", { name: "Create room", exact: true }).isDisabled(), true);
+  assert.match(await page.getByRole("status").innerText(), /SOL covers network fees/);
   await page.getByRole("button", { name: /Choose token/ }).click();
   await page.getByRole("button", { name: "TEST · available", exact: true }).click();
   await page.getByLabel("Token amount").fill("0.25");
   assert.equal(await page.getByRole("button", { name: "Create room", exact: true }).isEnabled(), true);
   assert.deepEqual(errors, []);
-  console.log("PASS: custom TEST stake, searchable picker, SOL/USD exploration, unsupported execution blocked, return to TEST; no browser errors.");
+  console.log("PASS: custom TEST stake, searchable picker, top Back control, scroll lock restored, SOL/USD exploration, explicit SOL restriction, return to TEST; no browser errors.");
 } finally { await browser.close(); }

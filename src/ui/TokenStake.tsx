@@ -58,6 +58,12 @@ export function TokenStake({ onChange, supportedMint }: { onChange: (token: Mark
   }, [mint, supportedMint]);
   useEffect(() => {
     if (!open) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previous; };
+  }, [open]);
+  useEffect(() => {
+    if (!open) return;
     const controller = new AbortController();
     const timer = window.setTimeout(() => {
       setSearching(true);
@@ -84,17 +90,16 @@ export function TokenStake({ onChange, supportedMint }: { onChange: (token: Mark
     {!isTest && <p className="choice-note">{loading ? "Updating price…" : "Approximate market value; prices may change."}</p>}
     {error && <p className="alert" role="alert">{error}</p>}
     {open && <DialogFrame id="token-title" onClose={() => setOpen(false)}>
-      <h2 id="token-title">Choose token</h2>
-      {supportedMint && <button onClick={() => { setMint(supportedMint); setToken({ mint: supportedMint, symbol: "TEST", name: "Test token", priceUsd: 0, updatedAt: 0 }); setKind("tokens"); setOpen(false); }}>TEST · available</button>}
+      <div className="token-dialog-nav"><button className="secondary" onClick={() => setOpen(false)}>← Back</button><h2 id="token-title">Choose token</h2></div>
+      {supportedMint && <button className="secondary" onClick={() => { setMint(supportedMint); setToken({ mint: supportedMint, symbol: "TEST", name: "Test token", priceUsd: 0, updatedAt: 0 }); setKind("tokens"); setOpen(false); }}>TEST · available</button>}
       <label htmlFor="token-search">Search by name, symbol, or mint address</label>
       <input id="token-search" className="form-input" value={search} onChange={event => setSearch(event.target.value)} placeholder="BTC, BONK, POLIS, or Solana mint" />
       <div className="tools">{[["SOL", SOL_MINT], ["USDC", USDC_MINT], ["POLIS", POLIS_MINT]].map(([symbol, address]) => <button key={symbol} onClick={() => { if (mint !== address) { setMint(address); setToken(null); } setOpen(false); }}>{symbol}</button>)}</div>
       <p className="choice-note">Solana tokens only. Check the mint address before selecting. {registryEnabled ? "Registry verification enabled." : "Market listings are not issuer verification."}</p>
       {searching && <p role="status">Searching tokens…</p>}
       {searchError && <p role="alert" className="alert">{searchError}</p>}
-      {!searching && !searchError && !results.length && <p>No Solana token with a supported liquid-market quote found. Try its mint address.</p>}
+      {!searching && !searchError && !results.length && <p>No unambiguous Solana token found. Search by mint address. Native BTC, ETH and ADA use other networks.</p>}
       {results.map(item => <button className="choice token-result" key={item.mint} onClick={() => select(item)}><strong>{item.symbol} · {item.name}</strong><span>{item.verified ? "Verified identity" : "Market listing · check mint"} · {usdLabel(item.priceUsd)} per token</span><small>{item.mint}</small></button>)}
-      <button className="text" onClick={() => setOpen(false)}>Back</button>
     </DialogFrame>}
   </section>;
 }

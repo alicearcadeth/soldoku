@@ -3,6 +3,15 @@ import { marketTokens, SOL_MINT, POLIS_MINT } from "./market";
 
 afterEach(() => vi.unstubAllGlobals());
 describe("Solana market prices", () => {
+  it("does not present several unverified mints sharing one symbol as interchangeable coins", async () => {
+    const pair = (address: string) => ({ chainId: "solana", baseToken: { address, name: "Bitcoin", symbol: "BTC" }, priceUsd: "60000", liquidity: { usd: 100000 } });
+    vi.stubGlobal("fetch", vi.fn(async () => Response.json({ pairs: [
+      pair("JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN"),
+      pair("FwtKA62k47DYe3jHmPNjspjVdc7PhipbqZjxTMfp81m6"),
+    ] })));
+    expect(await marketTokens("bitcoin-ambiguous-fixture")).toEqual([]);
+    expect(await marketTokens("", "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN")).toHaveLength(1);
+  });
   it("does not let a partial POLIS name match suppress the Star Atlas ATLAS token", async () => {
     const mint = "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx";
     vi.stubGlobal("fetch", vi.fn(async () => Response.json([{ chainId: "solana", baseToken: { address: mint, name: "Star Atlas", symbol: "ATLAS" }, priceUsd: "0.00123", liquidity: { usd: 150000 } }])));

@@ -329,13 +329,14 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
         <h3>Difficulty</h3><div className="tools" role="group" aria-label="Difficulty">{LEVELS.map(item => <button key={item} aria-pressed={item === level} className={item === level ? "on" : ""} onClick={() => setLevel(item)}>{item[0].toUpperCase() + item.slice(1)}</button>)}</div>
         <h2>2. Set the stake</h2>{mode === "tokens" ? <>
           <TokenStake onChange={changeStake} supportedMint={fundingConfig?.mint} />
-          <p className="choice-note">Only Devnet transactions are available. Choose TEST to deposit; explore other tokens and amounts here.</p>
+          <p className="choice-note">Devnet only · TEST deposits. Other tokens are amount previews.</p>
           {!fundingConfig && <p className="choice-note" role="status">{fundingReason}</p>}
           {fundingConfig && <details><summary>Rules & test funds</summary><p>Everyone starts together and has {durationText(fundingConfig.playMs)} to finish. The unique fastest finish wins the pool. Ties or no finishes refund everyone. Refunds unlock after {durationText(fundingConfig.graceMs)} if settlement fails.</p><TesterFunds busy={Boolean(busy)} note={fundNote} faucet={Boolean(fundingConfig.testerFaucet)} onRequest={() => void requestTesterFunds()} /></details>}
         </> : <p className="quote-total">Free entry · no deposit</p>}
         <h2>3. Set the {mode === "tokens" && fundingConfig ? "registration" : "competition"} period</h2><Duration value={period} onChange={setPeriod} funded={mode === "tokens" && Boolean(fundingConfig)} />
         <p className="choice-note">Ends approximately {Number.isFinite(period) ? new Date(now + period + (mode === "tokens" && fundingConfig ? fundingConfig.playMs + 30000 : 0)).toLocaleString() : "—"}. The creator can extend it only before another player joins.</p>
         {mode === "tokens" && !fundingConfig ? <button className="primary" disabled={Boolean(busy)} onClick={() => { setMode("free"); setError(null); }}>Switch to free competition</button> : <button className="primary" disabled={Boolean(busy) || (mode === "tokens" && (!token || token.mint !== fundingConfig?.mint || !stake))} onClick={() => void prepareCreate()}>Create room</button>}
+        {mode === "tokens" && fundingConfig && token && token.mint !== fundingConfig.mint && <p className="choice-note" role="status">{token.symbol === "SOL" ? "SOL covers network fees. This escrow accepts TEST stakes only." : `${token.symbol} is preview only. This escrow accepts TEST stakes only.`} Choose TEST in the token picker to create a room.</p>}
       </section> : <section className="stack">
         {fundingConfig && <details><summary>Need test funds?</summary><TesterFunds busy={Boolean(busy)} note={fundNote} faucet={Boolean(fundingConfig.testerFaucet)} onRequest={() => void requestTesterFunds()} /></details>}
         <h2>Competition rooms</h2><label className="check-label"><input type="checkbox" checked={showEnded} onChange={event => setShowEnded(event.target.checked)} /> Include ended competitions</label>

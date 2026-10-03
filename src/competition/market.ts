@@ -75,7 +75,12 @@ export async function marketTokens(query: string, mint?: string, registryKey?: s
     if (!response.ok) throw new Error("Live token prices are temporarily unavailable. Try again.");
     data = await response.json() as Pair[] | { pairs?: Pair[] };
   }
-  const result = tokensFrom(Array.isArray(data) ? data : data.pairs ?? [], identities).filter(token => !mint || token.mint === mint).slice(0, 10);
+  const quoted = tokensFrom(Array.isArray(data) ? data : data.pairs ?? [], identities).filter(token => !mint || token.mint === mint);
+  // A ticker is not an identity. Never pick an arbitrary winner among unrelated mints.
+  // An exact address remains searchable when someone deliberately wants that asset.
+  const exactAddress = mint ?? (/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(search) ? search : undefined);
+  const result = quoted.filter(token => exactAddress || token.verified ||
+    quoted.filter(other => other.symbol.trim().toUpperCase() === token.symbol.trim().toUpperCase()).length === 1).slice(0, 10);
   if (cache.size >= 100) cache.delete(cache.keys().next().value!);
   cache.set(key, { at: Date.now(), tokens: result });
   return result;
