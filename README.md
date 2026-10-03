@@ -4,11 +4,11 @@ A Sudoku app with Classic, Practice, leaderboard competitions and legacy two-pla
 
 The public app is a **Devnet** beta. The stake is a test token. It has **no cash value**. Mainnet staking is not enabled.
 
-The new funded competition flow passed a three-wallet browser test with real Devnet deposits, settlement and winner payout. Public receipts are recorded in [the browser evidence](docs/evidence/competition-devnet-browser.json). This implementation has not yet been pushed or deployed to the public Soldoku Worker; GitHub access and production release parity are remaining gates. See [competition setup and verification](docs/competition-devnet-build.md) for configuration, current limits and live refund tests. Funded creation stays disabled without its separate program and server authority configuration.
+The new funded competition flow passed a three-wallet browser test with real Devnet deposits, settlement and winner payout. Public receipts are recorded in [the browser evidence](docs/evidence/competition-devnet-browser.json). The implementation is pushed and deployed to the public Soldoku Worker. Local, GitHub and both public-domain assets match; the production three-wallet test is waiting for its normal settlement deadline. See [competition setup and verification](docs/competition-devnet-build.md) for configuration, current limits and live refund tests. Funded creation stays disabled without its separate program and server authority configuration.
 
 ## Play
 
-- Public beta: https://sudoku.jamesbitarcade.workers.dev
+- Soldoku Devnet competitions: https://soldoku.com/
 - Inert production shell: https://sudoku-mainnet.jamesbitarcade.workers.dev
 
 Classic starts without a wallet. Practice starts without a wallet. Staked mode asks for a Devnet wallet and shows `DEVNET`, `TEST TOKENS`, and `NO CASH VALUE`.

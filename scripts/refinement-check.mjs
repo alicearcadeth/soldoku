@@ -4,7 +4,7 @@ import { chromium } from "playwright";
 const origin = process.env.QA_ORIGIN ?? "http://127.0.0.1:5174/";
 const out = "output/refinement-check";
 mkdirSync(out, { recursive: true });
-const browser = await chromium.launch();
+const browser = await chromium.launch(process.env.PLAYWRIGHT_CHROMIUM ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM } : {});
 const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
 const page = await context.newPage();
 page.setDefaultTimeout(10000);
@@ -60,66 +60,26 @@ try {
     assert.equal((await page.getByRole("gridcell").nth(index).innerText()).trim(), String(saved.puzzle.solution[index]));
     await page.screenshot({ path: `${out}/solo-phone.png`, fullPage: true });
   });
-  await check("Canonical SOL search returns one result and keeps mint readable", async () => {
+  await check("Funded creation exposes only the configured Devnet TEST mint and clear stake presets", async () => {
     await page.getByRole("button", { name: "Home", exact: true }).click();
     await page.getByRole("button", { name: /^LEADERBOARD Compete/i }).click();
-    await page.getByRole("button", { name: "Create competition", exact: true }).click();
+    await page.getByRole("group", { name: "Competition navigation" }).getByRole("button", { name: "Create competition", exact: true }).click();
     await page.getByRole("button", { name: "For tokens", exact: true }).click();
-    await page.locator(".quote-line").filter({ hasText: "per token" }).waitFor();
-    await page.getByRole("button", { name: /Pick Your Token on Solana/ }).click();
-    const dialog = page.getByRole("dialog", { name: "Pick Your Token on Solana" });
-    await dialog.locator(".token-result").waitFor();
-    assert.equal(await dialog.locator(".token-result").count(), 1);
-    assert.match(await dialog.locator(".token-result").innerText(), /So11111111111111111111111111111111111111112/);
-    await page.screenshot({ path: `${out}/token-picker-phone.png` });
-    await dialog.getByRole("button", { name: "Back", exact: true }).click();
-  });
-  await check("POLIS search returns one issuer mint and selecting it updates precise conversions", async () => {
-    await page.getByRole("button", { name: /Pick Your Token on Solana/ }).click();
-    const dialog = page.getByRole("dialog", { name: "Pick Your Token on Solana" });
-    await dialog.getByRole("textbox", { name: /Search by/ }).fill("polis");
-    const result = dialog.locator(".token-result", { hasText: "POLIS" });
-    await result.waitFor();
-    assert.equal(await dialog.locator(".token-result").count(), 1);
-    assert.match(await result.innerText(), /poLisWXnNRwC6oBu1vHiuKQzFjGL4XDSu4g9qjz9qVk/);
-    await page.screenshot({ path: `${out}/polis-picker-phone.png` });
-    await result.click();
-    await page.locator(".quote-line").filter({ hasText: "Star Atlas DAO · POLIS" }).waitFor();
-    assert.match(await page.locator(".quote-line").filter({ hasText: "per token" }).innerText(), /\$0\.\d{4,}/);
-    const price = Number(await page.getByRole("spinbutton", { name: "USD value", exact: true }).inputValue());
-    await page.getByRole("spinbutton", { name: "Token amount", exact: true }).fill("10");
-    assert.ok(Math.abs(Number(await page.getByRole("spinbutton", { name: "USD value", exact: true }).inputValue()) - price * 10) < 1e-12);
-    await page.getByRole("spinbutton", { name: "USD value", exact: true }).fill("50");
-    assert.ok(Math.abs(Number(await page.getByRole("spinbutton", { name: "Token amount", exact: true }).inputValue()) * price - 50) < 1e-10);
-  });
-  await check("Star Atlas project search includes the official ATLAS mint", async () => {
-    await page.getByRole("button", { name: /Pick Your Token on Solana/ }).click();
-    const dialog = page.getByRole("dialog", { name: "Pick Your Token on Solana" });
-    await dialog.getByRole("textbox", { name: /Search by/ }).fill("Star Atlas");
-    const result = dialog.locator(".token-result", { hasText: "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx" });
-    await result.waitFor();
-    assert.equal(await result.count(), 1);
-    await result.click();
-    await page.locator(".quote-line").filter({ hasText: "Star Atlas · ATLAS" }).waitFor();
-    assert.match(await page.locator(".quote-line").filter({ hasText: "per token" }).innerText(), /\$0\.\d{5,}/);
-  });
-  await check("Broad BTC search works without registry credentials and selects a Solana mint", async () => {
-    await page.getByRole("button", { name: /Pick Your Token on Solana/ }).click();
-    const dialog = page.getByRole("dialog", { name: "Pick Your Token on Solana" });
-    await dialog.getByRole("textbox", { name: /Search by/ }).fill("btc");
-    const results = dialog.locator(".token-result", { hasText: "BTC" });
-    await results.first().waitFor();
-    const mints = await results.locator("small").allTextContents();
-    assert.equal(mints.length, new Set(mints).size);
-    const chosen = mints[0];
-    await page.screenshot({ path: `${out}/solana-btc-picker.png` });
-    await results.first().click();
-    await page.locator(".quote-line").filter({ hasText: "BTC" }).waitFor();
-    const quote = await page.request.get(`${origin}api/tokens?mint=${chosen}`);
-    const data = await quote.json();
-    assert.equal(data.tokens[0].mint, chosen);
-    await page.getByRole("spinbutton", { name: "Token amount", exact: true }).fill("1");
-    assert.ok(Number(await page.getByRole("spinbutton", { name: "USD value", exact: true }).inputValue()) > 0);
+    const config = await (await page.request.get(`${origin}api/competitions/config`)).json();
+    assert.equal(config.enabled, true); assert.equal(config.cluster, "devnet");
+    await page.locator(".token-mint").filter({ hasText: config.mint }).waitFor();
+    for (const amount of [1, 2, 5]) {
+      await page.getByRole("button", { name: `${amount} TEST`, exact: true }).click();
+      assert.equal(await page.getByRole("textbox", { name: "TEST stake", exact: true }).inputValue(), String(amount));
+    }
+    assert.equal(await page.getByRole("button", { name: /Pick Your Token on Solana/ }).count(), 0);
+    assert.match(await page.locator("body").innerText(), /TEST TOKENS · NO CASH VALUE/);
+    for (const width of [320, 360, 390, 768, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false, `Overflow at ${width}`);
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.screenshot({ path: `${out}/test-token-phone.png`, fullPage: true });
   });
   await check("Genuine server errors remain visible and useful", async () => {
     await page.getByRole("button", { name: "Browse rooms", exact: true }).click();

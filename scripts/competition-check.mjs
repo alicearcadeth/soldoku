@@ -7,7 +7,7 @@ import bs58 from "bs58";
 const origin = process.env.QA_ORIGIN ?? "http://127.0.0.1:5173/";
 const out = "output/competition-check";
 mkdirSync(out, { recursive: true });
-const browser = await chromium.launch();
+const browser = await chromium.launch(process.env.PLAYWRIGHT_CHROMIUM ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM } : {});
 const results = [];
 const errors = [];
 const contexts = [];
@@ -106,7 +106,7 @@ try {
     }
     await owner.page.getByText("Duration locked · another player has joined.", { exact: true }).waitFor();
     assert.equal(await owner.page.getByRole("button", { name: "Extend room duration", exact: true }).count(), 0);
-    assert.match(await owner.page.locator(".room-facts").innerText(), /3 · open entry/);
+    await owner.page.locator(".room-facts").filter({ hasText: "3 · open entry" }).waitFor();
     await owner.page.screenshot({ path: `${out}/room-phone.png`, fullPage: true });
   });
   await check("One attempt persists across Home, reload, and a second session of the same wallet", async () => {
@@ -165,29 +165,17 @@ try {
     assert.equal(await owner.page.getByRole("button", { name: /Start challenge|Continue challenge/ }).count(), 0);
     await owner.page.screenshot({ path: `${out}/finished-phone.png`, fullPage: true });
   });
-  await check("Live token price, bidirectional USD conversion, token search and clear stake presets", async () => {
+  await check("Devnet TEST stake presets and supported mint are explicit", async () => {
     await owner.page.getByRole("button", { name: "← Back to Rooms", exact: true }).first().click();
-    await owner.page.getByRole("button", { name: "Create competition", exact: true }).click();
+    await owner.page.getByRole("group", { name: "Competition navigation" }).getByRole("button", { name: "Create competition", exact: true }).click();
     await owner.page.getByRole("button", { name: "For tokens", exact: true }).click();
-    await owner.page.locator(".quote-line").filter({ hasText: "per token" }).waitFor();
-    const quote = await owner.page.locator(".quote-line").filter({ hasText: "per token" }).innerText();
-    assert.match(quote, /SOL/);
-    const live = await owner.page.request.get(`${origin}api/tokens?mint=So11111111111111111111111111111111111111112`);
-    const price = (await live.json()).tokens[0].priceUsd;
-    await owner.page.getByRole("spinbutton", { name: "Token amount", exact: true }).fill("10");
-    const usd = Number(await owner.page.getByRole("spinbutton", { name: "USD value", exact: true }).inputValue());
-    assert.ok(Math.abs(usd - price * 10) < 0.01);
-    await owner.page.getByRole("spinbutton", { name: "USD value", exact: true }).fill("50");
-    const tokens = Number(await owner.page.getByRole("spinbutton", { name: "Token amount", exact: true }).inputValue());
-    assert.ok(Math.abs(tokens * price - 50) < 0.01);
-    for (const amount of [1, 2, 5]) assert.equal(await owner.page.getByRole("button", { name: new RegExp(`^${amount} SOL`) }).isVisible(), true);
-    await owner.page.getByRole("button", { name: /Pick Your Token on Solana/ }).click();
-    const dialog = owner.page.getByRole("dialog", { name: "Pick Your Token on Solana" });
-    await dialog.getByRole("textbox", { name: /Search by/ }).fill("USDC");
-    await dialog.locator(".token-result").first().waitFor();
-    await dialog.getByRole("button", { name: "USDC", exact: true }).click();
-    await owner.page.locator(".quote-line").filter({ hasText: "per token" }).waitFor();
-    assert.match(await owner.page.locator(".quote-line").filter({ hasText: "per token" }).innerText(), /USDC/);
+    const config = await (await owner.page.request.get(`${origin}api/competitions/config`)).json();
+    assert.equal(config.enabled, true); assert.equal(config.cluster, "devnet");
+    await owner.page.locator(".token-mint").filter({ hasText: config.mint }).waitFor();
+    for (const amount of [1, 2, 5]) {
+      await owner.page.getByRole("button", { name: `${amount} TEST`, exact: true }).click();
+      assert.equal(await owner.page.getByRole("textbox", { name: "TEST stake", exact: true }).inputValue(), String(amount));
+    }
     await owner.page.screenshot({ path: `${out}/token-entry-phone.png`, fullPage: true });
   });
   await check("Responsive layouts from 320 to 1280 pixels", async () => {
@@ -202,8 +190,8 @@ try {
     await owner.page.getByRole("button", { name: "Custom Duration", exact: true }).click();
     await owner.page.getByRole("spinbutton", { name: "Custom duration", exact: true }).fill("3");
     await owner.page.getByRole("combobox", { name: "Duration unit", exact: true }).selectOption("3600000");
-    assert.equal(await owner.page.getByRole("button", { name: "Create room", exact: true }).count(), 0);
-    await owner.page.getByRole("button", { name: "Switch to free competition", exact: true }).click();
+    assert.equal(await owner.page.getByRole("button", { name: "Create room", exact: true }).isEnabled(), true);
+    await owner.page.getByRole("button", { name: "Free competition", exact: true }).click();
     assert.equal(await owner.page.getByRole("spinbutton", { name: "Custom duration", exact: true }).inputValue(), "3");
     assert.equal(await owner.page.getByRole("textbox", { name: "Room name", exact: true }).inputValue(), "Weekend Sprint");
     assert.equal(await owner.page.getByRole("button", { name: "Create room", exact: true }).isEnabled(), true);

@@ -77,8 +77,8 @@ $env:SUDOKU_COMPETITION_DEVNET_REFUNDS = '1'
 node node_modules/vitest/vitest.mjs run src/competition/escrow.devnet.test.ts
 ```
 
-## Remaining release gates
+## Production release verification
 
-Current-build live payout and refund verification are complete. Obtain GitHub access for the PC's account and restore real Git history around these ZIP-derived changes. The original ZIP records baseline commit `889944bf01b328c2aed7cb5f7464264e5ac68c6f`; preserve current work and merge any newer upstream changes before committing and pushing. Build from the clean committed checkout, publish `wrangler.soldoku.jsonc` with the private competition RPC and authority secrets, then verify local/GitHub/public release hashes on both Soldoku domains and repeat the live funded flow on production. Cloudflare authentication is available on this PC; GitHub repository access is currently denied.
+GitHub CLI access was restored as `alicearcadeth`. Remote main matched the original ZIP baseline `889944bf01b328c2aed7cb5f7464264e5ac68c6f`, so history was restored without upstream conflicts. Implementation commit `d1acf7bdabeda6837f1c762a425bcbce2d33b91c` was pushed, built clean and deployed as Worker version `e6b26786-1f7b-4da5-8a83-251043aa4563`. Private RPC and authority are Worker secrets. Release verification passed on both Soldoku domains for all 14 shipped assets. Production room `D7D908F6` has three real deposits and three server-verified finishes; its final payout verification is waiting for the immutable 30-minute deadline.
 
 The three-day goal remains incomplete until all requested gates have evidence.

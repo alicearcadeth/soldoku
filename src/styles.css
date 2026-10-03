@@ -623,3 +623,4 @@ button:disabled { cursor: not-allowed; }
     transition: none !important;
   }
 }
+.token-mint { overflow-wrap: anywhere; word-break: break-word; }

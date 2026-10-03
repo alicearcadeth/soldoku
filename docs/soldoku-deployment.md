@@ -28,11 +28,11 @@ The full app is configured in `wrangler.soldoku.jsonc`. It uses the competition 
 - Token search remains broad and Solana-only; Star Atlas ATLAS and POLIS are pinned to issuer mints.
 - Public deployment completed after signing in using device authorization.
 
-## Devnet competition release — pending
+## Devnet competition release — 3 October 2026
 
-The current source implements multiplayer Devnet escrow. The latest deployed Devnet program passed the three-wallet Worker/D1 browser flow and the live refund suite; the automated suite passes 232 tests. See [competition verification and receipts](competition-devnet-build.md). These changes have not been published to the public website. Repository access must be restored before the required commit, push, clean release build, deployment and production multi-wallet verification.
+The current source implements multiplayer Devnet escrow. The latest deployed Devnet program passed the three-wallet Worker/D1 browser flow and the live refund suite; the automated suite passes 232 tests. See [competition verification and receipts](competition-devnet-build.md). The implementation was pushed, built clean and deployed to both Soldoku domains. Release hashes match. The production three-wallet browser test has verified deposits, shared grid, refresh recovery, finishes and ranking; settlement and payout verification are waiting for the normal competition deadline.
 
-Configure the private `SUDOKU_COMPETITION_RPC` and `SUDOKU_COMPETITION_AUTHORITY_KEY` as Worker secrets before the new release. Keep credentials outside Git. Preserve the existing D1 database and follow the release alignment instructions above.
+The private `SUDOKU_COMPETITION_RPC` and `SUDOKU_COMPETITION_AUTHORITY_KEY` are configured as Worker secrets. Keep credentials outside Git. Preserve the existing D1 database and follow the release alignment instructions above.
 
 ## Publish the Worker
 
