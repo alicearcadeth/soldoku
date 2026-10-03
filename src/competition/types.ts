@@ -1,6 +1,13 @@
 import type { Level } from "../engine/types";
 
 export type MarketToken = { mint: string; symbol: string; name: string; priceUsd: number; priceUsdExact?: string; verified?: boolean; updatedAt: number };
+export type FundedConfig = { program: string; authority: string; mint: string; decimals: number; playMs: number; graceMs: number };
+export type FundedTerms = FundedConfig & { id: string; stakeUnits: string; startsAt: number; refundAt: number;
+  chainStatus: "pending" | "open" | "awarded" | "refunding" | "paid"; confirmedParticipants: number; chainTime: number;
+  winner: string | null; settlementSignature?: string };
+export type VerifiedChainRoom = { id: string; creator: string; authority: string; mint: string; stakeUnits: string;
+  startsAt: number; endsAt: number; refundAt: number; participants: number; chainTime: number;
+  status: "open" | "awarded" | "refunding" | "paid"; winner: string | null; entries: { wallet: string; claimed: boolean }[] };
 export type CompetitionSummary = {
   code: string;
   name: string;
@@ -13,10 +20,11 @@ export type CompetitionSummary = {
   token: MarketToken | null;
   stake: number;
   bestMs: number | null;
+  funded?: FundedTerms;
 };
 export type CompetitionView = CompetitionSummary & {
-  leaderboard: { rank: number; name: string; completedMs: number }[];
-  you: { owner: boolean; canExtend: boolean; startedAt: number | null; completedMs: number | null; rank: number | null; board: number[] | null; givens: number[] | null; sequence: number; name: string } | null;
+  leaderboard: { rank: number; name: string; completedMs: number; wallet?: string; you?: boolean }[];
+  you: { owner: boolean; canExtend: boolean; startedAt: number | null; completedMs: number | null; rank: number | null; board: number[] | null; givens: number[] | null; sequence: number; name: string; claimed?: boolean } | null;
 };
 export const DAY_MS = 24 * 60 * 60 * 1000;
 export function elapsedLabel(ms: number): string {

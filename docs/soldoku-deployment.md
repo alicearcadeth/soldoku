@@ -18,7 +18,7 @@ Final public-origin verification: all 23 browser checks pass, including classic 
 
 The full app is configured in `wrangler.soldoku.jsonc`. It uses the competition Worker, static assets, and a separate `soldoku-matches` D1 database. Do not use `wrangler.production.jsonc`: that configuration serves the older mainnet shell.
 
-## Current verification
+## Historical verification — initial public release
 
 - Production assets build successfully.
 - Cloudflare deployment bundle passes `wrangler deploy --dry-run`.
@@ -27,6 +27,12 @@ The full app is configured in `wrangler.soldoku.jsonc`. It uses the competition 
 - Unit tests: 216 passed, four optional integration tests skipped.
 - Token search remains broad and Solana-only; Star Atlas ATLAS and POLIS are pinned to issuer mints.
 - Public deployment completed after signing in using device authorization.
+
+## Devnet competition release — pending
+
+The current source implements multiplayer Devnet escrow. The latest deployed Devnet program passed the three-wallet Worker/D1 browser flow and the live refund suite; the automated suite passes 232 tests. See [competition verification and receipts](competition-devnet-build.md). These changes have not been published to the public website. Repository access must be restored before the required commit, push, clean release build, deployment and production multi-wallet verification.
+
+Configure the private `SUDOKU_COMPETITION_RPC` and `SUDOKU_COMPETITION_AUTHORITY_KEY` as Worker secrets before the new release. Keep credentials outside Git. Preserve the existing D1 database and follow the release alignment instructions above.
 
 ## Publish the Worker
 
@@ -45,7 +51,7 @@ npm.cmd run build
 npx.cmd wrangler deploy --config wrangler.soldoku.jsonc
 ```
 
-Verify the actual workers.dev URL reported by deployment before connecting the domain. Check token search, signed room creation, a second participant joining, leaderboard persistence, and classic/practice play. The leaderboard is free-entry in this release; its paid-entry escrow has not been implemented. Connecting a wallet authenticates identity and does not fund a room.
+Verify the actual workers.dev URL reported by deployment before connecting the domain. Check token search, signed room creation, a second participant joining, leaderboard persistence, and classic/practice play. The initial public release has a free-entry leaderboard. In the pending Devnet competition release, wallet authentication identifies a player; a separate, explicitly signed token deposit funds their entry. Production verification must include three real deposits, the common grid and start, verified ranking, full winner payout, empty vault and finalized Devnet receipts.
 
 ## Connect the Namecheap domain
 

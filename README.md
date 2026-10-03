@@ -1,8 +1,10 @@
-# Sudoku
+# Soldoku
 
-A two-player Sudoku race with a non-custodial Solana escrow. Classic and Practice are free. A staked match locks the same puzzle for both players and pays the winner from a program vault.
+A Sudoku app with Classic, Practice, leaderboard competitions and legacy two-player races. Funded competitions now use a separate multi-player Devnet escrow: players deposit TEST, play the same grid after registration closes, and the unique fastest server-verified finish receives the full pool. Ties and no valid finishes refund entrants.
 
 The public app is a **Devnet** beta. The stake is a test token. It has **no cash value**. Mainnet staking is not enabled.
+
+The new funded competition flow passed a three-wallet browser test with real Devnet deposits, settlement and winner payout. Public receipts are recorded in [the browser evidence](docs/evidence/competition-devnet-browser.json). This implementation has not yet been pushed or deployed to the public Soldoku Worker; GitHub access and production release parity are remaining gates. See [competition setup and verification](docs/competition-devnet-build.md) for configuration, current limits and live refund tests. Funded creation stays disabled without its separate program and server authority configuration.
 
 ## Play
 
@@ -11,7 +13,7 @@ The public app is a **Devnet** beta. The stake is a test token. It has **no cash
 
 Classic starts without a wallet. Practice starts without a wallet. Staked mode asks for a Devnet wallet and shows `DEVNET`, `TEST TOKENS`, and `NO CASH VALUE`.
 
-## Architecture
+## Legacy two-player architecture
 
 The browser and the Android Web Shell talk to a Cloudflare Worker. The Worker deals the puzzle, records accepted moves, and builds escrow transactions. Players sign those transactions in their own wallet. The Worker never holds the stake.
 
@@ -24,7 +26,7 @@ A future funding path quotes SOL to USDC through DFlow and then deposits that US
 ## Development
 
 ```powershell
-npm install
+npm ci
 npm run dev
 ```
 
@@ -39,7 +41,7 @@ npm test
 
 On this machine `npx` is optional. `node node_modules/typescript/bin/tsc --noEmit` and `node node_modules/vitest/vitest.mjs run` are the same checks.
 
-## Program
+## Legacy two-player program
 
 The escrow crate is `programs/match-escrow`. A production build has no `test-settlement` feature and embeds the Mainnet USDC mint. A staging or localnet build uses `--features test-settlement` and the fixture mint. Do not load the production binary on localnet, and do not deploy either binary to Mainnet from these scripts.
 

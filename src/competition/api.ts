@@ -3,16 +3,22 @@ import { dirname, join } from "node:path";
 import type { Connect } from "vite";
 import { createCompetitionStore } from "./store";
 import { marketTokens } from "./market";
+import { competitionChain } from "./chain";
+import { prepareCompetitionRequest } from "./funded";
 
 const path = process.env.SUDOKU_COMPETITION_STORE || join(process.cwd(), "data", "competitions.json");
+const chain = competitionChain(process.env);
 const store = createCompetitionStore(Date.now, raw => {
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, raw);
-});
+}, chain?.config);
 try { store.replace(readFileSync(path, "utf8")); } catch { /* First local run. */ }
 export const replaceCompetitions = store.replace;
 export const snapshotCompetitions = store.snapshot;
-export const handleCompetitionRequest = store.route;
+export async function handleCompetitionRequest(method: string, url: URL, body: Record<string, unknown>) {
+  const prepared = await prepareCompetitionRequest(store, chain, method, url, body);
+  return prepared.afterCommit ? prepared.afterCommit() : prepared.result;
+}
 export async function handleMarketRequest(url: URL) {
   return { tokens: await marketTokens(url.searchParams.get("q") ?? "", url.searchParams.get("mint") ?? undefined, process.env.JUPITER_API_KEY), registryEnabled: Boolean(process.env.JUPITER_API_KEY), source: "DEX Screener", refreshSeconds: 30 };
 }
@@ -31,7 +37,7 @@ export const competitionMiddleware: Connect.NextHandleFunction = (req, res, next
           raw += String(chunk);
           if (raw.length > 16384) throw new Error("Request is too large.");
         }
-        result = store.route(req.method ?? "GET", url, raw ? JSON.parse(raw) : {});
+        result = await handleCompetitionRequest(req.method ?? "GET", url, raw ? JSON.parse(raw) : {});
       }
       res.setHeader("content-type", "application/json");
       res.setHeader("cache-control", "no-store");

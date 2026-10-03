@@ -12,6 +12,7 @@ import { emptyBook, recordLine, type RecordBook } from "./ui/record";
 import { classicProgress } from "./ui/classicSave";
 import { syncMusicFromPage } from "./ui/audio";
 import { listenForSavedMusic, SettingsSheet } from "./ui/SettingsSheet";
+import { roomCodeFromUrl, roomUrl } from "./competition/roomLink";
 
 type Route =
   | { name: "home" }
@@ -39,6 +40,7 @@ function AppContent() {
   const [confirmLevel, setConfirmLevel] = useState<Level | null>(null);
   const [disclosure, setDisclosure] = useState("DEVNET · TEST TOKENS · NO CASH VALUE");
   const [route, setRoute] = useState<Route>(() => {
+    if (roomCodeFromUrl(location.href)) return { name: "competitions" };
     if (localStorage.getItem("sudoku.seat")) return { name: "compete", mode: "practice" };
     if (localStorage.getItem("sudoku.competition")) return { name: "competitions" };
     const classic = localStorage.getItem("sudoku.classic");
@@ -109,7 +111,7 @@ function AppContent() {
     setHelp(false);
     setConfirmLevel(null);
     const label = next.name === "classic" ? `classic:${next.level}` : next.name === "compete" ? `compete:${next.mode}` : next.name;
-    history.pushState({ sudoku: label }, "");
+    history.pushState({ sudoku: label }, "", next.name === "competitions" ? undefined : roomUrl(location.href, null));
     setRoute(next);
   }
 

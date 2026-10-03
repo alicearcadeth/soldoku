@@ -3,17 +3,18 @@ import nacl from "tweetnacl";
 import bs58 from "bs58";
 import { generatePuzzle } from "../engine/generate";
 import { LEVELS, type Puzzle } from "../engine/types";
-import { DAY_MS, type CompetitionView, type CompetitionSummary } from "./types";
+import { DAY_MS, type CompetitionView, type CompetitionSummary, type FundedConfig, type FundedTerms, type VerifiedChainRoom } from "./types";
+import { competitionOutcome } from "./outcome";
 
-type Entrant = { actor: string; name: string; startedAt: number | null; completedMs: number | null; values: number[]; sequence: number; lastMoveAt: number };
-type Room = { code: string; name?: string; owner: string; createdAt: number; endsAt: number; puzzle: Puzzle; entrants: Entrant[] };
+type Entrant = { actor: string; name: string; startedAt: number | null; completedMs: number | null; values: number[]; sequence: number; lastMoveAt: number; claimed?: boolean };
+type Room = { code: string; name?: string; owner: string; createdAt: number; endsAt: number; puzzle: Puzzle; entrants: Entrant[]; funded?: FundedTerms };
 type Gate = { id: string; actor: string; target: number; expires: number; passed: boolean; tries: number };
 type Proof = { id: string; wallet: string; message: string; expires: number };
 type Session = { id: string; wallet: string; expires: number };
 export const MIN_COMPETITION_FINISH_MS = 15000;
 const secret = () => randomBytes(24).toString("hex");
 
-export function createCompetitionStore(now = Date.now, onSave?: (raw: string) => void) {
+export function createCompetitionStore(now = Date.now, onSave?: (raw: string) => void, fundedConfig?: FundedConfig) {
   let rooms: Room[] = [];
   let gates: Gate[] = [];
   let proofs: Proof[] = [];
@@ -51,13 +52,24 @@ export function createCompetitionStore(now = Date.now, onSave?: (raw: string) =>
   }
   function summary(item: Room): CompetitionSummary {
     const best = item.entrants.reduce((result, entrant) => entrant.completedMs === null ? result : Math.min(result, entrant.completedMs), Infinity);
-    return { code: item.code, name: item.name || `Room ${item.code}`, level: item.puzzle.level, createdAt: item.createdAt, endsAt: item.endsAt, durationMs: item.endsAt - item.createdAt, participants: item.entrants.length, status: now() < item.endsAt ? "active" : "ended", token: null, stake: 0, bestMs: Number.isFinite(best) ? best : null };
+    const funded = item.funded;
+    return { code: item.code, name: item.name || `Room ${item.code}`, level: item.puzzle.level, createdAt: item.createdAt, endsAt: item.endsAt,
+      durationMs: (funded?.startsAt ?? item.endsAt) - item.createdAt, participants: funded?.confirmedParticipants ?? item.entrants.length,
+      status: now() < item.endsAt ? "active" : "ended", token: funded ? { mint: funded.mint, symbol: "TEST", name: "Devnet competition token", priceUsd: 0, updatedAt: 0 } : null,
+      stake: funded ? Number(funded.stakeUnits) / 10 ** funded.decimals : 0, bestMs: Number.isFinite(best) ? best : null,
+      ...(funded ? { funded: { ...funded } } : {}) };
   }
   function view(item: Room, player?: string): CompetitionView {
     const completed = item.entrants.filter(entrant => entrant.completedMs !== null).sort((a, b) => a.completedMs! - b.completedMs!);
     const entrant = item.entrants.find(entry => entry.actor === player);
     const rank = entrant?.completedMs == null ? null : completed.filter(entry => entry.completedMs! < entrant.completedMs!).length + 1;
-    return { ...summary(item), leaderboard: completed.slice(0, 50).map(entry => ({ name: entry.name, completedMs: entry.completedMs!, rank: completed.filter(other => other.completedMs! < entry.completedMs!).length + 1 })), you: entrant ? { name: entrant.name, owner: item.owner === player, canExtend: item.owner === player && item.entrants.length === 1 && now() < item.endsAt, startedAt: entrant.startedAt, completedMs: entrant.completedMs, rank, board: entrant.startedAt === null ? null : entrant.values, givens: entrant.startedAt === null ? null : item.puzzle.givens, sequence: entrant.sequence } : null };
+    return { ...summary(item), leaderboard: completed.slice(0, 50).map(entry => ({ name: entry.name, wallet: entry.actor, you: entry.actor === player,
+      completedMs: entry.completedMs!, rank: completed.filter(other => other.completedMs! < entry.completedMs!).length + 1 })),
+      you: entrant ? { name: entrant.name, owner: item.owner === player,
+        canExtend: item.owner === player && (item.funded?.confirmedParticipants ?? item.entrants.length) === 1 && now() < (item.funded?.startsAt ?? item.endsAt)
+          && (!item.funded || item.funded.chainStatus === "open"), startedAt: entrant.startedAt, completedMs: entrant.completedMs, rank,
+        board: entrant.startedAt === null ? null : entrant.values, givens: entrant.startedAt === null ? null : item.puzzle.givens,
+        sequence: entrant.sequence, ...(item.funded ? { claimed: Boolean(entrant.claimed) } : {}) } : null };
   }
   function enter(item: Room, player: string) {
     if (!item.entrants.some(entry => entry.actor === player)) item.entrants.push({ actor: player, name: `${player.slice(0, 4)}…${player.slice(-4)}`, startedAt: null, completedMs: null, values: [...item.puzzle.givens], sequence: 0, lastMoveAt: 0 });
@@ -108,23 +120,34 @@ export function createCompetitionStore(now = Date.now, onSave?: (raw: string) =>
     }
     if (method === "POST" && url.pathname === "/api/competitions/create") {
       const player = actor(body.actor);
-      if (body.mode !== "free") throw new Error("Token entry is unavailable: this release's escrow supports only two-player test-token races. No tokens were taken.");
+      if (body.mode !== "free" && (body.mode !== "tokens" || !fundedConfig)) throw new Error("Token entry is unavailable: the multi-player Devnet escrow is not configured. No tokens were taken.");
       if (!LEVELS.includes(body.level as Puzzle["level"])) throw new Error("Choose a valid difficulty.");
       const period = duration(body.durationMs);
       const name = typeof body.name === "string" ? body.name.trim().replace(/\s+/g, " ") : "";
       if (name.length > 60 || /[\u0000-\u001f\u007f]/.test(name)) throw new Error("Room names must be 60 characters or fewer, without control characters.");
+      let funded: FundedTerms | undefined;
+      if (body.mode === "tokens") {
+        if (body.mint !== fundedConfig!.mint || typeof body.stakeUnits !== "string" || !/^[1-9]\d{0,11}$/.test(body.stakeUnits)) {
+          throw new Error("Choose the supported Devnet TEST token and a positive stake in exact base units.");
+        }
+        const startsAt = Math.min(Math.ceil(now() / 1000) * 1000 + period + 30000, Math.floor(now() / 1000) * 1000 + 365 * DAY_MS);
+        funded = { ...fundedConfig!, id: randomBytes(8).readBigUInt64LE().toString(), stakeUnits: body.stakeUnits, startsAt,
+          refundAt: startsAt + fundedConfig!.playMs + fundedConfig!.graceMs, chainStatus: "pending", confirmedParticipants: 0, chainTime: 0, winner: null };
+      }
       takeGate(body.gateId, player);
       let code = "";
       do { code = randomBytes(4).toString("hex").toUpperCase(); } while (rooms.some(item => item.code === code));
-      const item: Room = { code, name: name || `Room ${code}`, owner: player, createdAt: now(), endsAt: now() + period, puzzle: generatePuzzle(body.level as Puzzle["level"]), entrants: [] };
+      const item: Room = { code, name: name || `Room ${code}`, owner: player, createdAt: now(), endsAt: funded ? funded.startsAt + funded.playMs : now() + period,
+        puzzle: generatePuzzle(body.level as Puzzle["level"]), entrants: [], ...(funded ? { funded } : {}) };
       rooms.push(item);
-      const result = enter(item, player);
+      const result = funded ? view(item, player) : enter(item, player);
       save();
       return result;
     }
     if (method === "POST" && url.pathname === "/api/competitions/join") {
       const item = room(body.code);
       active(item);
+      if (item.funded) throw new Error("Confirm your Devnet escrow deposit before joining this room.");
       const result = enter(item, actor(body.actor));
       save();
       return result;
@@ -132,6 +155,7 @@ export function createCompetitionStore(now = Date.now, onSave?: (raw: string) =>
     if (method === "POST" && url.pathname === "/api/competitions/extend") {
       const item = room(body.code);
       active(item);
+      if (item.funded) throw new Error("A funded room extension requires a confirmed creator transaction.");
       if (item.owner !== actor(body.actor)) throw new Error("Only the creator can extend this room.");
       if (item.entrants.length !== 1) throw new Error("The duration is locked because another player joined.");
       const nextDeadline = item.endsAt + duration(body.durationMs);
@@ -145,7 +169,9 @@ export function createCompetitionStore(now = Date.now, onSave?: (raw: string) =>
       active(item);
       const entrant = item.entrants.find(entry => entry.actor === actor(body.actor));
       if (!entrant) throw new Error("Join the room before starting.");
-      if (entrant.startedAt === null) entrant.startedAt = now();
+      if (item.funded && (item.funded.chainStatus !== "open" || item.funded.confirmedParticipants < 2 || entrant.claimed)) throw new Error("This room is not ready to compete. Check its escrow status.");
+      if (item.funded && (now() < item.funded.startsAt || item.funded.chainTime < item.funded.startsAt)) throw new Error("Registration is still open. The shared grid unlocks at the competition start.");
+      if (entrant.startedAt === null) entrant.startedAt = item.funded?.startsAt ?? now();
       save();
       return view(item, actor(body.actor));
     }
@@ -153,6 +179,7 @@ export function createCompetitionStore(now = Date.now, onSave?: (raw: string) =>
       const item = room(body.code);
       const at = now();
       active(item, at);
+      if (item.funded && item.funded.chainStatus !== "open") throw new Error("This escrow competition is no longer active.");
       const entrant = item.entrants.find(entry => entry.actor === actor(body.actor));
       if (!entrant || entrant.startedAt === null) throw new Error("Start your challenge first.");
       if (entrant.completedMs !== null) throw new Error("Your attempt is already finished.");
@@ -173,5 +200,38 @@ export function createCompetitionStore(now = Date.now, onSave?: (raw: string) =>
     }
     throw new Error("Unknown competition request.");
   }
-  return { route, snapshot, replace };
+  // Called only by the server's verified-chain adapter, never dispatched from request body.
+  function syncChain(code: unknown, chain: VerifiedChainRoom) {
+    const item = room(code); const terms = item.funded;
+    if (!terms) throw new Error("This is a free room.");
+    if (chain.id !== terms.id || chain.creator !== item.owner || chain.authority !== terms.authority || chain.mint !== terms.mint || chain.stakeUnits !== terms.stakeUnits
+      || chain.startsAt < terms.startsAt || chain.endsAt - chain.startsAt !== terms.playMs || chain.refundAt - chain.endsAt !== terms.graceMs
+      || !Number.isSafeInteger(chain.participants) || chain.participants < item.entrants.length || chain.entries.length !== chain.participants
+      || new Set(chain.entries.map(entry => entry.wallet)).size !== chain.entries.length
+      || item.entrants.some(entrant => !chain.entries.some(entry => entry.wallet === entrant.actor))) throw new Error("Escrow account does not match this room's immutable terms.");
+    const allowed = { pending: ["open", "awarded", "refunding", "paid"], open: ["open", "awarded", "refunding", "paid"],
+      awarded: ["awarded", "paid"], refunding: ["refunding"], paid: ["paid"] };
+    if (!allowed[terms.chainStatus].includes(chain.status) || chain.chainTime < terms.chainTime
+      || (terms.winner !== null && chain.winner !== terms.winner)
+      || item.entrants.some(entrant => entrant.claimed && !chain.entries.find(entry => entry.wallet === entrant.actor)?.claimed)) {
+      throw new Error("Escrow observation regressed. Refresh the latest chain state.");
+    }
+    if (chain.startsAt !== terms.startsAt && (terms.confirmedParticipants > 1 || item.entrants.some(entry => entry.startedAt !== null))) throw new Error("Room deadline changed after entry locked.");
+    for (const entry of chain.entries) {
+      enter(item, entry.wallet);
+      item.entrants.find(entrant => entrant.actor === entry.wallet)!.claimed = entry.claimed;
+    }
+    terms.startsAt = chain.startsAt; terms.refundAt = chain.refundAt; terms.chainStatus = chain.status;
+    terms.confirmedParticipants = chain.participants; terms.chainTime = Math.max(terms.chainTime, chain.chainTime); terms.winner = chain.winner;
+    item.endsAt = chain.endsAt;
+    save();
+  }
+  function fundingContext(code: unknown, session: unknown) {
+    const item = room(code); const wallet = actor(session);
+    if (!item.funded) throw new Error("This room has no escrow.");
+    return { owner: item.owner, wallet, wallets: [...new Set([item.owner, wallet, ...item.entrants.map(entry => entry.actor)])], endsAt: item.endsAt, terms: { ...item.funded },
+      outcome: competitionOutcome(item.entrants.map(entry => ({ wallet: entry.actor, startedAt: entry.startedAt, completedMs: entry.completedMs })), item.endsAt, now()) };
+  }
+  function rememberSettlement(code: unknown, signature: string) { room(code).funded!.settlementSignature = signature; save(); }
+  return { route, snapshot, replace, syncChain, fundingContext, rememberSettlement };
 }

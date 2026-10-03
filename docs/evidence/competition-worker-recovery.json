@@ -1,0 +1,17 @@
+{
+  "cluster": "devnet",
+  "startedAt": "2026-10-03T00:42:55.029Z",
+  "passed": true,
+  "transactions": [
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "signature": "2is146AQQVFbJbvMczZmzmXaqiVTngiWGzzy7VTBW6ef9Rad3rZdqBy2Z1um7Rt44rmoPaFo4YC6W7ymyS5srxSZ",
+      "action": "wallet-transaction",
+      "explorer": "https://explorer.solana.com/tx/2is146AQQVFbJbvMczZmzmXaqiVTngiWGzzy7VTBW6ef9Rad3rZdqBy2Z1um7Rt44rmoPaFo4YC6W7ymyS5srxSZ?cluster=devnet"
+    }
+  ],
+  "code": "E0E2202B",
+  "escrow": "BayY6EZMLFr4egBoSXdpAk57MumvCb6F137bT6uZbfR5",
+  "recovery": true,
+  "finishedAt": "2026-10-03T00:43:11.395Z"
+}

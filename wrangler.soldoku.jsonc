@@ -24,6 +24,10 @@
   ],
   "vars": {
     "SOLANA_CLUSTER": "devnet",
-    "SOLANA_RPC": "https://api.devnet.solana.com"
+    "SOLANA_RPC": "https://api.devnet.solana.com",
+    "SUDOKU_COMPETITION_PROGRAM_ID": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+    "SUDOKU_COMPETITION_MINT": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+    "SUDOKU_COMPETITION_PLAY_MS": "1800000",
+    "SUDOKU_COMPETITION_GRACE_MS": "3600000"
   }
 }

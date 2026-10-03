@@ -1,0 +1,87 @@
+{
+  "cluster": "devnet",
+  "passed": true,
+  "rooms": [
+    "C7pKMcxeYBNtFPV1ZzTazXmj5QYnHWDJDdzTBViwN1yc",
+    "AeBZykDM5pXLTchxGcWSKWAXkmBvHEJTe2Fu2GkuwEq",
+    "3wp4azMxDxjitkGFSVUmiH8f2BfL71Lg98bBxcUzkCKS"
+  ],
+  "receipts": [
+    {
+      "action": "open-0",
+      "signature": "5YWrX8ijnzL6feABtVaePJDuNHqGTZDojbyJMh5xDHhbEYMqAbiR886o421M1kDzNd29hSZE9yyo2WL2jkVpRwxE"
+    },
+    {
+      "action": "join-0",
+      "signature": "4mL22HHoeHkHar26Ybz7c4bB6A7iFnHu8AWcmDiVKKybXFaPnxQHmdfTMN1DVfZqSBjFfrXquRdsUgGtuB3JnWYS"
+    },
+    {
+      "action": "join-0",
+      "signature": "64x4hvKKbuSscwaSKby2TAoDoshKuB6jXgDbjF8Ce88twYBErx3Sw9VLvm9ZUCmdZyHRjQMA5n7X5LdrfKs4vkts"
+    },
+    {
+      "action": "open-1",
+      "signature": "2qNjRoNRpmvLnBASymds9izkVPkUb8reuN8azAykYpQUS6kARtsG9EFxfT9yGhk3f65KZQ5MHsZggKyL9tK9UHcU"
+    },
+    {
+      "action": "solo-extension",
+      "signature": "3QpW7fNoJoDrFHeeVTkcmyN6P4HZunmC3rHLNeGMmx2STdtgwvyq1uDho3EyhaDjPWr29gF2UsC4LnEnnQv5XHo5"
+    },
+    {
+      "action": "open-2",
+      "signature": "uGnaENKCuX2MxcZVHPP5GTcZdD1QACzyGBUqT6XvJMobevzeBvzfM1HY3JeG6nT8fYf1rRGpigRCXuDdAreKFcg"
+    },
+    {
+      "action": "join-2",
+      "signature": "3ML7aXXUgREaEoGLkByj96MjctqX1iW4s1jTLj2jhBoKacyUpBAq142JwR1EkndCRXhVQM9xb6wtsrDtyMgshPAZ"
+    },
+    {
+      "action": "join-2",
+      "signature": "4EF8oxGRZ3F9Q5t2tgGhsrfhrTcvWTYdELsXR4NB4BfE4cLSzdNdRn8PnC5S3VCekQczbZr8wRkjfrKrBoMvKgnv"
+    },
+    {
+      "action": "no-finisher-settlement",
+      "signature": "4iXba4N1WdMLY82dEvXpwVq2jrX4cuZ7o5YRZByQWXa8ZYVWe3twoHmXXU8tMrbarpgvsesA53KgXREnTWEFqptT"
+    },
+    {
+      "action": "no-finisher-refund",
+      "signature": "2W6WH4kFsKAqxbYqNVYq2dBn9XTWTw3Yy2ggp9eaU5CGbtrZ2dGzzkh6579X2ohq5jQoxUowzidsoxJpmNJLTAfD"
+    },
+    {
+      "action": "refund-retry",
+      "signature": "56pD128Hhoai4L6ajnGZjyPJyZLmzWqgJjzixH6NhtDWLjLb8QsaZa1R8oBZUXuktDGzsGeE8Wx3b9Q5iWZRKB81"
+    },
+    {
+      "action": "no-finisher-refund",
+      "signature": "4SkBL5KT87r5oRMt4BAn13GopNMRkLsQX9P7pZEaoY8ZavWyH6S6JrXF4SSPWafNoMAWTtWbKo2LzQmscpSooUB3"
+    },
+    {
+      "action": "refund-retry",
+      "signature": "5AdeafjqAXiH3ZW1PE2F3zfkVe759jpgwmtxjhmfFRZ8rdha5ntQWYZt5FaCxfUFQcn1BwpS3LoJcHpRsYf79pQN"
+    },
+    {
+      "action": "no-finisher-refund",
+      "signature": "TQQQXbiAseJ4p2xYgkwqfzQPXv5u7otDvaWMXGZitZvLyjBFy87C5pKyngxRba7oNmCcbuH7Mt62gSHSQMnHdNm"
+    },
+    {
+      "action": "refund-retry",
+      "signature": "5mRbZgGa7ikSQczuCaA6C3MX4cXHhhvfK4yCLJoEHYURAd589hAy5623zLHUQe2ji7AFuoPgb1e4m6ayGqymyJ3r"
+    },
+    {
+      "action": "solo-refund",
+      "signature": "49GkJeGhVjRNc6XUphrzVzYQWKi6K8FdP2x7wBwVkstWR8Ua33F7zJfX16FjaFQAeQWgU3eTMcW754pk2ZUKXUqn"
+    },
+    {
+      "action": "authority-timeout-refund",
+      "signature": "4USgtzqTrF4iQrsgTVUiQqkvP8kSUDwwKoDJygZmLpEzrW3uXVkWE1iNjPeEbqYojeNJv2qciSEkK236QgaJbSKr"
+    },
+    {
+      "action": "authority-timeout-refund",
+      "signature": "5HMWYvP2p3imaAyGwQZgFA7EWNmcxpCYbosS9GrfHWGPUNWKsjrzdcSjceHP8z49sUdPR7NRunuyTD84T6FfgNGx"
+    },
+    {
+      "action": "authority-timeout-refund",
+      "signature": "iSHY3wvYQnDkB6pafcnPFWMZPZX2f8ezNaU9cCTbkCWa4tW5wJUU7GdUgLxeJ1CEjCpVWu9h8Rb7xVL3FDWTVFF"
+    }
+  ]
+}

@@ -7,6 +7,8 @@ import { capabilityBody, sandboxSessionBody, webhookBody } from "./solana/fundin
 import { applySettleSignatures, settledChainUpdate, settleSignaturesIn } from "./solana/recover";
 import { createCompetitionStore } from "./competition/store";
 import { marketTokens } from "./competition/market";
+import { competitionChain, type CompetitionEnvironment } from "./competition/chain";
+import { prepareCompetitionRequest } from "./competition/funded";
 
 type Statement = {
   bind: (...values: unknown[]) => Statement;
@@ -15,7 +17,7 @@ type Statement = {
   run: () => Promise<{ meta?: { changes?: number } }>;
 };
 
-type Env = {
+type Env = CompetitionEnvironment & {
   ASSETS: { fetch: (request: Request) => Promise<Response> };
   DB: { prepare: (sql: string) => Statement };
   SOLANA_RPC?: string;
@@ -124,16 +126,17 @@ async function competitions(request: Request, env: Env): Promise<Response> {
     const raw = request.method === "GET" ? "" : await request.text();
     if (raw.length > 16384) throw new Error("Request is too large.");
     const body = raw ? JSON.parse(raw) as Record<string, unknown> : {};
+    const chain = competitionChain(env);
     await env.DB.prepare("CREATE TABLE IF NOT EXISTS competition_state (id INTEGER PRIMARY KEY, body TEXT NOT NULL)").run();
     for (let attempt = 0; attempt < 4; attempt++) {
       const row = await env.DB.prepare("SELECT body FROM competition_state WHERE id = 1").first<{ body: string }>();
-      const store = createCompetitionStore();
+      const store = createCompetitionStore(Date.now, undefined, chain?.config);
       store.replace(row?.body ?? null);
-      const result = store.route(request.method, url, body);
+      const prepared = await prepareCompetitionRequest(store, chain, request.method, url, body);
       const next = store.snapshot();
-      if (request.method === "GET" || next === row?.body) return Response.json(result, { headers: { "cache-control": "no-store" } });
+      if (request.method === "GET" || next === row?.body) return Response.json(prepared.afterCommit ? await prepared.afterCommit() : prepared.result, { headers: { "cache-control": "no-store" } });
       const written = await env.DB.prepare("INSERT INTO competition_state (id, body) VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET body = excluded.body WHERE body = ?").bind(next, row?.body ?? "").run();
-      if ((written.meta?.changes ?? 0) > 0) return Response.json(result, { headers: { "cache-control": "no-store" } });
+      if ((written.meta?.changes ?? 0) > 0) return Response.json(prepared.afterCommit ? await prepared.afterCommit() : prepared.result, { headers: { "cache-control": "no-store" } });
     }
     return Response.json({ error: "Room changed. Try the action again." }, { status: 409 });
   } catch (error) {
