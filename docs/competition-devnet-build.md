@@ -79,6 +79,20 @@ node node_modules/vitest/vitest.mjs run src/competition/escrow.devnet.test.ts
 
 ## Production release verification
 
-GitHub CLI access was restored as `alicearcadeth`. Remote main matched the original ZIP baseline `889944bf01b328c2aed7cb5f7464264e5ac68c6f`, so history was restored without upstream conflicts. Implementation commit `d1acf7bdabeda6837f1c762a425bcbce2d33b91c` was pushed, built clean and deployed as Worker version `e6b26786-1f7b-4da5-8a83-251043aa4563`. Private RPC and authority are Worker secrets. Release verification passed on both Soldoku domains for all 14 shipped assets. Production room `D7D908F6` has three real deposits and three server-verified finishes; its final payout verification is waiting for the immutable 30-minute deadline.
+GitHub CLI access was restored as `alicearcadeth`. Remote main matched the original ZIP baseline `889944bf01b328c2aed7cb5f7464264e5ac68c6f`, so history was restored without upstream conflicts. Implementation commit `d1acf7bdabeda6837f1c762a425bcbce2d33b91c` was pushed, built clean and deployed as Worker version `e6b26786-1f7b-4da5-8a83-251043aa4563`. Private RPC and authority are Worker secrets. Release verification passed on both Soldoku domains for all 14 shipped assets. Production room `D7D908F6` passed the complete real three-wallet flow on https://soldoku.com/: three deposits, hidden grid until the common start, refresh recovery, finishes at 35.351/52.272/69.131 seconds, correct ranking, settlement after the immutable 30-minute deadline and full 3 TEST winner payout. All five transactions finalized successfully and the vault is empty. [Production evidence](evidence/competition-production-devnet.json) includes the room, escrow, binary hash and receipts; [winner payout](https://explorer.solana.com/tx/2XtxwqU1H3bE92GG9qMhAG94HNKrzZbp6ZvqiazypQZQ7fk7tHdMF1oDGy3PSJUm7xdRqZz8Ghu8T8aXJHF66fFp?cluster=devnet). During the deadline wait, only mint wrapping and the room-list late-join control changed; escrow, server, gameplay and payout source stayed identical. The updated deployed UI separately passed all 20 production browser checks and the disabled late-join control was inspected in the browser. Final documentation/evidence commits require another clean build/deploy/parity check.
 
-The three-day goal remains incomplete until all requested gates have evidence.
+## Requirement audit
+
+| Requirement | Authoritative evidence |
+| --- | --- |
+| Three-wallet real deposits, same grid/common start, one attempt, leaderboard and winner payout | Production browser evidence above; five finalized successful Devnet transactions, exact balance changes and empty vault |
+| Duplicate joins/attempts/settlement/claims, deadlines and insufficient funds | Actual local-validator transaction suite, live Devnet refunds, funded/store/Worker tests; repeated claims conserve balances |
+| No entrants, solo extension, expired rooms, nonfinishers, authority failure and safe refunds | Unfunded intents take no stake; funded admission tests; final-build live refund evidence with 19 finalized receipts and empty vaults |
+| Result integrity | Server-accepted single-cell move sequences and timing; immutable terms; unique fastest accepted finish selected server-side; ties/no finish refund; outcome/funded tests |
+| Refresh/reconnect and share URLs | Production browser refresh, Worker fresh-session recovery/refund, room-link tests and public room inspection |
+| Room states/countdown/pool/count, ranking and current user | Production screenshots and UI checks; three ranked finishes, current-wallet marker, paid state and disabled repeat claim |
+| Reliable stake tokens and mobile polish | Configured six-decimal SPL TEST mint; explicit no-cash-value UI; 320–1280 px checks; mint wrapping and late-deposit controls verified on production |
+| Tests and documentation | 232 automated tests passed, six opt-in tests skipped in ordinary suite; six Rust tests; separate actual local/Devnet transaction runs; 20 production UI checks; this document and public receipts |
+| Commit/push and local/GitHub/production parity | Restored real Git history, pushed main, clean release builds, deployed Worker and `verify:release` checks of all 14 shipped assets on both domains |
+
+The explicit requirements have evidence. Wallet Standard browser adapters sign real transactions with three separate disposable Devnet keys; individual wallet-extension approval UIs are outside this test. The authority attests server results, and outside Sudoku solvers remain possible as described in the rules.

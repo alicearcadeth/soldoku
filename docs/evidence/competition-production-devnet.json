@@ -1,0 +1,76 @@
+{
+  "cluster": "devnet",
+  "startedAt": "2026-10-03T01:19:24.445Z",
+  "passed": true,
+  "transactions": [
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "signature": "2w6j4ka8Ve4HHyYcM2nYBeLW8XuSPPzpXHGwY5Zm2NqoQp1ziDQ5WckVDsvoahrDR7rAdKF8wkCyFco1X5JRJrBQ",
+      "action": "wallet-transaction",
+      "explorer": "https://explorer.solana.com/tx/2w6j4ka8Ve4HHyYcM2nYBeLW8XuSPPzpXHGwY5Zm2NqoQp1ziDQ5WckVDsvoahrDR7rAdKF8wkCyFco1X5JRJrBQ?cluster=devnet"
+    },
+    {
+      "wallet": "5Yj8tfWFSucMUyYZVdCRNFSw1QF3C1MbG7dbo8vFkkar",
+      "signature": "2pAqufnNcqoaGHZrKARbutPySvf9VTqeAUtsjLjmhXaBF1VZFuZLMMNXNFJpMMe7uor9g8abzXuUEteCHcmco1ny",
+      "action": "wallet-transaction",
+      "explorer": "https://explorer.solana.com/tx/2pAqufnNcqoaGHZrKARbutPySvf9VTqeAUtsjLjmhXaBF1VZFuZLMMNXNFJpMMe7uor9g8abzXuUEteCHcmco1ny?cluster=devnet"
+    },
+    {
+      "wallet": "6qtMCHsqEwxpYqqrdQWbDdJFFYzpKs8o5mmW1Zd9Bju2",
+      "signature": "TmwvEhCa9NXr8i5NEgM9EkdszWHw2XBPPt7RygPDT6UuequxmAhXWjVnaUYWg2f2Jivnk3vyDnw23jsNnMPNs1P",
+      "action": "wallet-transaction",
+      "explorer": "https://explorer.solana.com/tx/TmwvEhCa9NXr8i5NEgM9EkdszWHw2XBPPt7RygPDT6UuequxmAhXWjVnaUYWg2f2Jivnk3vyDnw23jsNnMPNs1P?cluster=devnet"
+    },
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "signature": "KfUhTdR783Umgie426EzXWuC6cnLvLQBxWcVc831mcN8Jxcx6uSKB6fxeMZjqPoqEGh7PcH6s2voooqQU4Hb2eH",
+      "action": "settle",
+      "explorer": "https://explorer.solana.com/tx/KfUhTdR783Umgie426EzXWuC6cnLvLQBxWcVc831mcN8Jxcx6uSKB6fxeMZjqPoqEGh7PcH6s2voooqQU4Hb2eH?cluster=devnet"
+    },
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "signature": "2XtxwqU1H3bE92GG9qMhAG94HNKrzZbp6ZvqiazypQZQ7fk7tHdMF1oDGy3PSJUm7xdRqZz8Ghu8T8aXJHF66fFp",
+      "action": "wallet-transaction",
+      "explorer": "https://explorer.solana.com/tx/2XtxwqU1H3bE92GG9qMhAG94HNKrzZbp6ZvqiazypQZQ7fk7tHdMF1oDGy3PSJUm7xdRqZz8Ghu8T8aXJHF66fFp?cluster=devnet"
+    }
+  ],
+  "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+  "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+  "programSHA256": "d16042a586a73b0da83f2f3aec58a135f92cda9c339ed51cc85c0dc2ee12c8d7",
+  "code": "D7D908F6",
+  "url": "https://soldoku.com/?room=D7D908F6",
+  "escrow": "7uYxmvN8QKDKK3fTSE6Tm3d7PpZmi2YEywaBdW6nVKnr",
+  "leaderboard": [
+    {
+      "name": "JCVs…kGM7",
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "you": true,
+      "completedMs": 35351,
+      "rank": 1
+    },
+    {
+      "name": "5Yj8…kkar",
+      "wallet": "5Yj8tfWFSucMUyYZVdCRNFSw1QF3C1MbG7dbo8vFkkar",
+      "you": false,
+      "completedMs": 52272,
+      "rank": 2
+    },
+    {
+      "name": "6qtM…Bju2",
+      "wallet": "6qtMCHsqEwxpYqqrdQWbDdJFFYzpKs8o5mmW1Zd9Bju2",
+      "you": false,
+      "completedMs": 69131,
+      "rank": 3
+    }
+  ],
+  "tokenBalances": [
+    "28000000",
+    "16000000",
+    "16000000"
+  ],
+  "finishedAt": "2026-10-03T01:53:29.509Z",
+  "origin": "https://soldoku.com/",
+  "applicationCommitAtStart": "d1acf7bdabeda6837f1c762a425bcbce2d33b91c",
+  "applicationCommitAtFinalClaims": "5b6e80109e83ee5284a6f757d90f549e37732b8e",
+  "changesDuringRun": "Mint-address wrapping and closed-registration room-list button. Escrow, server, gameplay and payout code were unchanged."
+}

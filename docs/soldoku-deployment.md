@@ -30,7 +30,7 @@ The full app is configured in `wrangler.soldoku.jsonc`. It uses the competition 
 
 ## Devnet competition release — 3 October 2026
 
-The current source implements multiplayer Devnet escrow. The latest deployed Devnet program passed the three-wallet Worker/D1 browser flow and the live refund suite; the automated suite passes 232 tests. See [competition verification and receipts](competition-devnet-build.md). The implementation was pushed, built clean and deployed to both Soldoku domains. Release hashes match. The production three-wallet browser test has verified deposits, shared grid, refresh recovery, finishes and ranking; settlement and payout verification are waiting for the normal competition deadline.
+The current source implements multiplayer Devnet escrow. The latest deployed Devnet program passed the three-wallet Worker/D1 browser flow and the live refund suite; the automated suite passes 232 tests. See [competition verification and receipts](competition-devnet-build.md). The implementation was pushed, built clean and deployed to both Soldoku domains. Release hashes match. The production three-wallet browser test passed deposits, common grid/start, refresh recovery, three valid finishes, ranking, finalized settlement, full 3 TEST winner payout and an empty vault. [Public production receipts](evidence/competition-production-devnet.json) retain all five finalized successful transactions. Twenty production UI/browser checks also pass, including Classic, Practice, Quick Match and widths from 320 to 1280 pixels.
 
 The private `SUDOKU_COMPETITION_RPC` and `SUDOKU_COMPETITION_AUTHORITY_KEY` are configured as Worker secrets. Keep credentials outside Git. Preserve the existing D1 database and follow the release alignment instructions above.
 

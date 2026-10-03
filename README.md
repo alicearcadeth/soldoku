@@ -4,7 +4,7 @@ A Sudoku app with Classic, Practice, leaderboard competitions and legacy two-pla
 
 The public app is a **Devnet** beta. The stake is a test token. It has **no cash value**. Mainnet staking is not enabled.
 
-The new funded competition flow passed a three-wallet browser test with real Devnet deposits, settlement and winner payout. Public receipts are recorded in [the browser evidence](docs/evidence/competition-devnet-browser.json). The implementation is pushed and deployed to the public Soldoku Worker. Local, GitHub and both public-domain assets match; the production three-wallet test is waiting for its normal settlement deadline. See [competition setup and verification](docs/competition-devnet-build.md) for configuration, current limits and live refund tests. Funded creation stays disabled without its separate program and server authority configuration.
+The new funded competition flow passed a three-wallet browser test with real Devnet deposits, settlement and winner payout. Public receipts are recorded in [the browser evidence](docs/evidence/competition-devnet-browser.json). The implementation is pushed and deployed to the public Soldoku Worker. The production three-wallet test passed deposits, shared-grid competition, ranking, finalized settlement and full 3 TEST winner payout with an empty vault. See [production receipts](docs/evidence/competition-production-devnet.json). Local, GitHub and both public-domain assets match. See [competition setup and verification](docs/competition-devnet-build.md) for configuration, current limits and live refund tests. Funded creation stays disabled without its separate program and server authority configuration.
 
 ## Play
 
@@ -86,7 +86,7 @@ The production worker returns 403 for financial routes until the owner sets the 
 
 Devnet stakes of 1, 2, or 5 are test tokens. A desktop staging session can create a disposable key in the browser. That key is not a personal wallet. Fund it only from the staging authority on Devnet. The public site expects a normal Devnet wallet.
 
-## Known limits
+## Legacy two-player limits
 
 An outside Sudoku solver can still be used. The server rejects impossible move sequences and very fast finishes, and it flags a fast finish for review. It does not take the stake because of that flag. See `docs/fair-play.md`.
 

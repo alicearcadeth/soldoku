@@ -1,8 +1,8 @@
 # PC check — 3 October 2026
 
 Project folder: `F:\James\codex project file\Soldoku\soldoku-main`.
-Extracted from `soldoku-main.zip`; original ZIP preserved. This download has no `.git` directory.
-The ZIP archive comment identifies its source commit as `889944bf01b328c2aed7cb5f7464264e5ac68c6f`. Use that commit as the migration baseline when repository access is restored; do not manufacture replacement history.
+Extracted from `soldoku-main.zip`; original ZIP preserved. The original download had no `.git` directory; real history has now been restored.
+The ZIP archive comment identifies its source commit as `889944bf01b328c2aed7cb5f7464264e5ac68c6f`. That commit was verified against remote main and used to restore the original repository history.
 
 ## Initial migration baseline
 
@@ -15,9 +15,9 @@ The ZIP archive comment identifies its source commit as `889944bf01b328c2aed7cb5
 - Browser checks used installed Chrome with `PLAYWRIGHT_CHROMIUM`. Screenshots/results are in `output/laptop-check/`.
 - Java 17 and the standard Android SDK directory are present. Android build, signing and device integration were not checked.
 
-## Remaining setup
+## Historical setup blockers — resolved
 
-GitHub CLI is signed into `Kleangkao`. Both cloning and GitHub API access to the user-confirmed repository `https://github.com/alicearcadeth/soldoku` failed with repository-not-found. Sign into an account that has access, or grant the current account access, then clone the repository into a separate folder. Do not create a replacement Git history for the ZIP.
+During the initial migration, GitHub CLI was signed into `Kleangkao`. Both cloning and GitHub API access to the user-confirmed repository `https://github.com/alicearcadeth/soldoku` failed with repository-not-found. Sign into an account that has access, or grant the current account access, then clone the repository into a separate folder. Do not create a replacement Git history for the ZIP.
 
 `scripts/verify-release.mjs` additionally requires GitHub access and checks a hosted deployment; it was not run.
 
@@ -38,7 +38,7 @@ The separate multi-player competition contract is now deployed on Devnet. Three-
 
 The current automated suite passes 232 tests, with six optional integration tests skipped. TypeScript, Vite bundling, Rust state tests, actual local-validator contract tests and the Worker deployment dry run pass. Private competition identities and Artportal's reused Alchemy Devnet RPC URL remain outside the repository. Cloudflare authentication is available on this PC.
 
-GitHub CLI access was restored as `alicearcadeth` on 3 October 2026. The remote HEAD exactly matched the original ZIP baseline, so real Git history was restored without upstream conflicts. The release must still pass clean build, push, deployment, production three-wallet testing and release parity checks.
+GitHub CLI access was restored as `alicearcadeth` on 3 October 2026. The remote HEAD exactly matched the original ZIP baseline, so real Git history was restored without upstream conflicts. Clean builds, Git pushes, deployment, the production three-wallet flow and release parity checks on both domains have passed. Production room `D7D908F6` paid the full 3 TEST pool and left its vault empty; all five transactions finalized.
 
 ## Run locally
 
