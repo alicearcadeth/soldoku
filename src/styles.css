@@ -533,7 +533,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
 .secondary:not(:disabled):hover, .choice:hover, .mode:hover, .tools button:not(:disabled):hover { border-color: var(--entered); }
 button:disabled { cursor: not-allowed; }
 .back-rooms { display: block; width: 100%; font-weight: 650; border: 2px solid var(--entered); color: var(--entered); margin: 12px 0; }
-.token-result { min-height: 98px; height: auto; }
+.token-result { height: auto; }
+.token-result .choice { width: 100%; }
+.token-address { font-size: 0.8rem; }
+.token-address summary { cursor: pointer; padding: 6px 0; }
+.token-address small { display: block; overflow-wrap: anywhere; }
 .token-result small { overflow-wrap: anywhere; line-height: 1.4; }
 .quote-total { overflow-wrap: anywhere; }
 .creation-form label { display: grid; gap: 8px; }

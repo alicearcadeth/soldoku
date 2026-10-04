@@ -3,7 +3,7 @@ import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';
 const origin=process.env.QA_ORIGIN ?? 'http://127.0.0.1:5173/';
 mkdirSync('output/win-celebration',{recursive:true});
-const browser=await chromium.launch(process.env.PLAYWRIGHT_CHROMIUM ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM } : {});
+const browser=await chromium.launch(process.env.PLAYWRIGHT_CHROMIUM ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM } : { channel: "msedge" });
 try {
   for(const reducedMotion of ['no-preference','reduce']) {
     const context=await browser.newContext({viewport:{width:390,height:900},reducedMotion});
@@ -18,7 +18,7 @@ try {
     for(const index of empty){ await page.getByRole('gridcell').nth(index).click(); await page.keyboard.press(String(save.puzzle.solution[index])); }
     const celebration=page.getByTestId('win-celebration');
     await celebration.waitFor();
-    assert.match(await celebration.innerText(),/Sudoku solved!/);
+    assert.match(await celebration.innerText(),/Soldoku solved!/);
     assert.equal(await celebration.evaluate(e=>getComputedStyle(e).pointerEvents),'none');
     if(reducedMotion==='reduce'){
       assert.equal(await page.locator('.win-badge').evaluate(e=>getComputedStyle(e).animationName),'none');

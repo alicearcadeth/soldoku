@@ -429,7 +429,7 @@ export function ClassicGame({ level, fresh = false, resume = false, onExit }: Pr
   const selectedValue = values[selected];
 
   return (
-    <main className="app game"><Brand /><WinCelebration eventKey={won && puzzle ? `classic:${puzzle.givens.join("")}` : null} message="Sudoku solved!" feedback={false} />
+    <main className="app game"><Brand /><WinCelebration eventKey={won && puzzle ? `classic:${puzzle.givens.join("")}` : null} message="Soldoku solved!" feedback={false} />
       <div className={paused ? "concealed" : undefined} inert={paused || won}>
       <header className="bar">
         <button className="text" onClick={requestExit}>

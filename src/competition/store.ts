@@ -58,7 +58,7 @@ export function createCompetitionStore(now = Date.now, onSave?: (raw: string) =>
     const funded = item.funded;
     return { code: item.code, name: item.name || `Room ${item.code}`, level: item.puzzle.level, createdAt: item.createdAt, endsAt: item.endsAt,
       durationMs: (funded?.startsAt ?? item.endsAt) - item.createdAt, participants: funded?.confirmedParticipants ?? item.entrants.length,
-      status: now() < item.endsAt ? "active" : "ended", token: funded ? { mint: funded.mint, symbol: "TEST", name: "Devnet competition token", priceUsd: 0, updatedAt: 0 } : null,
+      status: now() < item.endsAt ? "active" : "ended", token: funded ? { mint: funded.mint, symbol: "TEST", name: "Soldoku Token (Devnet)", priceUsd: 0, updatedAt: 0 } : null,
       stake: funded ? Number(funded.stakeUnits) / 10 ** funded.decimals : 0, bestMs: Number.isFinite(best) ? best : null,
       ...(funded ? { funded: { ...funded } } : {}) };
   }

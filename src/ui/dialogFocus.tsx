@@ -12,7 +12,7 @@ export function useDialogFocus(onClose: () => void) {
     const close = () => closeRef.current();
     stack.push(close);
     const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const items = () => [...(node?.querySelectorAll<HTMLElement>("button, input, textarea, a[href]") ?? [])].filter((el) => !el.hasAttribute("disabled"));
+    const items = () => [...(node?.querySelectorAll<HTMLElement>("button, input, textarea, select, summary, a[href]") ?? [])].filter((el) => !el.hasAttribute("disabled"));
     items()[0]?.focus();
     const onKey = (event: KeyboardEvent) => {
       if (stack[stack.length - 1] !== close) return;
