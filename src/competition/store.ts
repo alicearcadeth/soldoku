@@ -225,7 +225,11 @@ export function createCompetitionStore(now = Date.now, onSave?: (raw: string) =>
       item.entrants.find(entrant => entrant.actor === entry.wallet)!.claimed = entry.claimed;
     }
     terms.startsAt = chain.startsAt; terms.refundAt = chain.refundAt; terms.chainStatus = chain.status;
-    terms.confirmedParticipants = chain.participants; terms.chainTime = Math.max(terms.chainTime, chain.chainTime); terms.winner = chain.winner;
+    terms.confirmedParticipants = chain.participants;
+    // Persist a finalized clock lower bound only when it unlocks a registration,
+    // settlement, or refund gate. Unchanged polls must not churn the shared D1 row.
+    const clockGate = Math.max(0, ...[chain.startsAt, chain.endsAt, chain.refundAt].filter(deadline => chain.chainTime >= deadline));
+    terms.chainTime = Math.max(terms.chainTime, clockGate); terms.winner = chain.winner;
     item.endsAt = chain.endsAt;
     save();
   }

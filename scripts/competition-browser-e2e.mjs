@@ -59,7 +59,7 @@ async function client(key, index, url = origin) {
     await page.getByRole("button", { name: "Settings", exact: true }).click();
     await page.getByRole("button", { name: "Sound effects: Off", exact: true }).click();
     await page.getByRole("button", { name: "Done", exact: true }).click();
-    await capture.start("01-create-and-deposits"); await page.waitForTimeout(2500);
+    await capture.start(process.env.SUDOKU_COMPETITION_E2E_RESUME ? "00-reconnect" : "01-create-and-deposits"); await page.waitForTimeout(2500);
   }
   return page;
 }
@@ -105,33 +105,62 @@ try {
   const mint = new PublicKey(config.mint);
   const tokenAccounts = players.map(player => getAssociatedTokenAddressSync(mint, player.publicKey));
   const before = await Promise.all(tokenAccounts.map(async address => (await getAccount(connection, address, "finalized")).amount));
-  const recover = process.env.SUDOKU_COMPETITION_E2E_RECOVER;
+  const claimResume = process.env.SUDOKU_COMPETITION_E2E_CLAIM_RESUME;
+  const priorClaim = claimResume ? JSON.parse(readFileSync(claimResume, "utf8")) : null;
+  if (priorClaim) {
+    assert.equal(priorClaim.cluster, live ? "devnet" : "localnet"); assert.equal(priorClaim.program, config.program); assert.equal(priorClaim.mint, config.mint);
+    assert.equal(priorClaim.transactions.length, 4); transactions.push(...priorClaim.transactions); result.resumedFrom = claimResume;
+  }
+  const recover = priorClaim?.code ?? process.env.SUDOKU_COMPETITION_E2E_RECOVER;
   if (recover) {
     assert.match(recover, /^[A-F0-9]{8}$/);
     const recoveryUrl = new URL(origin); recoveryUrl.searchParams.set("room", recover);
     const a = await client(players[0], 0, recoveryUrl.href);
     await a.getByRole("button", { name: "Check my deposited entry", exact: true }).click(); await wallet(a);
-    await a.getByRole("button", { name: "Claim stake refund", exact: true }).waitFor();
-    const room = await state(a, recover); assert.equal(room.participants, 1); assert.equal(room.you.owner, true);
+    const claimLabel = priorClaim ? "Claim winner payout" : "Claim stake refund";
+    await a.getByRole("button", { name: claimLabel, exact: true }).waitFor();
+    const room = await state(a, recover); assert.equal(room.participants, priorClaim ? 3 : 1); assert.equal(room.you.owner, true);
+    if (priorClaim) assert.equal(room.funded.winner, players[0].publicKey.toBase58());
     const id = Buffer.alloc(8); id.writeBigUInt64LE(BigInt(room.funded.id));
     const escrow = PublicKey.findProgramAddressSync([Buffer.from("competition"), id], new PublicKey(config.program))[0];
     const vault = getAssociatedTokenAddressSync(mint, escrow, true);
-    assert.equal((await getAccount(connection, vault)).amount, BigInt(room.funded.stakeUnits));
-    await a.getByRole("button", { name: "Claim stake refund", exact: true }).click();
+    const payout = BigInt(room.funded.stakeUnits) * BigInt(priorClaim ? 3 : 1);
+    assert.equal((await getAccount(connection, vault)).amount, payout);
+    await a.getByRole("button", { name: claimLabel, exact: true }).click();
     await a.getByText("Your claim is complete.", { exact: true }).waitFor();
     assert.equal((await getAccount(connection, vault)).amount, 0n);
-    assert.equal((await getAccount(connection, tokenAccounts[0])).amount, before[0] + BigInt(room.funded.stakeUnits));
-    assert.equal(transactions.length, 1);
-    const status = (await connection.getSignatureStatuses([transactions[0].signature], { searchTransactionHistory: true })).value[0];
-    assert.equal(status?.err, null); assert.equal(status?.confirmationStatus, "finalized");
+    assert.equal((await getAccount(connection, tokenAccounts[0])).amount, before[0] + payout);
+    assert.equal(transactions.length, priorClaim ? 5 : 1);
+    for (const transaction of transactions) {
+      const status = (await connection.getSignatureStatuses([transaction.signature], { searchTransactionHistory: true })).value[0];
+      assert.equal(status?.err, null); assert.equal(status?.confirmationStatus, "finalized");
+    }
     await a.reload(); await a.getByText("Your claim is complete.", { exact: true }).waitFor();
-    assert.equal(await a.getByRole("button", { name: "Claim stake refund", exact: true }).count(), 0);
-    await a.screenshot({ path: `${out}/recovered-refund.png`, fullPage: true });
+    assert.equal(await a.getByRole("button", { name: claimLabel, exact: true }).count(), 0);
+    await a.screenshot({ path: `${out}/recovered-claim.png`, fullPage: true });
     result.passed = true; result.code = recover; result.escrow = escrow.toBase58(); result.recovery = true;
     assert.deepEqual(errors, []);
-    console.log(`PASS: ${result.cluster} browser reconnect → recovered entry → real refund; repeat claim unavailable after reload.`);
+    result.claimKind = priorClaim ? "winner" : "refund"; result.payoutUnits = payout.toString(); result.leaderboard = room.leaderboard;
+    result.tokenBalances = await Promise.all(tokenAccounts.map(async address => (await getAccount(connection, address)).amount.toString()));
+    console.log(`PASS: ${result.cluster} browser reconnect → recovered entry → real ${result.claimKind} claim; repeat claim unavailable after reload.`);
   } else {
-  const a = await client(players[0], 0);
+  const resumePath = process.env.SUDOKU_COMPETITION_E2E_RESUME;
+  let a, code, shared; const pages = [];
+  if (resumePath) {
+    const prior = JSON.parse(readFileSync(resumePath, "utf8"));
+    assert.equal(prior.cluster, live ? "devnet" : "localnet"); assert.equal(prior.program, config.program); assert.equal(prior.mint, config.mint);
+    assert.match(prior.code, /^[A-F0-9]{8}$/); assert.equal(prior.transactions.length, 3);
+    assert.deepEqual(new Set(prior.transactions.map(tx => tx.wallet)), new Set(players.map(key => key.publicKey.toBase58())));
+    code = prior.code; shared = new URL(origin); shared.searchParams.set("room", code); shared = shared.href;
+    result.code = code; result.url = shared; result.resumedFrom = resumePath; transactions.push(...prior.transactions);
+    for (let index = 0; index < 3; index++) {
+      const page = await client(players[index], index, shared); pages.push(page);
+      await page.getByRole("button", { name: "Check my deposited entry", exact: true }).click(); await wallet(page);
+      await page.getByText("Your stake is confirmed in escrow.", { exact: true }).waitFor();
+    }
+    a = pages[0];
+  } else {
+  a = await client(players[0], 0);
   await a.getByRole("button", { name: /^LEADERBOARD Compete/i }).click();
   await a.getByRole("group", { name: "Competition navigation" }).getByRole("button", { name: "Create competition", exact: true }).click();
   await a.getByRole("textbox", { name: "Room name", exact: true }).fill(`Three-wallet ${live ? "Devnet" : "local"} proof`);
@@ -149,8 +178,8 @@ try {
   await gate.getByRole("slider").fill(String(Math.round(target * 100)));
   await gate.getByRole("button", { name: "Verify position", exact: true }).click();
   await gate.getByRole("button", { name: "Confirm create room", exact: true }).click();
-  const roomElement = a.locator("[data-room-code]"); await roomElement.waitFor(); const code = await roomElement.getAttribute("data-room-code"); result.code = code;
-  const shared = await a.getByRole("link", { name: "Shareable room link", exact: true }).getAttribute("href"); result.url = shared;
+  const roomElement = a.locator("[data-room-code]"); await roomElement.waitFor(); code = await roomElement.getAttribute("data-room-code"); result.code = code;
+  shared = await a.getByRole("link", { name: "Shareable room link", exact: true }).getAttribute("href"); result.url = shared;
   assert.equal(new URL(shared).searchParams.get("room"), code);
   if (process.env.SUDOKU_COMPETITION_E2E_PREFUND === "1") {
     const intent = await state(a, code); const id = Buffer.alloc(8); id.writeBigUInt64LE(BigInt(intent.funded.id));
@@ -179,28 +208,30 @@ try {
   }
   await a.getByRole("button", { name: "Deposit 1 TEST to join", exact: true }).click();
   await a.getByText("Your stake is confirmed in escrow.", { exact: true }).waitFor();
-  const pages = [a];
+  pages.push(a);
   for (let index = 1; index < 3; index++) {
     const page = await client(players[index], index, shared); pages.push(page);
     await page.getByRole("button", { name: "Deposit 1 TEST to join", exact: true }).click(); await wallet(page);
     await page.getByText("Your stake is confirmed in escrow.", { exact: true }).waitFor();
   }
-  let room = await state(a, code); assert.equal(room.participants, 3); assert.equal(room.you.givens, null);
+  }
+  let room = await state(a, code); assert.equal(room.participants, 3); assert.equal(room.funded.stakeUnits, "1000000");
+  if (!resumePath) assert.equal(room.you.givens, null);
   const id = Buffer.alloc(8); id.writeBigUInt64LE(BigInt(room.funded.id));
   const escrow = PublicKey.findProgramAddressSync([Buffer.from("competition"), id], new PublicKey(config.program))[0];
   const vault = getAssociatedTokenAddressSync(mint, escrow, true); result.escrow = escrow.toBase58();
   assert.equal((await getAccount(connection, vault)).amount, 3_000_000n);
-  for (let index = 0; index < 3; index++) assert.equal((await getAccount(connection, tokenAccounts[index])).amount, before[index] - 1_000_000n);
-  console.log("PASS: three independent browser wallets deposited real SPL tokens; shared grid remains hidden.");
+  for (let index = 0; index < 3; index++) assert.equal((await getAccount(connection, tokenAccounts[index])).amount, before[index] - (resumePath ? 0n : 1_000_000n));
+  console.log(resumePath ? "PASS: three finalized entries recovered without depositing again; vault still holds 3 TEST." : "PASS: three independent browser wallets deposited real SPL tokens; shared grid remains hidden.");
   await a.screenshot({ path: `${out}/three-deposits.png`, fullPage: true });
   if (capture) { await a.waitForTimeout(3000); await capture.stop(); }
   console.log(`Waiting for common competition start at ${new Date(room.funded.startsAt).toISOString()}`);
-  for (const page of pages) await page.getByRole("button", { name: "Start challenge", exact: true }).waitFor({ state: "visible" });
+  for (const page of pages) await page.getByRole("button", { name: /^(Start|Continue) challenge$/ }).waitFor({ state: "visible" });
   if (capture) await capture.start("02-shared-start");
   const started = [];
   for (const page of pages) {
     console.log(`Starting browser attempt for wallet ${players[pages.indexOf(page)].publicKey.toBase58()}`);
-    await page.getByRole("button", { name: "Start challenge", exact: true }).click();
+    await page.getByRole("button", { name: /^(Start|Continue) challenge$/ }).click();
     await page.getByRole("gridcell").first().waitFor({ timeout: 45000 }); started.push(await state(page, code));
   }
   assert.deepEqual(started.map(item => item.you.startedAt), [room.funded.startsAt, room.funded.startsAt, room.funded.startsAt]);
@@ -240,8 +271,8 @@ try {
   await a.getByText("Your claim is complete.", { exact: true }).waitFor();
   room = await state(a, code); assert.equal(room.funded.chainStatus, "paid");
   assert.equal((await getAccount(connection, vault)).amount, 0n);
-  assert.equal((await getAccount(connection, tokenAccounts[0])).amount, before[0] + 2_000_000n);
-  for (let index = 1; index < 3; index++) assert.equal((await getAccount(connection, tokenAccounts[index])).amount, before[index] - 1_000_000n);
+  assert.equal((await getAccount(connection, tokenAccounts[0])).amount, before[0] + (resumePath ? 3_000_000n : 2_000_000n));
+  for (let index = 1; index < 3; index++) assert.equal((await getAccount(connection, tokenAccounts[index])).amount, before[index] - (resumePath ? 0n : 1_000_000n));
   assert.equal(await a.getByRole("button", { name: "Start challenge", exact: true }).count(), 0);
   assert.equal(await a.getByRole("button", { name: "Claim winner payout", exact: true }).count(), 0);
   for (const tx of transactions) {

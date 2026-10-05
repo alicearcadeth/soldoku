@@ -4,6 +4,7 @@ import bs58 from "bs58";
 import worker from "../worker";
 import { DAY_MS } from "./types";
 import { competitionChain, type CompetitionChain } from "./chain";
+import { createCompetitionStore } from "./store";
 vi.mock("./chain", () => ({ competitionChain: vi.fn() }));
 
 function database() {
@@ -63,18 +64,24 @@ describe("Worker leaderboard persistence", () => {
     const config = { program: "program", authority: "authority", mint: "mint", decimals: 6, playMs: 60000, graceMs: 60000 };
     const terms = { ...config, id: "10", stakeUnits: "1000000", startsAt: at - 1000, refundAt: at + 119000,
       chainStatus: "open", confirmedParticipants: 2, chainTime: at, winner: null };
-    const entrants = [wallet, "other-wallet"].map(actor => ({ actor, name: actor, startedAt: null, completedMs: null, values: Array(81).fill(0), sequence: 0, lastMoveAt: 0 }));
+    const entrants = [wallet, "other-wallet"].map(actor => ({ actor, name: actor, startedAt: null, completedMs: null, values: Array(81).fill(0), sequence: 0, lastMoveAt: 0, claimed: false }));
     const target = { code: "READY001", owner: wallet, createdAt: at - 60000, endsAt: at + 59000, puzzle: { level: "easy", givens: Array(81).fill(0), solution: Array(81).fill(1) }, entrants, funded: terms };
     db.seed(JSON.stringify({ rooms: [target, { ...target, code: "OTHER001", name: "Other room" }], gates: [], proofs: [],
       sessions: [{ id: "signed-session", wallet, expires: at + DAY_MS }], grants: [] }));
+    let polls = 0;
     const read = vi.fn(async () => {
       // A different browser finishes its chain poll while this request is waiting on RPC.
-      const latest = JSON.parse(db.snapshot()!); latest.rooms[1].name += "."; db.seed(JSON.stringify(latest));
-      return { id: "10", creator: wallet, authority: config.authority, mint: config.mint, stakeUnits: "1000000", startsAt: terms.startsAt,
+      const observation = { id: "10", creator: wallet, authority: config.authority, mint: config.mint, stakeUnits: "1000000", startsAt: terms.startsAt,
         endsAt: target.endsAt, refundAt: terms.refundAt, status: "open", winner: null, chainTime: at, participants: 2,
-        entries: entrants.map(entry => ({ wallet: entry.actor, claimed: false })) };
+        entries: entrants.map(entry => ({ wallet: entry.actor, claimed: false })) } as const;
+      const otherPoll = createCompetitionStore(Date.now, undefined, config); otherPoll.replace(db.snapshot());
+      otherPoll.syncChain("OTHER001", { ...observation, chainTime: at + (++polls) * 1000 });
+      db.seed(otherPoll.snapshot());
+      return observation;
     });
-    const chain = { config, cluster: "devnet", verify: vi.fn(async () => {}), read, submit: vi.fn(), transaction: vi.fn(), settle: vi.fn(),
+    const transaction = vi.fn(async () => ({ transaction: "unsigned", action: "deposit", wallet, cluster: "devnet", room: "pda", mint: config.mint,
+      stakeUnits: "1000000", startsAt: terms.startsAt, endsAt: target.endsAt, refundAt: terms.refundAt, expiresAtBlockHeight: 1 }));
+    const chain = { config, cluster: "devnet", verify: vi.fn(async () => {}), read, submit: vi.fn(), transaction, settle: vi.fn(),
       faucetConfigured: false, testerBalances: vi.fn(), fundTester: vi.fn() } as CompetitionChain;
     vi.mocked(competitionChain).mockReturnValue(chain);
     try {
@@ -86,6 +93,10 @@ describe("Worker leaderboard persistence", () => {
       expect(started.you.startedAt).toBe(terms.startsAt); expect(started.you.givens).toHaveLength(81);
       expect(read).not.toHaveBeenCalled();
       expect((await (await request()).json() as any).you.startedAt).toBe(terms.startsAt);
+      const prepared = await worker.fetch(new Request("https://soldoku.test/api/competitions/transaction", { method: "POST",
+        body: JSON.stringify({ code: target.code, actor: "signed-session", action: "deposit" }) }), env);
+      expect(prepared.status, await prepared.clone().text()).toBe(200);
+      expect(transaction).toHaveBeenCalledTimes(1);
     } finally { vi.mocked(competitionChain).mockReset(); }
   });
   it("broadcasts only after the funded snapshot survives D1 conflicts, and never after exhausted retries", async () => {
@@ -118,7 +129,8 @@ describe("Worker leaderboard persistence", () => {
       const response = await request("/settle", { code: room.code, actor: auth.actor });
       expect(await response.json()).toEqual({ signature: "finalized-later" }); expect(response.status).toBe(200);
       expect(read).toHaveBeenCalledTimes(4); expect(settle).toHaveBeenCalledTimes(1);
-      observation.chainTime += 1000;
+      observation.participants = 2;
+      observation.entries.push({ wallet: bs58.encode(nacl.sign.keyPair().publicKey), claimed: false });
       for (let index = 0; index < 4; index++) db.conflict();
       expect((await request("/settle", { code: room.code, actor: auth.actor })).status).toBe(409);
       expect(settle).toHaveBeenCalledTimes(1);

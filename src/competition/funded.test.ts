@@ -66,6 +66,20 @@ describe("funded leaderboard admission and integrity", () => {
       expect(f.store.snapshot()).toBe(before);
     }
   });
+  it("does not write clock-only polls between finalized gates, but advances every required gate", () => {
+    const f = fixture(); f.store.syncChain(f.created.code, f.chain);
+    let before = f.store.snapshot();
+    f.chain.chainTime += 1000; f.store.syncChain(f.created.code, f.chain);
+    expect(f.store.snapshot()).toBe(before);
+    for (const boundary of [f.chain.startsAt, f.chain.endsAt, f.chain.refundAt]) {
+      f.chain.chainTime = boundary; f.store.syncChain(f.created.code, f.chain);
+      expect(f.call("/state", { code: f.created.code, actor: f.owner.actor }).funded.chainTime).toBe(boundary);
+      before = f.store.snapshot();
+      f.chain.chainTime = boundary + 1000; f.store.syncChain(f.created.code, f.chain);
+      expect(f.store.snapshot()).toBe(before);
+      expect(() => f.store.syncChain(f.created.code, { ...f.chain, chainTime: boundary - 1 })).toThrow(/regressed/);
+    }
+  });
   it("preserves attempt sequences, rejects forged timing, and derives the winner only from accepted moves", async () => {
     const f = fixture(); f.chain.chainTime = f.chain.startsAt; f.setTime(f.chain.startsAt);
     await f.prepare("/start", { code: f.created.code, actor: f.b.actor });
