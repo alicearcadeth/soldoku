@@ -5,6 +5,7 @@ import { chromium } from "playwright";
 import nacl from "tweetnacl";
 import { Connection, Keypair, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { getAccount, getAssociatedTokenAddressSync } from "@solana/spl-token";
+import { demoCapture } from "./demo-capture.mjs";
 
 const origin = process.env.QA_ORIGIN ?? "http://127.0.0.1:5178/";
 const rpc = process.env.SUDOKU_COMPETITION_E2E_RPC ?? "http://127.0.0.1:18999";
@@ -22,8 +23,9 @@ const out = process.env.SUDOKU_COMPETITION_E2E_OUTPUT ?? (live ? "output/competi
 mkdirSync(out, { recursive: true });
 const browser = await chromium.launch(process.env.PLAYWRIGHT_CHROMIUM ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM } : {});
 const contexts = []; const errors = []; const transactions = []; const result = { cluster: live ? "devnet" : "localnet", startedAt: new Date().toISOString(), passed: false, transactions };
+let capture;
 async function client(key, index, url = origin) {
-  const context = await browser.newContext({ viewport: { width: index === 0 ? 390 : 1280, height: 900 } }); contexts.push(context);
+  const context = await browser.newContext({ viewport: { width: index === 0 ? 390 : 1280, height: 900 }, deviceScaleFactor: index === 0 && process.env.SUDOKU_COMPETITION_RECORD === "1" ? 2 : 1 }); contexts.push(context);
   await context.exposeBinding("competitionSignMessage", (_, bytes) => Array.from(nacl.sign.detached(Uint8Array.from(bytes), key.secretKey)));
   await context.exposeBinding("competitionSignTransaction", (_, bytes) => {
     const tx = Transaction.from(Buffer.from(bytes));
@@ -51,7 +53,15 @@ async function client(key, index, url = origin) {
         action: response.url().endsWith("settle") ? "settle" : "wallet-transaction", ...(live ? { explorer: `https://explorer.solana.com/tx/${body.signature}?cluster=devnet` } : {}) });
     }
   });
-  await page.goto(url); return page;
+  if (index === 0 && process.env.SUDOKU_COMPETITION_RECORD === "1") capture = await demoCapture(context, page, `${out}/capture`);
+  await page.goto(url);
+  if (capture && index === 0) {
+    await page.getByRole("button", { name: "Settings", exact: true }).click();
+    await page.getByRole("button", { name: "Sound effects: Off", exact: true }).click();
+    await page.getByRole("button", { name: "Done", exact: true }).click();
+    await capture.start("01-create-and-deposits"); await page.waitForTimeout(2500);
+  }
+  return page;
 }
 async function wallet(page) {
   const dialog = page.getByRole("dialog", { name: "Connect wallet", exact: true });
@@ -127,7 +137,9 @@ try {
   await a.getByRole("textbox", { name: "Room name", exact: true }).fill(`Three-wallet ${live ? "Devnet" : "local"} proof`);
   await a.getByRole("button", { name: "Easy", exact: true }).click();
   await a.getByRole("button", { name: "For tokens", exact: true }).click();
-  await a.getByRole("textbox", { name: "TEST stake", exact: true }).fill("1");
+  await a.getByRole("button", { name: /^Choose token/ }).click();
+  await a.getByRole("button", { name: "Soldoku Token (Devnet) · available", exact: true }).click();
+  await a.getByRole("spinbutton", { name: "Token amount", exact: true }).fill("1");
   await a.getByRole("button", { name: "Custom Duration", exact: true }).click();
   await a.getByRole("combobox", { name: "Duration unit", exact: true }).selectOption("60000");
   await a.getByRole("spinbutton", { name: "Custom duration", exact: true }).fill("3");
@@ -181,8 +193,10 @@ try {
   for (let index = 0; index < 3; index++) assert.equal((await getAccount(connection, tokenAccounts[index])).amount, before[index] - 1_000_000n);
   console.log("PASS: three independent browser wallets deposited real SPL tokens; shared grid remains hidden.");
   await a.screenshot({ path: `${out}/three-deposits.png`, fullPage: true });
+  if (capture) { await a.waitForTimeout(3000); await capture.stop(); }
   console.log(`Waiting for common competition start at ${new Date(room.funded.startsAt).toISOString()}`);
   for (const page of pages) await page.getByRole("button", { name: "Start challenge", exact: true }).waitFor({ state: "visible" });
+  if (capture) await capture.start("02-shared-start");
   const started = [];
   for (const page of pages) {
     console.log(`Starting browser attempt for wallet ${players[pages.indexOf(page)].publicKey.toBase58()}`);
@@ -194,8 +208,10 @@ try {
   const solution = solveGrid(started[0].you.givens); const firstEmpty = solution.findIndex((_, index) => !started[0].you.givens[index]);
   await a.getByRole("gridcell").nth(firstEmpty).click(); await a.locator(".pad button").nth(solution[firstEmpty] - 1).click();
   await a.getByRole("gridcell").nth(firstEmpty).filter({ hasText: String(solution[firstEmpty]) }).waitFor();
+  if (capture) { await a.waitForTimeout(1200); await capture.stop(); }
   await a.reload(); await a.getByRole("button", { name: "Continue challenge", exact: true }).click();
   await a.getByRole("gridcell").first().waitFor();
+  if (capture) await capture.start("03-solve-and-fireworks");
   assert.equal((await state(a, code)).you.startedAt, room.funded.startsAt);
   assert.equal((await state(a, code)).you.board[firstEmpty], solution[firstEmpty]);
   // All three players finish through visible controls; intentionally staggered finish order.
@@ -209,12 +225,15 @@ try {
       await page.waitForTimeout(150);
     }
     await page.getByText(/Finished in .*rank/).waitFor();
+    if (capture && playerIndex === 0) { await page.waitForTimeout(7200); await capture.stop(); }
   }
   room = await state(a, code); assert.equal(room.leaderboard.length, 3); assert.equal(room.leaderboard[0].wallet, players[0].publicKey.toBase58());
   await a.screenshot({ path: `${out}/leaderboard.png`, fullPage: true });
+  if (capture) { await capture.start("04-leaderboard"); await a.waitForTimeout(4500); await capture.stop(); }
   console.log("PASS: common grid/time, refresh recovery, three accepted finishes and correct ranking.");
   console.log(`Waiting for settlement deadline ${new Date(room.endsAt).toISOString()}`);
   await a.getByRole("button", { name: "Finalize result", exact: true }).waitFor({ state: "visible", timeout: Math.max(300000, room.endsAt - Date.now() + 180000) });
+  if (capture) await capture.start("05-settlement-and-payout");
   await a.getByRole("button", { name: "Finalize result", exact: true }).click();
   await a.getByRole("button", { name: "Claim winner payout", exact: true }).waitFor({ state: "visible" });
   await a.getByRole("button", { name: "Claim winner payout", exact: true }).click();
@@ -232,6 +251,7 @@ try {
   assert.equal(transactions.length, 5, "Expected three deposits, one settlement and one winner claim");
   assert.deepEqual(errors, []);
   await a.screenshot({ path: `${out}/winner-paid.png`, fullPage: true });
+  if (capture) { await a.waitForTimeout(4500); await capture.stop(); }
   result.passed = true; result.leaderboard = room.leaderboard; result.tokenBalances = await Promise.all(tokenAccounts.map(async address => (await getAccount(connection, address)).amount.toString()));
   console.log(`PASS: ${result.cluster} browser stake → compete → leaderboard → payout; five finalized transactions.`);
   }

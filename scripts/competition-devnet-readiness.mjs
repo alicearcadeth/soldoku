@@ -5,7 +5,9 @@ import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { getMint } from "@solana/spl-token";
 
 // Read-only. Public addresses/balances only; never displays key contents or credential URLs.
-const connection = new Connection("https://api.devnet.solana.com", { commitment: "confirmed",
+const endpoint = process.env.SUDOKU_COMPETITION_RPC ?? "https://api.devnet.solana.com";
+if (new URL(endpoint).protocol !== "https:") throw new Error("Devnet readiness requires HTTPS.");
+const connection = new Connection(endpoint, { commitment: "confirmed",
   fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(15000) }) });
 const genesis = await connection.getGenesisHash();
 if (genesis !== "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG") throw new Error("Refusing a non-Devnet connection.");

@@ -203,7 +203,7 @@ export function competitionChain(env: CompetitionEnvironment): CompetitionChain 
     if (plan.sol) {
       try { solSignature = await connection.requestAirdrop(owner, TESTER_SOL_AIRDROP); }
       catch {
-        note = `Devnet refused the SOL airdrop. Request SOL at ${TESTER_SOL_FAUCET} for this wallet, then return here for TEST.`;
+        note = `Devnet refused the SOL airdrop. Request Devnet SOL at ${TESTER_SOL_FAUCET} for this wallet to cover entry fees. Any TEST sent by this request is separate from the SOL airdrop.`;
         if (!plan.test) throw new Error(note);
       }
     }
