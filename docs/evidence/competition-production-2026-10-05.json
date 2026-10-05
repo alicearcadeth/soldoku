@@ -1,0 +1,155 @@
+{
+  "verifiedCodeCommit": "db12ea438a0d9c75ed7086e8efc409cbb77e0b48",
+  "workerVersion": "17f32c99-968c-4326-983b-34b1e1af3f4a",
+  "note": "Both rounds recovered existing deposits after concurrency fixes. Captured demo uses test wallet adapters and scripted inputs; transactions are real Devnet transactions.",
+  "rounds": [
+    {
+      "cluster": "devnet",
+      "startedAt": "2026-10-05T07:28:43.861Z",
+      "passed": true,
+      "transactions": [
+        {
+          "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+          "signature": "3quNMpHvaQBGKkVvk6xt2jcnX8wRi2tZoxcXLTR9wGLzwKjNEApMsJQrpAg1xfg5Y3f3du8AioBFLb2b5JkLZfQq",
+          "action": "wallet-transaction",
+          "explorer": "https://explorer.solana.com/tx/3quNMpHvaQBGKkVvk6xt2jcnX8wRi2tZoxcXLTR9wGLzwKjNEApMsJQrpAg1xfg5Y3f3du8AioBFLb2b5JkLZfQq?cluster=devnet"
+        },
+        {
+          "wallet": "5Yj8tfWFSucMUyYZVdCRNFSw1QF3C1MbG7dbo8vFkkar",
+          "signature": "4m3g46HSECodGUaQP3V5pDAkH2nvNH6qsWWCTgmayRgwouM9ua4L8YR4yFohNiJLBCU42NjnrYp1t9T4sSTjPBza",
+          "action": "wallet-transaction",
+          "explorer": "https://explorer.solana.com/tx/4m3g46HSECodGUaQP3V5pDAkH2nvNH6qsWWCTgmayRgwouM9ua4L8YR4yFohNiJLBCU42NjnrYp1t9T4sSTjPBza?cluster=devnet"
+        },
+        {
+          "wallet": "6qtMCHsqEwxpYqqrdQWbDdJFFYzpKs8o5mmW1Zd9Bju2",
+          "signature": "2p1gcpyDMENt82hYCBTywFWum1LufE9Mb2AgLSKDFHJB4ZbtrmJoKtnfhnGdEonffwjvpY342UF1ZUjBKeCEQwyw",
+          "action": "wallet-transaction",
+          "explorer": "https://explorer.solana.com/tx/2p1gcpyDMENt82hYCBTywFWum1LufE9Mb2AgLSKDFHJB4ZbtrmJoKtnfhnGdEonffwjvpY342UF1ZUjBKeCEQwyw?cluster=devnet"
+        },
+        {
+          "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+          "signature": "C32fg2Z3Cm37aNUdPY1aL7XCjaLMrzbNb4hUeZNZTfaAKq22tGb2JMh1p23JYzdVmwkbiSDtxhg31ZNmDtPiguV",
+          "action": "settle",
+          "explorer": "https://explorer.solana.com/tx/C32fg2Z3Cm37aNUdPY1aL7XCjaLMrzbNb4hUeZNZTfaAKq22tGb2JMh1p23JYzdVmwkbiSDtxhg31ZNmDtPiguV?cluster=devnet"
+        },
+        {
+          "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+          "signature": "2wSJpiGesLZyRb3XFJVt5rbfAzPrSLh97ZLgSZ4XEZYScNYQ7yq1wKiCxGmS1oA4nmsSCEwZ4bUw5PspZmUGVLYg",
+          "action": "wallet-transaction",
+          "explorer": "https://explorer.solana.com/tx/2wSJpiGesLZyRb3XFJVt5rbfAzPrSLh97ZLgSZ4XEZYScNYQ7yq1wKiCxGmS1oA4nmsSCEwZ4bUw5PspZmUGVLYg?cluster=devnet"
+        }
+      ],
+      "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+      "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+      "programSHA256": "d16042a586a73b0da83f2f3aec58a135f92cda9c339ed51cc85c0dc2ee12c8d7",
+      "resumedFrom": "output/competition-production-2026-10-05-current/results.json",
+      "code": "D09C55C2",
+      "escrow": "8xR5YQd4sAffajvW2Be9YbXVBtPoPUQYKbtXzMzFypTH",
+      "recovery": true,
+      "claimKind": "winner",
+      "payoutUnits": "3000000",
+      "leaderboard": [
+        {
+          "name": "JCVs…kGM7",
+          "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+          "you": true,
+          "completedMs": 34157,
+          "rank": 1
+        },
+        {
+          "name": "5Yj8…kkar",
+          "wallet": "5Yj8tfWFSucMUyYZVdCRNFSw1QF3C1MbG7dbo8vFkkar",
+          "you": false,
+          "completedMs": 51326,
+          "rank": 2
+        },
+        {
+          "name": "6qtM…Bju2",
+          "wallet": "6qtMCHsqEwxpYqqrdQWbDdJFFYzpKs8o5mmW1Zd9Bju2",
+          "you": false,
+          "completedMs": 68307,
+          "rank": 3
+        }
+      ],
+      "tokenBalances": [
+        "30000000",
+        "15000000",
+        "15000000"
+      ],
+      "finishedAt": "2026-10-05T07:29:00.804Z"
+    },
+    {
+      "cluster": "devnet",
+      "startedAt": "2026-10-05T07:14:38.685Z",
+      "passed": true,
+      "transactions": [
+        {
+          "wallet": "EeDPBz5pQFnruRvzdEc2MhDZyHYfZWefEHUQS5uU2p9x",
+          "signature": "4KFrr34XEDjRDgWMxmGqwT6hszLRuh8cK6gPGiB6373BM1xnZ8Mg1zDitRS3tttdquoURe21L12C9UFwDPdyd8z3",
+          "action": "wallet-transaction",
+          "explorer": "https://explorer.solana.com/tx/4KFrr34XEDjRDgWMxmGqwT6hszLRuh8cK6gPGiB6373BM1xnZ8Mg1zDitRS3tttdquoURe21L12C9UFwDPdyd8z3?cluster=devnet"
+        },
+        {
+          "wallet": "3Rw2gn3LWw2tPaQ7TYjdXqoZQSgJhbdTyP7gRhGvZknx",
+          "signature": "4XtcEHTn4goCtZ15yVDyn9PQqaCt6ZknY2hwrUHrr2jVsNo7MiBGhUhZwKVM7oFm4HkuoPAs1Ady9ik7Ax7qZ34P",
+          "action": "wallet-transaction",
+          "explorer": "https://explorer.solana.com/tx/4XtcEHTn4goCtZ15yVDyn9PQqaCt6ZknY2hwrUHrr2jVsNo7MiBGhUhZwKVM7oFm4HkuoPAs1Ady9ik7Ax7qZ34P?cluster=devnet"
+        },
+        {
+          "wallet": "Tc2oybUsYYqeygEYyASLZ91qNzXn8y6FMTaNbLtNnST",
+          "signature": "5uKwrwBPR9xPGWt8DkDcgrfrZqcRuXoXtSDxiXrfxfqE7v5T34cp3vzb8NhVQJEhK2ZnYcS6A8298CkSk4WWnDct",
+          "action": "wallet-transaction",
+          "explorer": "https://explorer.solana.com/tx/5uKwrwBPR9xPGWt8DkDcgrfrZqcRuXoXtSDxiXrfxfqE7v5T34cp3vzb8NhVQJEhK2ZnYcS6A8298CkSk4WWnDct?cluster=devnet"
+        },
+        {
+          "wallet": "EeDPBz5pQFnruRvzdEc2MhDZyHYfZWefEHUQS5uU2p9x",
+          "signature": "43wWoycSENyL9devefqm9k21TqkFyHPWxD99J45BKiaBd1eViSfEcPHcHF3nNv1vTMKV7m6RS1yRDSWRuy5v72AM",
+          "action": "settle",
+          "explorer": "https://explorer.solana.com/tx/43wWoycSENyL9devefqm9k21TqkFyHPWxD99J45BKiaBd1eViSfEcPHcHF3nNv1vTMKV7m6RS1yRDSWRuy5v72AM?cluster=devnet"
+        },
+        {
+          "wallet": "EeDPBz5pQFnruRvzdEc2MhDZyHYfZWefEHUQS5uU2p9x",
+          "signature": "5yKpbVtZBqnRQgESNPA7rz9HT38Kyk8ArtKA3eLzsUiNfCRF21yxSgs6ekgvx55cyf9QbmdND6eEyxv35A5RvkBu",
+          "action": "wallet-transaction",
+          "explorer": "https://explorer.solana.com/tx/5yKpbVtZBqnRQgESNPA7rz9HT38Kyk8ArtKA3eLzsUiNfCRF21yxSgs6ekgvx55cyf9QbmdND6eEyxv35A5RvkBu?cluster=devnet"
+        }
+      ],
+      "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+      "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+      "programSHA256": "d16042a586a73b0da83f2f3aec58a135f92cda9c339ed51cc85c0dc2ee12c8d7",
+      "code": "0E5B8C04",
+      "url": "https://soldoku.com/?room=0E5B8C04",
+      "resumedFrom": "output/competition-demo-2026-10-05/results.json",
+      "escrow": "6qEg7CTMsa8kRgR3nMcp8eT8xPytCdyQjNQ6t981c3m1",
+      "leaderboard": [
+        {
+          "name": "EeDP…2p9x",
+          "wallet": "EeDPBz5pQFnruRvzdEc2MhDZyHYfZWefEHUQS5uU2p9x",
+          "you": true,
+          "completedMs": 823673,
+          "rank": 1
+        },
+        {
+          "name": "3Rw2…Zknx",
+          "wallet": "3Rw2gn3LWw2tPaQ7TYjdXqoZQSgJhbdTyP7gRhGvZknx",
+          "you": false,
+          "completedMs": 848316,
+          "rank": 2
+        },
+        {
+          "name": "Tc2o…NnST",
+          "wallet": "Tc2oybUsYYqeygEYyASLZ91qNzXn8y6FMTaNbLtNnST",
+          "you": false,
+          "completedMs": 865895,
+          "rank": 3
+        }
+      ],
+      "tokenBalances": [
+        "22000000",
+        "19000000",
+        "19000000"
+      ],
+      "finishedAt": "2026-10-05T07:32:07.753Z"
+    }
+  ]
+}
