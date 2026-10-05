@@ -20,13 +20,15 @@ try {
     await celebration.waitFor();
     assert.match(await celebration.innerText(),/Soldoku solved!/);
     assert.equal(await celebration.evaluate(e=>getComputedStyle(e).pointerEvents),'none');
+    assert.equal(await page.locator('.win-fireworks-canvas').getAttribute('data-shells'),'20','Twenty fireworks should launch across the screen');
     if(reducedMotion==='reduce'){
       assert.equal(await page.locator('.win-badge').evaluate(e=>getComputedStyle(e).animationName),'none');
-      assert.equal(await page.locator('.win-burst i').first().evaluate(e=>getComputedStyle(e).display),'none');
+      assert.equal(await page.locator('.win-fireworks-canvas').evaluate(e=>getComputedStyle(e).display),'none');
+      assert.equal(await page.locator('.win-finale-halo').evaluate(e=>getComputedStyle(e).display),'none');
     }
     await page.waitForTimeout(220);
     await page.screenshot({path:`output/win-celebration/${reducedMotion}.png`,fullPage:true});
-    await celebration.waitFor({state:'hidden',timeout:5000});
+    await celebration.waitFor({state:'hidden',timeout:8000});
     await page.reload();
     await page.getByRole('dialog',{name:'Solved',exact:true}).waitFor();
     await page.waitForTimeout(150);

@@ -1,6 +1,8 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { feel } from "./feel";
+import { FireworksCanvas } from "./FireworksCanvas";
+import { FIREWORK_CELEBRATION_MS } from "./fireworks";
 
 /** A short, non-blocking payoff. Remember results so polling/reloads cannot replay it. */
 export function WinCelebration({ eventKey, message = "You won!", feedback = true }: {
@@ -19,20 +21,14 @@ export function WinCelebration({ eventKey, message = "You won!", feedback = true
   }, [eventKey, feedback]);
   useEffect(() => {
     if (!visible) return;
-    const timer = window.setTimeout(() => setVisible(false), 2800);
+    const timer = window.setTimeout(() => setVisible(false), FIREWORK_CELEBRATION_MS);
     return () => window.clearTimeout(timer);
   }, [visible]);
   if (!visible) return null;
   return createPortal(<div className="win-celebration" aria-hidden="true" data-testid="win-celebration">
-    <div className="win-burst">
-      <div className="win-ring" />
-      {Array.from({ length: 28 }, (_, index) => {
-        const angle = index * Math.PI * 2 / 28;
-        const distance = 110 + index % 4 * 24;
-        return <i key={index} style={{ "--x": `${Math.cos(angle) * distance}px`, "--y": `${Math.sin(angle) * distance}px`,
-          "--turn": `${index * 47}deg`, "--color": ["#14f195", "#9945ff", "#00c2ff", "#ffd166"][index % 4] } as CSSProperties} />;
-      })}
-      <div className="win-badge"><span>✦</span><strong>{message}</strong><small>Nicely played.</small></div>
-    </div>
+    <div className="win-sky" />
+    <FireworksCanvas />
+    <div className="win-finale-halo" />
+    <div className="win-badge"><span>✦</span><small>VICTORY</small><strong>{message}</strong><em>SHEEEESH. You did that.</em></div>
   </div>, document.body);
 }
