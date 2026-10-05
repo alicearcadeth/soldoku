@@ -1,6 +1,7 @@
 import type { createCompetitionStore } from "./store";
 import type { CompetitionChain } from "./chain";
 import { planTesterGrant } from "./testerFunds";
+import type { CompetitionView } from "./types";
 
 type Store = ReturnType<typeof createCompetitionStore>;
 export type CompetitionRequest = { result: unknown; afterCommit?: () => Promise<unknown> };
@@ -50,13 +51,21 @@ export async function prepareCompetitionRequest(store: Store, chain: Competition
   }
   // No grid until the blockchain itself has closed registration. Free rooms skip RPC.
   if (method === "POST" && url.pathname.endsWith("/start")) {
-    const view = store.route("POST", new URL("/api/competitions/state", url), body) as { funded?: unknown };
+    const view = store.route("POST", new URL("/api/competitions/state", url), body) as CompetitionView;
     if (view.funded) {
       if (!chain) throw new Error("The competition escrow is unavailable.");
       await chain.verify();
-      const verified = await chain.read(store.fundingContext(body.code, body.actor));
-      if (!verified) throw new Error("Your escrow deposit is not confirmed.");
-      store.syncChain(body.code, verified);
+      const terms = view.funded;
+      // Finalized admission and the closed registration gate are already persisted by sync.
+      // Re-reading RPC during every D1 retry lets other rooms' polls starve a ready start.
+      const ready = view.you && !view.you.claimed && terms.chainStatus === "open" && terms.confirmedParticipants >= 2
+        && terms.chainTime >= terms.startsAt && terms.program === chain.config.program && terms.authority === chain.config.authority
+        && terms.mint === chain.config.mint && terms.decimals === chain.config.decimals;
+      if (!ready) {
+        const verified = await chain.read(store.fundingContext(body.code, body.actor));
+        if (!verified) throw new Error("Your escrow deposit is not confirmed.");
+        store.syncChain(body.code, verified);
+      }
     }
   }
   return { result: store.route(method, url, body) };

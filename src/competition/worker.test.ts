@@ -57,6 +57,37 @@ describe("Worker leaderboard persistence", () => {
     expect(refused.status).toBe(400);
     expect(await refused.json()).toMatchObject({ error: expect.stringMatching(/Token entry is unavailable/) });
   });
+  it("starts from a persisted finalized registration gate while another room is being polled", async () => {
+    const db = database(); const at = Date.now();
+    const key = nacl.sign.keyPair(); const wallet = bs58.encode(key.publicKey);
+    const config = { program: "program", authority: "authority", mint: "mint", decimals: 6, playMs: 60000, graceMs: 60000 };
+    const terms = { ...config, id: "10", stakeUnits: "1000000", startsAt: at - 1000, refundAt: at + 119000,
+      chainStatus: "open", confirmedParticipants: 2, chainTime: at, winner: null };
+    const entrants = [wallet, "other-wallet"].map(actor => ({ actor, name: actor, startedAt: null, completedMs: null, values: Array(81).fill(0), sequence: 0, lastMoveAt: 0 }));
+    const target = { code: "READY001", owner: wallet, createdAt: at - 60000, endsAt: at + 59000, puzzle: { level: "easy", givens: Array(81).fill(0), solution: Array(81).fill(1) }, entrants, funded: terms };
+    db.seed(JSON.stringify({ rooms: [target, { ...target, code: "OTHER001", name: "Other room" }], gates: [], proofs: [],
+      sessions: [{ id: "signed-session", wallet, expires: at + DAY_MS }], grants: [] }));
+    const read = vi.fn(async () => {
+      // A different browser finishes its chain poll while this request is waiting on RPC.
+      const latest = JSON.parse(db.snapshot()!); latest.rooms[1].name += "."; db.seed(JSON.stringify(latest));
+      return { id: "10", creator: wallet, authority: config.authority, mint: config.mint, stakeUnits: "1000000", startsAt: terms.startsAt,
+        endsAt: target.endsAt, refundAt: terms.refundAt, status: "open", winner: null, chainTime: at, participants: 2,
+        entries: entrants.map(entry => ({ wallet: entry.actor, claimed: false })) };
+    });
+    const chain = { config, cluster: "devnet", verify: vi.fn(async () => {}), read, submit: vi.fn(), transaction: vi.fn(), settle: vi.fn(),
+      faucetConfigured: false, testerBalances: vi.fn(), fundTester: vi.fn() } as CompetitionChain;
+    vi.mocked(competitionChain).mockReturnValue(chain);
+    try {
+      const env = { DB: db, ASSETS: { fetch: async () => new Response("asset") } };
+      const request = () => worker.fetch(new Request("https://soldoku.test/api/competitions/start", { method: "POST",
+        body: JSON.stringify({ code: target.code, actor: "signed-session" }) }), env);
+      const response = await request(); expect(response.status, await response.clone().text()).toBe(200);
+      const started = await response.json() as any;
+      expect(started.you.startedAt).toBe(terms.startsAt); expect(started.you.givens).toHaveLength(81);
+      expect(read).not.toHaveBeenCalled();
+      expect((await (await request()).json() as any).you.startedAt).toBe(terms.startsAt);
+    } finally { vi.mocked(competitionChain).mockReset(); }
+  });
   it("broadcasts only after the funded snapshot survives D1 conflicts, and never after exhausted retries", async () => {
     const db = database();
     const config = { program: "program", authority: "authority", mint: "mint", decimals: 6, playMs: 60000, graceMs: 60000 };
