@@ -88,7 +88,16 @@ export async function advanceRoomSettlement(store: Store, chain: SettlementChain
   }
   if (observed && observed.status !== "open") {
     try { store.syncChain(code, observed); } catch { /* The chain outcome still stops another settlement send. */ }
+    for (const existing of liveAttempts(store, code)) {
+      const status = await chain.observeSettlement(existing.signature, existing.lastValidBlockHeight);
+      if (status !== "confirmed") continue;
+      store.completeSettlement(code, existing.signature);
+      store.setSettlementAlert(code, "");
+      await persist();
+      return { confirmed: true, signature: existing.signature, status: "confirmed" };
+    }
     store.completeSettlement(code, "chain-closed");
+    store.setSettlementAlert(code, "");
     await persist();
     return { confirmed: true, signature: "chain-closed", status: "confirmed" };
   }

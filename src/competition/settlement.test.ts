@@ -127,6 +127,22 @@ describe("settlement recovery", () => {
     const signatures = [funded.settlement.signature, ...funded.settlementAlso.map((item: { signature: string }) => item.signature)];
     expect(signatures).toEqual(expect.arrayContaining(["sent-a", "sent-b"]));
   });
+  it("promotes a retained signature when the escrow has already closed", async () => {
+    const h = harness();
+    h.store.stageSettlement("DUE00001", attempt({ signature: "sent-a", phase: "unknown", serialized: "bytes-a" }));
+    h.store.setSettlementAlert("DUE00001", "Settlement is unknown.");
+    h.chainRoom.status = "awarded";
+    h.chainRoom.winner = "owner-wallet";
+    h.setObservation("confirmed");
+    const report = await h.advance();
+    expect(report).toMatchObject({ confirmed: true, signature: "sent-a", status: "confirmed" });
+    expect(h.events).toContain("observe:sent-a");
+    expect(h.events).not.toContain("prepare");
+    const funded = JSON.parse(h.store.snapshot()).rooms[0].funded;
+    expect(funded.settlementSignature).toBe("sent-a");
+    expect(funded.settlement.phase).toBe("confirmed");
+    expect(funded.settlementAlert).toBe("");
+  });
   it("replaces an expired blockhash only while the escrow is still open", async () => {
     const h = harness(); h.setObservation("expired");
     await h.advance();
