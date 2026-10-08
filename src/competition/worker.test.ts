@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
 import nacl from "tweetnacl";
 import bs58 from "bs58";
@@ -263,5 +264,52 @@ describe("Worker leaderboard persistence", () => {
     const api = await worker.fetch(new Request("https://soldoku.test/api/competitions"), env);
     expect(api.headers.get("content-security-policy")).toBe("frame-ancestors 'none'");
     expect(api.headers.get("content-security-policy")).not.toContain("script-src");
+    expect(readFileSync("wrangler.soldoku.jsonc", "utf8")).toContain('"run_worker_first": true');
+  });
+  it("passes a revalidated document through without a hashless script policy", async () => {
+    const env = { DB: database(), ASSETS: { fetch: async () => new Response(null, { status: 304, headers: { etag: "\"asset\"", "content-type": "text/html" } }) } };
+    const page = await worker.fetch(new Request("https://soldoku.test/", { headers: { "if-none-match": "\"asset\"" } }), env);
+    expect(page.status).toBe(304);
+    expect(await page.text()).toBe("");
+    expect(page.headers.get("content-security-policy") ?? "").not.toContain("script-src");
+    expect(page.headers.get("x-content-type-options")).toBe("nosniff");
+    expect(page.headers.get("referrer-policy")).toBe("no-referrer");
+  });
+  it("reconciles a closed room the open-room selector skips", async () => {
+    const db = database();
+    const at = Date.now();
+    const observeSettlement = vi.fn(async () => "confirmed" as const);
+    const broadcastSettlement = vi.fn();
+    const prepareSettlement = vi.fn();
+    const chain = { config: { program: "program", authority: "authority", mint: "mint", decimals: 6, playMs: 60000, graceMs: 3600000 },
+      cluster: "devnet", verify: async () => {}, read: vi.fn(async () => ({ id: "1", creator: "owner", authority: "authority", mint: "mint", stakeUnits: "1000000",
+        startsAt: at - 61000, endsAt: at - 1000, refundAt: at - 1000 + 3600000, status: "paid" as const, winner: "owner", chainTime: at, participants: 2,
+        entries: [{ wallet: "owner", claimed: true }, { wallet: "other", claimed: false }] })),
+      submit: vi.fn(), transaction: vi.fn(), settle: vi.fn(), prepareSettlement, broadcastSettlement, observeSettlement, faucetConfigured: false,
+      testerBalances: vi.fn(), fundTester: vi.fn() } as CompetitionChain;
+    vi.mocked(competitionChain).mockReturnValue(chain);
+    db.seed(JSON.stringify({ rooms: [{ code: "2B4FB023", owner: "owner", createdAt: at - 120000, endsAt: at - 1000, puzzle: { level: "easy", givens: [], solution: [] },
+      entrants: [
+        { actor: "owner", name: "a", startedAt: at - 80000, completedMs: 35802, values: [], sequence: 4, lastMoveAt: 0, claimed: true },
+        { actor: "other", name: "b", startedAt: at - 80000, completedMs: null, values: [], sequence: 0, lastMoveAt: 0, claimed: false },
+      ],
+      funded: { program: "program", authority: "authority", mint: "mint", decimals: 6, playMs: 60000, graceMs: 3600000, id: "1", stakeUnits: "1000000", startsAt: at - 61000, refundAt: at - 1000 + 3600000, chainStatus: "paid", confirmedParticipants: 2, chainTime: at - 1000, winner: "owner", settlementSignature: "chain-closed", settlementAlert: "Settlement is unknown.",
+        settlement: { phase: "unknown", winner: "owner", signature: "sent-a", serialized: "bytes", blockhash: "bh", lastValidBlockHeight: 3, preparedAt: at - 500 } } }], gates: [], proofs: [], sessions: [], grants: [] }));
+    try {
+      const env = { DB: db, ASSETS: { fetch: async () => new Response("asset") } };
+      await worker.scheduled({}, env);
+      expect(prepareSettlement).not.toHaveBeenCalled();
+      expect(broadcastSettlement).not.toHaveBeenCalled();
+      const room = JSON.parse(db.snapshot()!).rooms[0];
+      expect(room.funded.settlementSignature).toBe("sent-a");
+      expect(room.funded.settlement.phase).toBe("confirmed");
+      expect(room.funded.settlementAlert).toBe("");
+      expect(room.funded.winner).toBe("owner");
+      expect(room.entrants[0].claimed).toBe(true);
+      expect(room.entrants[0].sequence).toBe(4);
+      await worker.scheduled({}, env);
+      expect(observeSettlement).toHaveBeenCalledTimes(1);
+      expect(broadcastSettlement).not.toHaveBeenCalled();
+    } finally { vi.mocked(competitionChain).mockReset(); }
   });
 });

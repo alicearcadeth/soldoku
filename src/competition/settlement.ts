@@ -27,7 +27,7 @@ function sameSignature(current: SettlementAttempt, local: SettlementAttempt): Se
 /** Keep every signature that may have been broadcast. A newer prepared transaction must not hide an older one. */
 export function mergeSettlementFields(currentRaw: string, localRaw: string, codes: string[]): string {
   const current = JSON.parse(currentRaw) as { rooms: { code: string; entrants?: { actor: string; claimed?: boolean }[]; funded?: Record<string, unknown> }[] };
-  const local = JSON.parse(localRaw) as { rooms: { code: string; entrants?: { actor: string; claimed?: boolean }[]; funded?: { settlement?: SettlementAttempt; settlementAlso?: SettlementAttempt[]; settlementSignature?: string; settlementAlert?: string } }[] };
+  const local = JSON.parse(localRaw) as { rooms: { code: string; entrants?: { actor: string; claimed?: boolean }[]; funded?: { settlement?: SettlementAttempt; settlementAlso?: SettlementAttempt[]; settlementSignature?: string; settlementClosure?: "external"; settlementAlert?: string } }[] };
   for (const code of codes) {
     const into = current.rooms.find(item => item.code === code);
     const from = local.rooms.find(item => item.code === code);
@@ -48,10 +48,12 @@ export function mergeSettlementFields(currentRaw: string, localRaw: string, code
       if (rest.length) into.funded.settlementAlso = rest;
       else delete into.funded.settlementAlso;
     }
+    if (into.funded.settlementSignature === "chain-closed") delete into.funded.settlementSignature;
     const signature = into.funded.settlementSignature as string | undefined;
-    if (!signature && localFunded.settlementSignature && (localFunded.settlementSignature === "chain-closed" || attempts.some(item => item.signature === localFunded.settlementSignature && item.phase === "confirmed"))) {
-      into.funded.settlementSignature = localFunded.settlementSignature;
-    }
+    const localSignature = localFunded.settlementSignature;
+    const localConfirmed = Boolean(localSignature && localSignature !== "chain-closed" && attempts.some(item => item.signature === localSignature && item.phase === "confirmed"));
+    if (!signature && localConfirmed) into.funded.settlementSignature = localSignature;
+    if (!into.funded.settlementSignature && localFunded.settlementClosure === "external") into.funded.settlementClosure = "external";
     if (!into.funded.settlementSignature && localFunded.settlementAlert && !into.funded.settlementAlert) into.funded.settlementAlert = localFunded.settlementAlert;
     for (const entrant of from.entrants ?? []) {
       if (!entrant.claimed) continue;
@@ -72,6 +74,19 @@ function liveAttempts(store: Store, code: string) {
   return store.settlementAttempts(code).filter(item => item.phase !== "failed" && item.phase !== "expired");
 }
 
+function unresolvedAttempt(attempt: SettlementAttempt) {
+  return attempt.phase === "prepared" || attempt.phase === "broadcast" || attempt.phase === "unknown";
+}
+
+/** A real finalized signature, or an explicit external closure with nothing left unresolved. */
+function receiptComplete(store: Store, code: string) {
+  const terms = store.settlementContext(code).terms;
+  const attempts = store.settlementAttempts(code);
+  if (terms.settlementSignature === "chain-closed") return false;
+  if (terms.settlementSignature && (attempts.some(item => item.signature === terms.settlementSignature && item.phase === "confirmed") || attempts.length === 0)) return true;
+  return terms.settlementClosure === "external" && !attempts.some(unresolvedAttempt);
+}
+
 /**
  * One step of the settlement lifecycle. The signed transaction is stored before it is sent.
  * A returned signature is not completion. Every signature that may have been broadcast stays until it fails or expires.
@@ -87,19 +102,39 @@ export async function advanceRoomSettlement(store: Store, chain: SettlementChain
     return { confirmed: false, signature: null, status: "unknown", attention: note };
   }
   if (observed && observed.status !== "open") {
-    try { store.syncChain(code, observed); } catch { /* The chain outcome still stops another settlement send. */ }
-    for (const existing of liveAttempts(store, code)) {
-      const status = await chain.observeSettlement(existing.signature, existing.lastValidBlockHeight);
-      if (status !== "confirmed") continue;
-      store.completeSettlement(code, existing.signature);
-      store.setSettlementAlert(code, "");
-      await persist();
-      return { confirmed: true, signature: existing.signature, status: "confirmed" };
+    if (receiptComplete(store, code)) {
+      const signature = store.settlementContext(code).terms.settlementSignature ?? null;
+      return { confirmed: true, signature: signature === "chain-closed" ? null : signature, status: "confirmed" };
     }
-    store.completeSettlement(code, "chain-closed");
+    try { store.syncChain(code, observed); } catch { /* The chain outcome still stops another settlement send. */ }
+    const seen: { attempt: SettlementAttempt; status: SettlementObservation | "confirmed" }[] = [];
+    for (const existing of store.settlementAttempts(code)) {
+      if (!unresolvedAttempt(existing)) {
+        seen.push({ attempt: existing, status: existing.phase === "confirmed" ? "confirmed" : existing.phase === "failed" ? "failed" : "expired" });
+        continue;
+      }
+      const status = await chain.observeSettlement(existing.signature, existing.lastValidBlockHeight);
+      seen.push({ attempt: existing, status });
+      if (status === "confirmed") continue;
+      const phase: SettlementPhase = status === "pending" ? "broadcast" : status === "unknown" ? "unknown" : status;
+      store.stageSettlement(code, { ...existing, phase, note: status === "unknown" ? "The signature status is not known yet." : status === "pending" ? "Submitted. Finality is not known yet." : status });
+    }
+    const confirmed = seen.find(item => item.status === "confirmed");
+    if (confirmed) {
+      store.completeSettlement(code, confirmed.attempt.signature);
+      store.setSettlementAlert(code, "");
+      if (await persist() !== "saved") return { confirmed: false, signature: confirmed.attempt.signature, status: "unknown", attention: "Settlement progress could not be saved." };
+      return { confirmed: true, signature: confirmed.attempt.signature, status: "confirmed" };
+    }
+    if (seen.some(item => item.status === "pending" || item.status === "unknown")) {
+      warn(store, code, now, "Settlement is not confirmed.");
+      if (await persist() !== "saved") return { confirmed: false, signature: null, status: "unknown", attention: "Settlement progress could not be saved." };
+      return { confirmed: false, signature: null, status: "unknown", attention: "Settlement is not confirmed." };
+    }
+    store.recordExternalClosure(code);
     store.setSettlementAlert(code, "");
-    await persist();
-    return { confirmed: true, signature: "chain-closed", status: "confirmed" };
+    if (await persist() !== "saved") return { confirmed: false, signature: null, status: "unknown", attention: "Settlement progress could not be saved." };
+    return { confirmed: true, signature: null, status: "confirmed" };
   }
   if (observed) {
     try { store.syncChain(code, observed); }
@@ -160,9 +195,12 @@ export async function advanceRoomSettlement(store: Store, chain: SettlementChain
     return { confirmed: false, signature: null, status: "refused", attention: note.includes("refund") ? note : undefined };
   }
   if (!prepared) {
-    store.completeSettlement(code, "chain-closed");
-    await persist();
-    return { confirmed: true, signature: "chain-closed", status: "confirmed" };
+    if (liveAttempts(store, code).length === 0) {
+      store.recordExternalClosure(code);
+      store.setSettlementAlert(code, "");
+    }
+    if (await persist() !== "saved") return { confirmed: false, signature: null, status: "unknown", attention: "Settlement progress could not be saved." };
+    return { confirmed: liveAttempts(store, code).length === 0, signature: null, status: liveAttempts(store, code).length === 0 ? "confirmed" : "unknown" };
   }
   const attempt: SettlementAttempt = { phase: "prepared", winner: prepared.winner, signature: prepared.signature, serialized: prepared.serialized,
     blockhash: prepared.blockhash, lastValidBlockHeight: prepared.lastValidBlockHeight, preparedAt: now };

@@ -19,6 +19,8 @@ describe("room reconciliation", () => {
     const paid = reconcileRoom(room({ chainStatus: "paid", settlementSignature: "done" }), 2_000, 0n);
     expect(paid.unpaidPrize).toBe(0n);
     expect(paid.unknownSignatures).toEqual([]);
+    const synthetic = reconcileRoom(room({ settlementSignature: "chain-closed", settlement: attempt("sent-a", "unknown") }), 2_000, 0n);
+    expect(synthetic.unknownSignatures).toEqual(["sent-a"]);
   });
   it("retains both signatures when a conditional merge sees two broadcasts", () => {
     const currentRoom = room({ settlement: attempt("sent-a", "broadcast") });

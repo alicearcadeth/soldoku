@@ -46,4 +46,18 @@ describe("automatic settlement selection", () => {
     restored.replace(store.snapshot());
     expect(restored.dueSettlementCodes()).toEqual([]);
   });
+  it("selects a closed room whose receipt is still unknown", () => {
+    const paid = room({ code: "PAID0001" });
+    (paid.funded as { chainStatus: string }).chainStatus = "paid";
+    const synthetic = room({ code: "CHAIN001" });
+    (synthetic.funded as { chainStatus: string; settlementSignature?: string }).chainStatus = "awarded";
+    (synthetic.funded as { settlementSignature?: string }).settlementSignature = "chain-closed";
+    (synthetic.funded as { settlement?: { phase: string; signature: string } }).settlement = { phase: "unknown", signature: "sent-a" };
+    const external = room({ code: "EXTERNAL" });
+    (external.funded as { chainStatus: string; settlementClosure?: string }).chainStatus = "refunding";
+    (external.funded as { settlementClosure?: string }).settlementClosure = "external";
+    const store = storeWith([paid, synthetic, external]);
+    expect(store.dueSettlementCodes()).toEqual([]);
+    expect(store.receiptReconciliationCodes()).toEqual(["CHAIN001"]);
+  });
 });

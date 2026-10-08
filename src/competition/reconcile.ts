@@ -18,7 +18,8 @@ export function reconcileRoom(room: { code: string; endsAt: number; entrants: En
   const participants = funded?.confirmedParticipants ?? 0;
   const unclaimed = room.entrants.filter(entry => !entry.claimed).length;
   const signatures = [funded?.settlement, ...(funded?.settlementAlso ?? [])].filter((item): item is SettlementAttempt => Boolean(item));
-  const unknownSignatures = funded?.settlementSignature ? [] : signatures.filter(item => item.phase === "unknown" || item.phase === "broadcast" || item.phase === "prepared").map(item => item.signature);
+  const receipt = funded?.settlementSignature && funded.settlementSignature !== "chain-closed" ? funded.settlementSignature : undefined;
+  const unknownSignatures = receipt ? [] : signatures.filter(item => item.phase === "unknown" || item.phase === "broadcast" || item.phase === "prepared").map(item => item.signature);
   let expectedVault = 0n;
   let unpaidPrize = 0n;
   let outstandingRefund = 0n;
@@ -33,7 +34,7 @@ export function reconcileRoom(room: { code: string; endsAt: number; entrants: En
   }
   const held = vault ?? null;
   const unsolicited = held !== null && held > expectedVault ? held - expectedVault : 0n;
-  const deadline = !funded || funded.settlementSignature ? "none"
+  const deadline = !funded || receipt ? "none"
     : now >= room.endsAt && now < funded.refundAt ? "settlement"
     : funded.refundAt - now <= SETTLEMENT_REFUND_WARNING_MS && now < funded.refundAt ? "refund" : "none";
   return {

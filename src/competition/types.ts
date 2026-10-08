@@ -9,7 +9,7 @@ export type SettlementAttempt = {
 };
 export type FundedTerms = FundedConfig & { id: string; stakeUnits: string; startsAt: number; refundAt: number;
   chainStatus: "pending" | "open" | "awarded" | "refunding" | "paid"; confirmedParticipants: number; chainTime: number;
-  winner: string | null; settlementSignature?: string; settlement?: SettlementAttempt; settlementAlso?: SettlementAttempt[]; settlementAlert?: string };
+  winner: string | null; settlementSignature?: string; settlementClosure?: "external"; settlement?: SettlementAttempt; settlementAlso?: SettlementAttempt[]; settlementAlert?: string };
 export type VerifiedChainRoom = { id: string; creator: string; authority: string; mint: string; stakeUnits: string;
   startsAt: number; endsAt: number; refundAt: number; participants: number; chainTime: number;
   status: "open" | "awarded" | "refunding" | "paid"; winner: string | null; entries: { wallet: string; claimed: boolean }[] };

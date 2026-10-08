@@ -6,7 +6,7 @@ const html = readFileSync("dist/index.html");
 const text = html.toString("utf8");
 const script = text.match(/<script>([\s\S]*?)<\/script>/);
 if (!script) throw new Error("Built index.html has no inline script to hash.");
-const expected = createHash("sha256").update(script[1]).digest("base64");
+const expected = createHash("sha256").update(script[1].replaceAll("\r\n", "\n")).digest("base64");
 const env = {
   DB: { prepare: () => ({ bind: () => ({ first: async () => null, all: async () => ({ results: [] }), run: async () => ({ meta: { changes: 1 } }) }) }) },
   ASSETS: { fetch: async () => new Response(html, { headers: { "content-type": "text/html; charset=utf-8" } }) },

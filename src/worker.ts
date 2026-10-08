@@ -125,15 +125,22 @@ async function handleFetch(request: Request, env: Env): Promise<Response> {
     }
 }
 
+function nullBodyStatus(status: number): boolean {
+  return status === 101 || status === 204 || status === 205 || status === 304;
+}
+
 async function withSecurityHeaders(response: Response): Promise<Response> {
   const headers = new Headers(response.headers);
   headers.set("x-content-type-options", "nosniff");
   headers.set("referrer-policy", "no-referrer");
+  if (nullBodyStatus(response.status)) {
+    return new Response(null, { status: response.status, statusText: response.statusText, headers });
+  }
   const type = headers.get("content-type") ?? "";
   if (type.includes("text/html")) {
     const html = await response.clone().text();
     const script = html.match(/<script>([\s\S]*?)<\/script>/);
-    const hash = script ? createHash("sha256").update(script[1]).digest("base64") : "";
+    const hash = script ? createHash("sha256").update(script[1].replaceAll("\r\n", "\n")).digest("base64") : "";
     headers.set("content-security-policy", `script-src 'self'${hash ? ` 'sha256-${hash}'` : ""}; frame-ancestors 'none'`);
     return new Response(html, { status: response.status, statusText: response.statusText, headers });
   }
@@ -193,7 +200,7 @@ async function settleDueCompetitions(env: Env): Promise<{ settled: string[] }> {
   store.replace(row?.body ?? null);
   const expected = { body: row?.body ?? null };
   const settled: string[] = [];
-  for (const code of [...store.dueSettlementCodes()]) {
+  for (const code of [...new Set([...store.dueSettlementCodes(), ...store.receiptReconciliationCodes()])]) {
     const report = await advanceRoomSettlement(store, { read: chain.read, prepareSettlement, broadcastSettlement, observeSettlement }, code, competitionPersist(env, store, expected, [code]), Date.now());
     if (report.confirmed) settled.push(code);
   }
