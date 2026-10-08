@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { missingTesterTokenAccount, planTesterGrant, TESTER_COOLDOWN_MS, TESTER_SOL_FLOOR, TESTER_TOKEN_FLOOR } from "./testerFunds";
+import { missingTesterTokenAccount, planTesterGrant, TESTER_COOLDOWN_MS, TESTER_GLOBAL_CAP, TESTER_SOL_FLOOR, TESTER_TOKEN_FLOOR } from "./testerFunds";
 
 const now = 1_700_000_000_000;
 describe("tester fund grants", () => {
@@ -17,6 +17,11 @@ describe("tester fund grants", () => {
   });
   it("allows another grant after the cooldown", () => {
     expect(planTesterGrant({ solLamports: 0, testUnits: 0n, lastGrantAt: now - TESTER_COOLDOWN_MS, now, faucetConfigured: true }).sol).toBe(true);
+  });
+  it("stops a shared day of grants at 50 wallets", () => {
+    expect(() => planTesterGrant({ solLamports: 0, testUnits: 0n, lastGrantAt: null, now, faucetConfigured: true, recentGrants: TESTER_GLOBAL_CAP }))
+      .toThrow(/50 grants/);
+    expect(planTesterGrant({ solLamports: 0, testUnits: 0n, lastGrantAt: null, now, faucetConfigured: true, recentGrants: TESTER_GLOBAL_CAP - 1 }).sol).toBe(true);
   });
   it("still requests SOL when the TEST mint faucet is not configured", () => {
     expect(planTesterGrant({ solLamports: 0, testUnits: 0n, lastGrantAt: null, now, faucetConfigured: false }))

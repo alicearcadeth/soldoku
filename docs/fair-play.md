@@ -6,7 +6,7 @@ This is a product limit, not a claim that matches are provably human.
 
 The puzzle is the givens. Those cells are visible and are returned with the room. An external solver can fill the grid. The in-game Smart Hint is already withheld in Compete. That does not matter to a second program.
 
-A local test client has already done this on hosted Devnet: it solved the public givens and entered one correct cell at a time. The server accepted the finish because the gaps were at least 400 ms and the match lasted at least 15 seconds. The same path is available to anyone who can call the move API. No public answer endpoint was added. `GET /api/rooms/solution` stays closed unless the process is localnet and the reveal secret matches. The hosted Worker secret list does not include that secret.
+A local test client has already done this on hosted Devnet: it solved the public givens and entered one correct cell at a time. The server accepted the finish because the gaps were at least 400 ms and the match lasted at least 15 seconds. Multiplayer competition moves use a separate 120 ms gap. A move 119 ms after the previous accepted move is rejected, and a move at 120 ms is accepted. That gap does not prove a person played. A solver can still post one cell at a time after 15 seconds. Extra wallets and arranged losses remain possible. The same path is available to anyone who can call the move API. No public answer endpoint was added. `GET /api/rooms/solution` stays closed unless the process is localnet and the reveal secret matches. The hosted Worker secret list does not include that secret.
 
 Other realistic cases:
 

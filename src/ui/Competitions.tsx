@@ -7,6 +7,7 @@ import { DAY_MS, elapsedLabel, usdLabel, type CompetitionSummary, type Competiti
 import { connectedAddress, signPlayMessage, signPlayTransaction, setPlayChain } from "../solana/browserWallet";
 import { roomCodeFromUrl, roomUrl, stakeBaseUnits, tokenUnitsLabel } from "../competition/roomLink";
 import type { PreparedCompetitionTransaction } from "../competition/chain";
+import { blockSecondApproval, readPending, recoveryMessage, rememberPending, signedTransactionIdentity, storageFailureMessage, writePending, type PendingEscrow } from "../competition/pendingTx";
 import { cellLabel } from "./boardInput";
 import { DialogFrame } from "./dialogFocus";
 import { SettingsSheet } from "./SettingsSheet";
@@ -232,17 +233,52 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
       } else visit(await api<CompetitionView>("/api/competitions/join", { code: codeToJoin, actor: auth.actor }));
     });
   }
+  function savePending(list: PendingEscrow[]) {
+    if (writePending(localStorage, list) === "unavailable") throw new Error(storageFailureMessage());
+  }
+  async function submitSaved(target: CompetitionView, auth: Session, item: PendingEscrow) {
+    try {
+      const sent = await api<{ signature: string }>("/api/competitions/submit", { code: target.code, actor: auth.actor, action: item.action, transaction: item.serialized });
+      const next = rememberPending(readPending(localStorage), { ...item, signature: sent.signature || item.signature, status: "broadcast" });
+      savePending(next);
+      return sent.signature || item.signature;
+    } catch (error) {
+      const next = rememberPending(readPending(localStorage), { ...item, status: "unknown", note: "The response was lost. This is not a failure." });
+      savePending(next);
+      if (error instanceof Error && /paused|does not match|Unrelated|different/.test(error.message)) throw error;
+      throw new Error(recoveryMessage(item, "unknown"));
+    }
+  }
   async function escrowAction(target: CompetitionView, auth: Session, kind: "deposit" | "extend" | "claim") {
-    const prepared = await api<PreparedCompetitionTransaction>("/api/competitions/transaction", { code: target.code, actor: auth.actor, action: kind, ...(kind === "extend" ? { durationMs: extra } : {}) });
-    if (!target.funded || prepared.wallet !== auth.wallet || prepared.mint !== target.funded.mint || prepared.stakeUnits !== target.funded.stakeUnits
-      || prepared.action !== kind || !["devnet", "localnet"].includes(prepared.cluster)) throw new Error("Transaction preview does not match this competition.");
-    setPlayChain(prepared.cluster);
-    setBusy(kind === "deposit" ? `Approve ${target.stake} TEST deposit in your wallet` : `Approve ${kind} in your wallet`);
-    const signed = await signPlayTransaction(Uint8Array.from(atob(prepared.transaction), character => character.charCodeAt(0)));
-    if (!signed) throw new Error("Choose a wallet that supports transaction signing.");
-    if (connectedAddress() !== auth.wallet) throw new Error("Your wallet changed before submission. Reconnect the original account.");
-    const sent = await api<{ signature: string }>("/api/competitions/submit", { code: target.code, actor: auth.actor, transaction: btoa(Array.from(signed, byte => String.fromCharCode(byte)).join("")) });
-    const nextReceipt = { code: target.code, signature: sent.signature, cluster: prepared.cluster };
+    const existing = blockSecondApproval(readPending(localStorage), target.code, auth.wallet);
+    if (existing.blocked) throw new Error(existing.message);
+    let serialized = existing.resume?.serialized;
+    let signature = existing.resume?.signature;
+    let cluster = existing.resume?.cluster ?? "devnet";
+    if (!existing.resume) {
+      const prepared = await api<PreparedCompetitionTransaction>("/api/competitions/transaction", { code: target.code, actor: auth.actor, action: kind, ...(kind === "extend" ? { durationMs: extra } : {}) });
+      if (!target.funded || prepared.wallet !== auth.wallet || prepared.mint !== target.funded.mint || prepared.stakeUnits !== target.funded.stakeUnits
+        || prepared.action !== kind || !["devnet", "localnet"].includes(prepared.cluster)) throw new Error("Transaction preview does not match this competition.");
+      setPlayChain(prepared.cluster);
+      cluster = prepared.cluster;
+      setBusy(kind === "deposit" ? `Approve ${target.stake} TEST deposit in your wallet` : `Approve ${kind} in your wallet`);
+      let signed: Uint8Array | null;
+      try { signed = await signPlayTransaction(Uint8Array.from(atob(prepared.transaction), character => character.charCodeAt(0))); }
+      catch (error) {
+        if (error instanceof Error && /declined/i.test(error.message)) throw new Error("Wallet approval was cancelled. Nothing was submitted.");
+        throw error;
+      }
+      if (!signed) throw new Error("Choose a wallet that supports transaction signing.");
+      if (connectedAddress() !== auth.wallet) throw new Error("Your wallet changed before submission. Reconnect the original account. Nothing new was submitted.");
+      const identity = signedTransactionIdentity(signed);
+      serialized = identity.serialized;
+      signature = identity.signature;
+      savePending(rememberPending(readPending(localStorage), { code: target.code, wallet: auth.wallet, action: kind, signature, serialized, cluster, expiresAtBlockHeight: prepared.expiresAtBlockHeight, status: "prepared" }));
+    }
+    if (!serialized || !signature) throw new Error(recoveryMessage({ action: kind, signature: signature ?? "unknown" }, "unknown"));
+    setBusy("Resubmitting the signed transaction. A timeout is not a failure.");
+    const sentSignature = await submitSaved(target, auth, { code: target.code, wallet: auth.wallet, action: kind, signature, serialized, cluster, expiresAtBlockHeight: existing.resume?.expiresAtBlockHeight ?? 0, status: "broadcast" });
+    const nextReceipt = { code: target.code, signature: sentSignature, cluster };
     setReceipt(nextReceipt); localStorage.setItem("sudoku.competitionReceipt", JSON.stringify(nextReceipt));
     setBusy("Transaction submitted · waiting for finalized escrow confirmation");
     const until = Date.now() + 90000;
@@ -255,9 +291,13 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
         throw error;
       }
       setRoom(latest);
-      if (kind === "deposit" && latest.you || kind === "extend" && latest.funded!.startsAt > target.funded.startsAt || kind === "claim" && latest.you?.claimed) return;
+      if (kind === "deposit" && latest.you || kind === "extend" && latest.funded!.startsAt > target.funded!.startsAt || kind === "claim" && latest.you?.claimed) {
+        savePending(rememberPending(readPending(localStorage), { code: target.code, wallet: auth.wallet, action: kind, signature: sentSignature, serialized, cluster, expiresAtBlockHeight: existing.resume?.expiresAtBlockHeight ?? 0, status: "confirmed" }));
+        return;
+      }
     }
-    throw new Error("Transaction confirmation is still pending. Refresh this room to recover; do not deposit again.");
+    savePending(rememberPending(readPending(localStorage), { code: target.code, wallet: auth.wallet, action: kind, signature: sentSignature, serialized, cluster, expiresAtBlockHeight: existing.resume?.expiresAtBlockHeight ?? 0, status: "unknown" }));
+    throw new Error(recoveryMessage({ action: kind, signature: sentSignature }, "unknown"));
   }
   async function claim() {
     if (!room) return;

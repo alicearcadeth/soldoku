@@ -10,8 +10,10 @@ vi.mock("./chain", () => ({ competitionChain: vi.fn() }));
 function database() {
   let saved: string | null = null;
   let conflicts = 0;
+  let denials = 0;
   return {
     conflict: () => { conflicts++; },
+    deny: (count: number) => { denials = count; },
     snapshot: () => saved,
     seed(body: string) { saved = body; },
     prepare(sql: string) {
@@ -23,6 +25,7 @@ function database() {
         async run() {
           if (sql.startsWith("CREATE TABLE")) return { meta: { changes: 0 } };
           if (conflicts > 0) { conflicts--; return { meta: { changes: 0 } }; }
+          if (denials > 0) { denials--; return { meta: { changes: 0 } }; }
           if (saved !== null && args[1] !== saved) return { meta: { changes: 0 } };
           saved = String(args[0]); return { meta: { changes: 1 } };
         },
@@ -140,8 +143,12 @@ describe("Worker leaderboard persistence", () => {
     const db = database();
     const fundTester = vi.fn(async (): Promise<{ solSignature: string | null; testSignature: string | null; note: string | null }> => ({ solSignature: "sol-sig", testSignature: "test-sig", note: null }));
     const settle = vi.fn(async () => "auto-signature");
+    let observation: "pending" | "confirmed" = "pending";
+    const prepareSettlement = vi.fn(async () => ({ serialized: "same-bytes", signature: "prepared-sig", blockhash: "bh", lastValidBlockHeight: 50, winner: "" }));
+    const broadcastSettlement = vi.fn(async () => "prepared-sig");
+    const observeSettlement = vi.fn(async () => observation);
     const chain = { config: { program: "program", authority: "authority", mint: "mint", decimals: 6, playMs: 60000, graceMs: 60000 },
-      cluster: "devnet", verify: async () => {}, read: vi.fn(), submit: vi.fn(), transaction: vi.fn(), settle, faucetConfigured: true,
+      cluster: "devnet", verify: async () => {}, read: vi.fn(), submit: vi.fn(), transaction: vi.fn(), settle, prepareSettlement, broadcastSettlement, observeSettlement, faucetConfigured: true,
       testerBalances: async () => ({ solLamports: 0, testUnits: 0n }), fundTester } as CompetitionChain;
     vi.mocked(competitionChain).mockReturnValue(chain);
     const env = { DB: db, ASSETS: { fetch: async () => new Response("asset") } };
@@ -172,15 +179,89 @@ describe("Worker leaderboard persistence", () => {
             { actor: wallet, name: "a", startedAt: at - 80000, completedMs: 20000, values: [], sequence: 1, lastMoveAt: 0 },
             { actor: otherWallet, name: "b", startedAt: at - 80000, completedMs: 30000, values: [], sequence: 1, lastMoveAt: 0 },
           ],
-          funded: { program: "program", authority: "authority", mint: "mint", decimals: 6, playMs: 60000, graceMs: 3600000, id: "1", stakeUnits: "1000000", startsAt: at - 61000, refundAt: at + 3600000, chainStatus: "open", confirmedParticipants: 2, chainTime: at - 1000, winner: null } },
+          funded: { program: "program", authority: "authority", mint: "mint", decimals: 6, playMs: 60000, graceMs: 3600000, id: "1", stakeUnits: "1000000", startsAt: at - 61000, refundAt: at - 1000 + 3600000, chainStatus: "open", confirmedParticipants: 2, chainTime: at - 1000, winner: null } },
         { code: "EARLY001", owner: wallet, createdAt: at, endsAt: at + 60000, puzzle: { level: "easy", givens: [], solution: [] }, entrants: [],
           funded: { program: "program", authority: "authority", mint: "mint", decimals: 6, playMs: 60000, graceMs: 3600000, id: "2", stakeUnits: "1000000", startsAt: at + 30000, refundAt: at + 3600000, chainStatus: "open", confirmedParticipants: 1, chainTime: at, winner: null } },
       ], gates: [], proofs: [], sessions: [], grants: [] }));
+      vi.mocked(chain.read).mockResolvedValue({ id: "1", creator: wallet, authority: "authority", mint: "mint", stakeUnits: "1000000",
+        startsAt: at - 61000, endsAt: at - 1000, refundAt: at - 1000 + 3600000, status: "open", winner: null, chainTime: at, participants: 2,
+        entries: [{ wallet, claimed: false }, { wallet: otherWallet, claimed: false }] });
       await worker.scheduled({}, env);
-      expect(settle).toHaveBeenCalledTimes(1);
-      expect(JSON.parse(db.snapshot()!).rooms.find((item: { code: string }) => item.code === "DUE00001").funded.settlementSignature).toBe("auto-signature");
+      expect(settle).not.toHaveBeenCalled();
+      expect(prepareSettlement).toHaveBeenCalledTimes(1);
+      expect(broadcastSettlement).toHaveBeenCalledTimes(1);
+      expect(JSON.parse(db.snapshot()!).rooms.find((item: { code: string }) => item.code === "DUE00001").funded.settlementSignature).toBeUndefined();
       await worker.scheduled({}, env);
-      expect(settle).toHaveBeenCalledTimes(1);
+      expect(prepareSettlement).toHaveBeenCalledTimes(1);
+      expect(broadcastSettlement).toHaveBeenCalledTimes(2);
+      observation = "confirmed";
+      await worker.scheduled({}, env);
+      expect(broadcastSettlement).toHaveBeenCalledTimes(2);
+      expect(JSON.parse(db.snapshot()!).rooms.find((item: { code: string }) => item.code === "DUE00001").funded.settlementSignature).toBe("prepared-sig");
+      await worker.scheduled({}, env);
+      expect(prepareSettlement).toHaveBeenCalledTimes(1);
     } finally { vi.mocked(competitionChain).mockReset(); }
+  });
+  it("does not broadcast a settlement when the conditional write reports no change", async () => {
+    const db = database();
+    const at = Date.now();
+    const broadcastSettlement = vi.fn(async () => "sig");
+    const chain = { config: { program: "program", authority: "authority", mint: "mint", decimals: 6, playMs: 60000, graceMs: 3600000 },
+      cluster: "devnet", verify: async () => {}, read: vi.fn(async () => ({ id: "1", creator: "owner", authority: "authority", mint: "mint", stakeUnits: "1000000",
+        startsAt: at - 61000, endsAt: at - 1000, refundAt: at - 1000 + 3600000, status: "open" as const, winner: null, chainTime: at, participants: 2,
+        entries: [{ wallet: "owner", claimed: false }, { wallet: "other", claimed: false }] })),
+      submit: vi.fn(), transaction: vi.fn(), settle: vi.fn(), prepareSettlement: vi.fn(async () => ({ serialized: "bytes", signature: "sig", blockhash: "bh", lastValidBlockHeight: 3, winner: "owner" })),
+      broadcastSettlement, observeSettlement: vi.fn(async () => "confirmed" as const), faucetConfigured: false,
+      testerBalances: vi.fn(), fundTester: vi.fn() } as CompetitionChain;
+    vi.mocked(competitionChain).mockReturnValue(chain);
+    db.seed(JSON.stringify({ rooms: [{ code: "DUE00001", owner: "owner", createdAt: at - 120000, endsAt: at - 1000, puzzle: { level: "easy", givens: [], solution: [] },
+      entrants: [
+        { actor: "owner", name: "a", startedAt: at - 80000, completedMs: 20000, values: [], sequence: 1, lastMoveAt: 0 },
+        { actor: "other", name: "b", startedAt: at - 80000, completedMs: 30000, values: [], sequence: 1, lastMoveAt: 0 },
+      ],
+      funded: { program: "program", authority: "authority", mint: "mint", decimals: 6, playMs: 60000, graceMs: 3600000, id: "1", stakeUnits: "1000000", startsAt: at - 61000, refundAt: at - 1000 + 3600000, chainStatus: "open", confirmedParticipants: 2, chainTime: at - 1000, winner: null } }],
+      gates: [], proofs: [], sessions: [], grants: [] }));
+    db.deny(8);
+    try {
+      await worker.scheduled({}, { DB: db, ASSETS: { fetch: async () => new Response("asset") } });
+      expect(broadcastSettlement).not.toHaveBeenCalled();
+    } finally { vi.mocked(competitionChain).mockReset(); }
+  });
+  it("pauses new funded rooms and deposit relays while claims and settlement stay available", async () => {
+    const db = database();
+    const transaction = vi.fn(async () => ({ transaction: "unsigned", action: "claim", wallet: "wallet", cluster: "devnet", room: "pda", mint: "mint", stakeUnits: "1", startsAt: 1, endsAt: 2, refundAt: 3, expiresAtBlockHeight: 1 }));
+    const chain = { config: { program: "program", authority: "authority", mint: "mint", decimals: 6, playMs: 60000, graceMs: 60000 },
+      cluster: "devnet", verify: async () => {}, read: vi.fn(async () => null), submit: vi.fn(), transaction, settle: vi.fn(), faucetConfigured: false,
+      testerBalances: vi.fn(), fundTester: vi.fn() } as CompetitionChain;
+    vi.mocked(competitionChain).mockReturnValue(chain);
+    const env = { DB: db, ASSETS: { fetch: async () => new Response("asset") }, SUDOKU_COMPETITION_PAUSED: "1" };
+    try {
+      const key = nacl.sign.keyPair(); const wallet = bs58.encode(key.publicKey);
+      const proof = await (await worker.fetch(new Request("https://soldoku.test/api/competitions/proof", { method: "POST", body: JSON.stringify({ wallet }) }), env)).json() as { id: string; message: string };
+      const auth = await (await worker.fetch(new Request("https://soldoku.test/api/competitions/authorize", { method: "POST", body: JSON.stringify({ id: proof.id, signature: bs58.encode(nacl.sign.detached(new TextEncoder().encode(proof.message), key.secretKey)) }) }), env)).json() as { actor: string };
+      const gate = await (await worker.fetch(new Request("https://soldoku.test/api/competitions/check", { method: "POST", body: JSON.stringify({ actor: auth.actor }) }), env)).json() as { id: string; target: number };
+      await worker.fetch(new Request("https://soldoku.test/api/competitions/check/verify", { method: "POST", body: JSON.stringify({ actor: auth.actor, id: gate.id, value: gate.target }) }), env);
+      const created = await worker.fetch(new Request("https://soldoku.test/api/competitions/create", { method: "POST", body: JSON.stringify({ actor: auth.actor, gateId: gate.id, mode: "tokens", mint: "mint", stakeUnits: "1000000", level: "easy", durationMs: 60000 }) }), env);
+      expect(created.status).toBe(400);
+      expect(await created.json()).toMatchObject({ error: expect.stringMatching(/paused/) });
+      const free = await worker.fetch(new Request("https://soldoku.test/api/competitions/create", { method: "POST", body: JSON.stringify({ actor: auth.actor, gateId: gate.id, mode: "free", level: "easy", durationMs: DAY_MS }) }), env);
+      expect(free.status).toBe(200);
+      const deposit = await worker.fetch(new Request("https://soldoku.test/api/competitions/transaction", { method: "POST", body: JSON.stringify({ code: "MISSING1", actor: auth.actor, action: "deposit" }) }), env);
+      expect(deposit.status).toBe(400);
+      expect(await deposit.json()).toMatchObject({ error: expect.stringMatching(/paused|not found|no escrow/) });
+      expect(transaction).not.toHaveBeenCalled();
+    } finally { vi.mocked(competitionChain).mockReset(); }
+  });
+  it("sends isolation headers and a script policy only on HTML", async () => {
+    const env = { DB: database(), ASSETS: { fetch: async () => new Response("<!doctype html><script>\nconst ready = true;\n</script>", { headers: { "content-type": "text/html" } }) } };
+    const page = await worker.fetch(new Request("https://soldoku.test/"), env);
+    expect(page.headers.get("x-content-type-options")).toBe("nosniff");
+    expect(page.headers.get("referrer-policy")).toBe("no-referrer");
+    expect(page.headers.get("content-security-policy")).toContain("script-src 'self' 'sha256-");
+    expect(page.headers.get("content-security-policy")).not.toContain("unsafe-inline");
+    expect(page.headers.get("content-security-policy")).toContain("frame-ancestors 'none'");
+    const api = await worker.fetch(new Request("https://soldoku.test/api/competitions"), env);
+    expect(api.headers.get("content-security-policy")).toBe("frame-ancestors 'none'");
+    expect(api.headers.get("content-security-policy")).not.toContain("script-src");
   });
 });
