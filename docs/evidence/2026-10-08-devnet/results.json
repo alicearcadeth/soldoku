@@ -1,0 +1,51 @@
+{
+  "cluster": "devnet",
+  "genesis": "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG",
+  "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+  "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+  "passed": true,
+  "rooms": [
+    {
+      "kind": "winner",
+      "id": "1791474514010",
+      "room": "35rLa8vKuJjWX3hNHEUroxiQWaa2o6QghcWabjuGM4iQ",
+      "vault": "7qWqXGXpgguP4sz8xkdWHsDBZL1uMvmSCgcTz4WtK5ot",
+      "settlement": "5gbVDMDdZ5tgUmCjpCUiBTt6VdesmTrzD1Wv1qSD8ZbzNg8n5xtcwpj1brrsozomTHqZUiT8DvSGiZFb4yYFKk2v",
+      "interruptedSignature": "57sniYZkPUYJPEhry4HJWpLaeqtyzrdWdygU1obqfmGFPjKVZ9CSunP1w8K61mMVyiAdSc4X74aaJxJaH9LXNawd",
+      "interruptedStatus": "finalized",
+      "claimDelta": "2000000",
+      "duplicateDelta": "0",
+      "vaultAfter": "0",
+      "status": "paid"
+    },
+    {
+      "kind": "refund",
+      "id": "1791474514011",
+      "room": "GWwRsF2tifc4L8pvocosUm5zTQNXQF4KJEnHeWqHwt4L",
+      "vault": "CaVNa3xa71DmDQu1ex182WWVm4Zge9yqWdCnp9SskMvb",
+      "returnedStakeEach": "1000000",
+      "duplicateDelta": "0",
+      "vaultAfter": "0",
+      "status": "refunding",
+      "note": "The balance sample was taken after both deposits, so each later +1000000 is the returned stake."
+    },
+    {
+      "kind": "missing-ata",
+      "id": "1791474514012",
+      "room": "JEDSQ3sNkucAAVZCkkawmyUWvbWmc9pv456c64BREvDw",
+      "vault": "7qFGkWKW7QwSKDcvyoDH9fA2sWTJ4FhdMFEz7ATwTuLF",
+      "firstSignature": "ZbU9SejF21xYMgYwbeUpPJRoftcVKtzk47br4npeQMwubLzYayzDnRGdHX99Cu5usrtCp4HaYtBWWqEuSL5Eo68",
+      "firstDelta": "1000000",
+      "duplicateSignature": "5KcTop17eANMtorWhkvKEHjtoaVCHB7ocWCZ769GKVNtpcNs2gCqSz2H6vfdGyxBY4VnrEpw4bNrsNfGXSQ9tzz4",
+      "duplicateDelta": "0",
+      "vaultAfter": "0",
+      "parkedTokensReturned": "31000000"
+    }
+  ],
+  "participants": {
+    "winner": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+    "loser": "5Yj8tfWFSucMUyYZVdCRNFSw1QF3C1MbG7dbo8vFkkar",
+    "authority": "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N"
+  },
+  "stakeUnits": "1000000"
+}

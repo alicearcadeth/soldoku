@@ -11,14 +11,23 @@ Prepared, not authorized. Do not deploy until the owner approves this reconstruc
 
 ## Before
 
-From a clean checkout of the reconstructed commit:
+From a clean checkout of the reconstructed commit, before asking for approval:
 
 ```
 npm ci
 npm test
 npm run build
+```
+
+Only after the owner approves this release:
+
+```
 npx wrangler deploy --config wrangler.soldoku.jsonc
 ```
+
+Do not upgrade the program. Do not point the Worker at Mainnet.
+
+This release also changes settlement behavior the previous build did not have. A cron step observes every retained signature before it resends or replaces one. A failed or expired observation outranks a stale broadcast record for the same signature. A relayed join whose entry account belongs to another wallet is rejected. The browser stores a signed competition transaction with the `buffer` package, because the page has no global `Buffer`.
 
 ## After
 

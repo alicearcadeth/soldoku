@@ -93,6 +93,29 @@ describe("settlement recovery", () => {
     const funded = JSON.parse(h.store.snapshot()).rooms[0].funded;
     expect(funded.settlementAlso.map((item: { signature: string }) => item.signature)).toContain("sig-1");
   });
+  it("completes a retained signature that confirms while another broadcast is still pending", async () => {
+    const h = harness();
+    h.store.stageSettlement("DUE00001", attempt({ signature: "sent-a", phase: "broadcast", serialized: "bytes-a" }));
+    h.store.stageSettlement("DUE00001", attempt({ signature: "sent-b", phase: "unknown", serialized: "bytes-b" }));
+    h.chain.observeSettlement = async (signature: string) => {
+      h.events.push(`observe:${signature}`);
+      return signature === "sent-b" ? "confirmed" : "pending";
+    };
+    const report = await h.advance();
+    expect(report).toMatchObject({ confirmed: true, signature: "sent-b", status: "confirmed" });
+    expect(h.events).toContain("observe:sent-a");
+    expect(h.events).toContain("observe:sent-b");
+    expect(h.events).not.toContain("prepare");
+    expect(JSON.parse(h.store.snapshot()).rooms[0].funded.settlementSignature).toBe("sent-b");
+  });
+  it("does not let a stale broadcast observation erase a failed signature", () => {
+    const current = room();
+    const local = room();
+    (current.funded as { settlement?: SettlementAttempt }).settlement = attempt({ signature: "sig-1", phase: "failed" });
+    (local.funded as { settlement?: SettlementAttempt }).settlement = attempt({ signature: "sig-1", phase: "broadcast" });
+    const merged = JSON.parse(mergeSettlementFields(JSON.stringify({ rooms: [current], gates: [], proofs: [], sessions: [], grants: [] }), JSON.stringify({ rooms: [local], gates: [], proofs: [], sessions: [], grants: [] }), ["DUE00001"]));
+    expect(merged.rooms[0].funded.settlement.phase).toBe("failed");
+  });
   it("does not prepare a replacement while another signature may still have been broadcast", async () => {
     const h = harness();
     h.store.stageSettlement("DUE00001", attempt({ signature: "sent-a", phase: "broadcast", serialized: "bytes-a" }));

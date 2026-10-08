@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Keypair, SystemProgram, Transaction } from "@solana/web3.js";
+import { Keypair, SystemProgram, Transaction, TransactionInstruction } from "@solana/web3.js";
 import { COMPETITION_DEVNET_MINT, assertRelayedCompetitionTransaction, competitionInstructions, type RelayBinding } from "./escrow";
 
 const program = Keypair.generate().publicKey;
@@ -47,5 +47,14 @@ describe("relayed competition transactions", () => {
     const own = pack([ix.claim(player.publicKey, true)], [player]);
     expect(() => assertRelayedCompetitionTransaction(own, { ...binding, action: "claim" })).not.toThrow();
     expect(() => assertRelayedCompetitionTransaction(own, { ...binding, action: "deposit" })).toThrow(/requested action/);
+  });
+  it("rejects a join whose entry account belongs to a different wallet", () => {
+    const other = Keypair.generate();
+    const join = ix.join(player.publicKey);
+    const swapped = new TransactionInstruction({
+      programId: join.programId, data: join.data,
+      keys: join.keys.map((key, index) => index === 1 ? { ...key, pubkey: ix.entry(other.publicKey) } : key),
+    });
+    expect(() => assertRelayedCompetitionTransaction(pack([swapped], [player]), binding)).toThrow(/different entrant/);
   });
 });

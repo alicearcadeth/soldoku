@@ -284,8 +284,14 @@ export function createCompetitionStore(now = Date.now, onSave?: (raw: string) =>
     const funded = room(code).funded;
     if (!funded) throw new Error("This room has no escrow.");
     funded.settlementSignature = signature;
-    if (funded.settlement && signature !== "chain-closed" && funded.settlement.signature === signature) {
-      funded.settlement = { ...funded.settlement, phase: "confirmed" };
+    if (signature !== "chain-closed") {
+      const attempts = settlementAttempts(code).map(item => item.signature === signature ? { ...item, phase: "confirmed" as const } : item);
+      const confirmed = attempts.find(item => item.signature === signature);
+      const rest = attempts.filter(item => item.signature !== signature);
+      if (confirmed) {
+        funded.settlement = confirmed;
+        funded.settlementAlso = rest.length ? rest : undefined;
+      }
     }
     save();
   }

@@ -10,7 +10,7 @@ type SettlementChain = {
   observeSettlement: NonNullable<CompetitionChain["observeSettlement"]>;
 };
 export const SETTLEMENT_REFUND_WARNING_MS = 10 * 60 * 1000;
-const phaseRank: Record<SettlementPhase, number> = { prepared: 1, broadcast: 2, unknown: 2, failed: 2, expired: 2, confirmed: 3 };
+const phaseRank: Record<SettlementPhase, number> = { prepared: 1, broadcast: 2, unknown: 2, failed: 3, expired: 3, confirmed: 4 };
 
 export type SettlementPersist = () => Promise<"saved" | "conflict" | "error">;
 export type SettlementAdvance = { confirmed: boolean; signature: string | null; status: SettlementPhase | "refused"; attention?: string; handedOff?: boolean };
@@ -101,31 +101,46 @@ export async function advanceRoomSettlement(store: Store, chain: SettlementChain
       return { confirmed: false, signature: null, status: "refused", attention: note };
     }
   }
-  for (const existing of liveAttempts(store, code)) {
-    const status = await chain.observeSettlement(existing.signature, existing.lastValidBlockHeight);
-    if (status === "confirmed") {
-      store.completeSettlement(code, existing.signature);
+  const pending = liveAttempts(store, code);
+  if (pending.length) {
+    const seen: { attempt: SettlementAttempt; status: SettlementObservation }[] = [];
+    for (const existing of pending) seen.push({ attempt: existing, status: await chain.observeSettlement(existing.signature, existing.lastValidBlockHeight) });
+    const confirmed = seen.find(item => item.status === "confirmed");
+    if (confirmed) {
+      store.completeSettlement(code, confirmed.attempt.signature);
       await persist();
-      return { confirmed: true, signature: existing.signature, status: "confirmed" };
+      return { confirmed: true, signature: confirmed.attempt.signature, status: "confirmed" };
     }
-    if (status === "failed" || status === "expired") {
-      store.stageSettlement(code, { ...existing, phase: status, note: status });
+    let stillLive = false;
+    for (const item of seen) {
+      if (item.status === "failed" || item.status === "expired") {
+        store.stageSettlement(code, { ...item.attempt, phase: item.status, note: item.status });
+        continue;
+      }
+      stillLive = true;
+      const phase: SettlementPhase = item.status === "unknown" ? "unknown" : "broadcast";
+      store.stageSettlement(code, { ...item.attempt, phase, note: item.status === "unknown" ? "The signature status is not known yet." : item.attempt.note });
+    }
+    if (stillLive) {
+      if (await persist() !== "saved") return { confirmed: false, signature: seen[0].attempt.signature, status: "unknown", attention: "Settlement progress could not be saved." };
+      for (const item of seen) {
+        if (item.status === "failed" || item.status === "expired") continue;
+        const current = store.settlementAttempts(code).find(attempt => attempt.signature === item.attempt.signature);
+        if (!current) continue;
+        try { await chain.broadcastSettlement(current.serialized); }
+        catch {
+          store.stageSettlement(code, { ...current, phase: "unknown", note: "Broadcast response was lost. The same signed transaction is kept." });
+          warn(store, code, now, "Broadcast response was lost.");
+          await persist();
+          return { confirmed: false, signature: current.signature, status: "unknown", attention: "Broadcast response was lost." };
+        }
+      }
+      const unknown = seen.some(item => item.status === "unknown");
+      warn(store, code, now, unknown ? "Settlement is not confirmed." : "");
       await persist();
-      continue;
+      return { confirmed: false, signature: seen.find(item => item.status !== "failed" && item.status !== "expired")?.attempt.signature ?? null, status: unknown ? "unknown" : "broadcast", attention: unknown ? "Settlement is not confirmed." : undefined };
     }
-    const phase: SettlementPhase = status === "unknown" ? "unknown" : "broadcast";
-    store.stageSettlement(code, { ...existing, phase, note: status === "unknown" ? "The signature status is not known yet." : existing.note });
-    if (await persist() !== "saved") return { confirmed: false, signature: existing.signature, status: "unknown", attention: "Settlement progress could not be saved." };
-    try { await chain.broadcastSettlement(existing.serialized); }
-    catch {
-      store.stageSettlement(code, { ...existing, phase: "unknown", note: "Broadcast response was lost. The same signed transaction is kept." });
-      warn(store, code, now, "Broadcast response was lost.");
-      await persist();
-      return { confirmed: false, signature: existing.signature, status: "unknown", attention: "Broadcast response was lost." };
-    }
-    warn(store, code, now, status === "unknown" ? "Settlement is not confirmed." : "");
     await persist();
-    return { confirmed: false, signature: existing.signature, status: phase, attention: status === "unknown" ? "Settlement is not confirmed." : undefined };
   }
   let prepared: PreparedSettlement | null;
   try { prepared = await chain.prepareSettlement(store.settlementContext(code)); }

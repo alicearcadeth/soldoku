@@ -1,3 +1,4 @@
+import { Buffer } from "buffer";
 import { Transaction } from "@solana/web3.js";
 import bs58 from "bs58";
 import type { SettlementObservation } from "./chain";

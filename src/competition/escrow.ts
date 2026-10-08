@@ -106,6 +106,7 @@ export function assertRelayedCompetitionTransaction(tx: Transaction, binding: Re
         throw new Error("Open instruction does not match this room's amount or deadline.");
       }
     }
+    if (tag === 1 && !instruction.keys[1]?.pubkey.equals(built.entry(wallet))) throw new Error("The join entry belongs to a different entrant.");
     if (tag === 1 || tag === 4 || tag === 5) {
       if (!instruction.keys[2]?.pubkey.equals(mint) || !instruction.keys[3]?.pubkey.equals(expectedAta)) throw new Error("The claim destination or token account is a different entrant.");
     }
