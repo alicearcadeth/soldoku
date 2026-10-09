@@ -1,0 +1,120 @@
+{
+  "startedAt": "2026-10-09T14:11:50.082Z",
+  "phases": [
+    {
+      "name": "parse-board",
+      "status": "passed",
+      "givens": 36,
+      "pad": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "gridPreview": "098030015603005900401090003000780000806304701000061000900020107002900806380040250",
+      "at": "2026-10-09T14:11:53.324Z"
+    },
+    {
+      "name": "solve",
+      "status": "passed",
+      "at": "2026-10-09T14:11:53.324Z"
+    },
+    {
+      "name": "enter-moves",
+      "status": "passed",
+      "placed": 3,
+      "probe": [
+        0,
+        3,
+        5
+      ],
+      "seen": [
+        2,
+        6,
+        7
+      ],
+      "at": "2026-10-09T14:12:10.656Z"
+    },
+    {
+      "name": "background",
+      "status": "observed",
+      "note": "Launcher screenshot intentionally omitted",
+      "at": "2026-10-09T14:12:12.748Z"
+    },
+    {
+      "name": "bg-reopen-recovery",
+      "status": "passed",
+      "onBoard": true,
+      "recoveredProbe": [
+        2,
+        6,
+        7
+      ],
+      "at": "2026-10-09T14:12:23.396Z"
+    },
+    {
+      "name": "complete-puzzle",
+      "status": "passed",
+      "filled": 42,
+      "texts": [
+        "Finished in 7:27.3 · rank 1 so far. Rankings can change until the room closes.",
+        "Leaderboard"
+      ],
+      "at": "2026-10-09T14:18:07.014Z"
+    },
+    {
+      "name": "leaderboard-result",
+      "status": "passed",
+      "texts": [
+        "Home",
+        "Settings",
+        "ONE GRID. YOUR FASTEST FINISH.",
+        "Seeker relay diagnostic",
+        "Room code: ",
+        "FE65DD6D",
+        "← Back to Rooms",
+        "Game mode",
+        "Sudoku · easy",
+        "Token",
+        "TEST",
+        "Stake per player",
+        "1 TEST",
+        "Prize pool",
+        "2 TEST",
+        "Play window",
+        "30 minutes",
+        "Participants",
+        "2 · confirmed deposits",
+        "Status",
+        "Competition running",
+        "Best completion",
+        "7:27.3",
+        "Ends 10/9/2026, 9:40:31 PM. No fixed player limit.",
+        "Finished in 7:27.3 · rank 1 so far. Rankings can change until the room closes.",
+        "Share this room’s code to invite others, or use Back to Rooms for another competition.",
+        "Devnet · TEST entry",
+        "Need test funds?",
+        "Competition closes in 22:22.5.",
+        "Fastest unique finish wins the pool. Ties or no finishes refund everyone.",
+        "Your stake is confirmed in escrow.",
+        "Leaderboard",
+        "#",
+        "1",
+        " · ",
+        "E3DQ…DpJn",
+        " · You",
+        "Share this room code: ",
+        ". Finish times are checked by the server. The same grid allows one attempt per wallet.",
+        "Shareable room link",
+        "Copy room link"
+      ],
+      "at": "2026-10-09T14:18:09.834Z"
+    }
+  ],
+  "finishedAt": "2026-10-09T14:18:09.834Z"
+}

@@ -1,0 +1,56 @@
+{
+  "release": "eb14d0d8b733fc7d4dd00a583a5ff9c867ab6836",
+  "observedAt": "2026-10-09T14:10:47.151Z",
+  "paused": true,
+  "before": [
+    {
+      "wallet": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+      "test": "19000000"
+    },
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "test": "33000000"
+    }
+  ],
+  "balances": [
+    {
+      "wallet": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+      "test": "18000000"
+    },
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "test": "32000000"
+    }
+  ],
+  "rooms": [
+    {
+      "code": "E571262D",
+      "name": "Seeker relay diagnostic",
+      "participants": 2,
+      "endsAt": 1791557060000,
+      "funded": {
+        "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+        "authority": "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N",
+        "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+        "decimals": 6,
+        "playMs": 1800000,
+        "graceMs": 3600000,
+        "id": "12751992574235001959",
+        "stakeUnits": "1000000",
+        "startsAt": 1791555260000,
+        "refundAt": 1791560660000,
+        "chainStatus": "open",
+        "confirmedParticipants": 2,
+        "chainTime": 0,
+        "winner": null
+      },
+      "leaderboard": [],
+      "ownerDeposit": "2djmuqB5rcFiFSr4EhAcKGxEqMkLG7FjiEdXzM89Ykw48ayvPwt2o7wmUghgHDwdxgSe9hQ4KqMKwjH35f2bvZzW",
+      "escrow": "H2TJmpAgAcBFp2gAUKeK1S7ue4CehAxB7BPj62Ec46G9",
+      "vault": "799p6YUSacNXqRV8efudrpToceQwm8cqYQGm4DFxLKwB",
+      "vaultAmount": "2000000",
+      "duplicateRejected": false
+    }
+  ],
+  "duplicateDelta": null
+}
