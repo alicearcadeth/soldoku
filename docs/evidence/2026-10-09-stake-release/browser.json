@@ -1,0 +1,24 @@
+[
+  {
+    "host": "soldoku.com",
+    "passed": true,
+    "customAmounts": [
+      "3",
+      "10"
+    ],
+    "paused": true,
+    "cardStatus": 403,
+    "csp": "script-src 'self' 'sha256-0O7guzLcvq90WTIFoiK+MIxo2eYv1PMO5mZfGr8llGg='; frame-ancestors 'none'"
+  },
+  {
+    "host": "www.soldoku.com",
+    "passed": true,
+    "customAmounts": [
+      "3",
+      "10"
+    ],
+    "paused": true,
+    "cardStatus": 403,
+    "csp": "script-src 'self' 'sha256-0O7guzLcvq90WTIFoiK+MIxo2eYv1PMO5mZfGr8llGg='; frame-ancestors 'none'"
+  }
+]
