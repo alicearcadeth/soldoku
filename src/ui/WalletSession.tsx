@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState, type ReactNode 
 import { connectPlayWallet, connectedAddress, connectedWalletName, disconnectPlayWallet, listPlayWallets, onPlayAccount, onPlayWallets, reconnectPlayWallet, type PlayWallet } from "../solana/browserWallet";
 import { shortAddress } from "./copy";
 import { DialogFrame } from "./dialogFocus";
+import { hasMobileWalletAdapter, orderWalletChoices, walletInstallSuggestions } from "./walletInstallSuggestions";
 
 type Session = { address: string | null; requestWallet: () => Promise<string | null>; manageWallet: () => void };
 const WalletContext = createContext<Session | null>(null);
@@ -10,11 +11,6 @@ export function useWalletSession() {
   if (!value) throw new Error("Wallet provider is missing.");
   return value;
 }
-const suggested = [
-  { name: "Phantom", url: "https://phantom.com/download" },
-  { name: "Solflare", url: "https://solflare.com/download" },
-  { name: "Backpack", url: "https://backpack.app/downloads" },
-];
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [address, setAddress] = useState<string | null>(connectedAddress);
   const [open, setOpen] = useState(false);
@@ -29,7 +25,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, []);
   useEffect(() => {
     if (!open) return;
-    const refresh = () => setChoices(listPlayWallets().filter(item => item.canSignMessage || item.canSignTransaction));
+    const refresh = () => setChoices(orderWalletChoices(listPlayWallets().filter(item => item.canSignMessage || item.canSignTransaction)));
     refresh();
     return onPlayWallets(refresh);
   }, [open]);
@@ -48,18 +44,22 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setError(null);
     try { finish(await connectPlayWallet(name)); } catch (err) { setError(err instanceof Error ? err.message : "Wallet connection failed."); } finally { setBusy(null); }
   }
+  const installHints = walletInstallSuggestions(choices);
+  const mwa = hasMobileWalletAdapter(choices);
   return <WalletContext.Provider value={{ address, requestWallet, manageWallet }}>
     {children}
     {open && <DialogFrame id="wallet-title" onClose={() => finish(null)}>
       <h2 id="wallet-title">Connect wallet</h2>
-      <p className="choice-note">Choose your Solana wallet. You approve the connection in your wallet.</p>
+      <p className="choice-note">{mwa
+        ? "On this phone, use Mobile Wallet Adapter. It opens Seed Vault or another installed mobile wallet (including Phantom). You approve in the wallet app — not a download page."
+        : "Choose your Solana wallet. You approve the connection in your wallet."}</p>
       {address ? <>
         <p>{connectedWalletName()} · {shortAddress(address)}</p>
         <button className="secondary" onClick={() => void disconnectPlayWallet().then(() => finish(null))}>Disconnect</button>
       </> : <>
         {choices.map(wallet => <button className="choice" key={wallet.name} disabled={Boolean(busy)} onClick={() => void connect(wallet.name)}><strong>{wallet.name}</strong><span className="choice-note">{busy === wallet.name ? "Waiting for approval…" : "Detected · connect"}</span></button>)}
         {!choices.length && <p role="status">No compatible wallet detected in this browser.</p>}
-        {suggested.filter(item => !choices.some(wallet => wallet.name.toLowerCase().includes(item.name.toLowerCase()))).map(item => <a className="wallet-install" key={item.name} href={item.url} target="_blank" rel="noopener noreferrer"><strong>{item.name}</strong><span>Get wallet ↗</span></a>)}
+        {installHints.map(item => <a className="wallet-install" key={item.name} href={item.url} target="_blank" rel="noopener noreferrer"><strong>{item.name}</strong><span>Get wallet ↗</span></a>)}
       </>}
       {error && <p className="alert" role="alert">{error}</p>}
       <button className="text" onClick={() => finish(null)}>Close</button>

@@ -1,0 +1,21 @@
+{
+  "status": "dumped",
+  "hasMwa": true,
+  "hasPhantomGetWallet": true,
+  "hasPhantomDownloadHint": true,
+  "texts": [
+    "Connect wallet",
+    "Choose your Solana wallet. You approve the connection in your wallet.",
+    "Mobile Wallet Adapter Detected · connect",
+    "Phantom",
+    "Get wallet ↗",
+    "Solflare",
+    "Backpack",
+    "Close"
+  ],
+  "packages": {
+    "phantom": true,
+    "seedVault": true
+  },
+  "bug": "MWA detected but Phantom Get-wallet download link still shown — installed app.phantom ignored"
+}
