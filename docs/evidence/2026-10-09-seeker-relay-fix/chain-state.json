@@ -1,0 +1,66 @@
+{
+  "release": "dc186d928bd23188acc5034b884f471b5f8d018a",
+  "observedAt": "2026-10-09T14:02:55.368Z",
+  "paused": true,
+  "before": [
+    {
+      "wallet": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+      "test": "20000000"
+    },
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "test": "34000000"
+    }
+  ],
+  "balances": [
+    {
+      "wallet": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+      "test": "20000000"
+    },
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "test": "34000000"
+    }
+  ],
+  "rooms": [
+    {
+      "code": "1B501B07",
+      "name": "Seeker relay diagnostic",
+      "participants": 1,
+      "endsAt": 1791556230000,
+      "funded": {
+        "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+        "authority": "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N",
+        "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+        "decimals": 6,
+        "playMs": 1800000,
+        "graceMs": 3600000,
+        "id": "17805076397159755350",
+        "stakeUnits": "1000000",
+        "startsAt": 1791554430000,
+        "refundAt": 1791559830000,
+        "chainStatus": "refunding",
+        "confirmedParticipants": 1,
+        "chainTime": 1791554430000,
+        "winner": null
+      },
+      "leaderboard": [],
+      "ownerDeposit": "43Fw76PiJGH7MiD29X1nYQq3cop8ueodQFVPBa21A6JTYdtZRuKkhEnPHogtjoqes7yJTFCRHZEPyAfpz6NfB8FN",
+      "ownerRefund": "uBeQ4XosoJBrKSSxvjSSjtEpYcU9dRktQ6Sfkht6vtm2tPLAm9ZR9Y1J4bF7RxN5gNRmJjRY7qUSb7CExXpj745",
+      "escrow": "B6qi8AUML1o8Yfc5nkZKECv73eiNjXwzpos17uaiAu3P",
+      "vault": "As8bjDbnhUhq8uSLFTfSGmPVmCr5ezJtUJ5YqLueVoc4",
+      "vaultAmount": "0",
+      "duplicateRejected": false,
+      "ownerRefundChainStatus": {
+        "confirmationStatus": "finalized",
+        "confirmations": null,
+        "err": null,
+        "slot": 509202429,
+        "status": {
+          "Ok": null
+        }
+      }
+    }
+  ],
+  "duplicateDelta": null
+}

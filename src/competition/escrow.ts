@@ -1,4 +1,4 @@
-import { PublicKey, SystemProgram, Transaction, TransactionInstruction, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
+import { ComputeBudgetProgram, PublicKey, SystemProgram, Transaction, TransactionInstruction, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
 import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync } from "@solana/spl-token";
 
 export const COMPETITION_TEST_MINT = new PublicKey("7VaC5xJULHGQzsZsyUCaZ7BbLGNDENLjXiPbfbbRY84j");
@@ -83,7 +83,22 @@ export function assertRelayedCompetitionTransaction(tx: Transaction, binding: Re
   const stake = BigInt(binding.stake);
   const expectedAta = getAssociatedTokenAddressSync(mint, wallet);
   let matched = false;
+  let computeLimit: bigint | undefined;
+  let computePrice: bigint | undefined;
   for (const instruction of tx.instructions) {
+    if (instruction.programId.equals(ComputeBudgetProgram.programId)) {
+      // Wallets may add fee settings. Never accept accounts, deprecated variants,
+      // duplicate settings, or an unbounded priority fee with this exception.
+      const tag = instruction.data[0];
+      if (instruction.keys.length !== 0) throw new Error("Compute budget instructions must not include accounts.");
+      if (tag === 2 && instruction.data.length === 5 && computeLimit === undefined) {
+        computeLimit = BigInt(instruction.data.readUInt32LE(1));
+        if (computeLimit < 1n || computeLimit > 1_400_000n) throw new Error("Compute unit limit is outside the supported range.");
+      } else if (tag === 3 && instruction.data.length === 9 && computePrice === undefined) {
+        computePrice = instruction.data.readBigUInt64LE(1);
+      } else throw new Error("Unsupported or duplicate compute budget instruction.");
+      continue;
+    }
     if (instruction.programId.equals(ASSOCIATED_TOKEN_PROGRAM_ID)) {
       const ata = instruction.keys[1]?.pubkey;
       const owner = instruction.keys[2]?.pubkey;
@@ -113,5 +128,9 @@ export function assertRelayedCompetitionTransaction(tx: Transaction, binding: Re
     if ((tag === 4 || tag === 5) && !instruction.keys[1]?.pubkey.equals(built.entry(wallet))) throw new Error("The claim destination or token account is a different entrant.");
     matched = true;
   }
+  // Without an explicit limit, use the protocol maximum as a conservative bound.
+  // This relay caps the optional priority fee at 0.001 SOL, excluding base/rent fees.
+  const priorityLamports = ((computeLimit ?? 1_400_000n) * (computePrice ?? 0n) + 999_999n) / 1_000_000n;
+  if (priorityLamports > 1_000_000n) throw new Error("Competition priority fee exceeds 0.001 SOL.");
   if (!matched) throw new Error("This transaction does not match the requested action.");
 }

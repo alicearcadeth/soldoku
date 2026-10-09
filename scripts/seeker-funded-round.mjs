@@ -7,8 +7,8 @@ import nacl from 'tweetnacl';
 import bs58 from 'bs58';
 import {Connection,Keypair,PublicKey,Transaction} from '@solana/web3.js';
 import {getAssociatedTokenAddressSync,getAccount} from '@solana/spl-token';
-const out='docs/evidence/2026-10-09-seeker-funded';mkdirSync(out,{recursive:true});mkdirSync('output',{recursive:true});
-const file='output/seeker-funded-session.json';
+const out=process.env.SEEKER_FUNDED_OUT??'docs/evidence/2026-10-09-seeker-funded';mkdirSync(out,{recursive:true});mkdirSync('output',{recursive:true});
+const file=process.env.SEEKER_FUNDED_SESSION??'output/seeker-funded-session.json';
 const key=Keypair.fromSecretKey(Uint8Array.from(JSON.parse(readFileSync(join(homedir(),'.config/solana/sudoku-dev.json'),'utf8'))));
 const phone='E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn';
 const c=new Connection('https://api.devnet.solana.com','finalized');
@@ -20,13 +20,13 @@ const delay=ms=>new Promise(r=>setTimeout(r,ms));
 async function pause(value){const r=spawnSync('cmd.exe',['/d','/s','/c','npx wrangler secret put SUDOKU_COMPETITION_PAUSED --config wrangler.soldoku.jsonc'],{input:`${value}\n`,encoding:'utf8',windowsHide:true});assert.equal(r.status,0,'pause change failed');for(let i=0;i<20;i++){const p=await fetch('https://soldoku.com/api/competitions/config').then(r=>r.json());if(p.paused===(value==='1'))return;await delay(3000);}throw Error('pause verification failed');}
 async function relay(code,actor,action){const p=await api('/transaction',{code,actor,action});const tx=Transaction.from(Buffer.from(p.transaction,'base64'));assert.equal(tx.feePayer.toBase58(),key.publicKey.toBase58());tx.partialSign(key);const {signature}=await api('/submit',{code,actor,action,transaction:tx.serialize().toString('base64')});for(let i=0;i<80;i++){const st=(await c.getSignatureStatuses([signature],{searchTransactionHistory:true})).value[0];if(st?.err)throw Error('transaction failed');if(st?.confirmationStatus==='finalized')return signature;await delay(1500);}throw Error(`transaction pending ${signature}`);}
 async function amounts(){const mint=new PublicKey(cfg.mint);return Promise.all([phone,key.publicKey.toBase58()].map(async wallet=>{let amount='0';try{amount=(await getAccount(c,getAssociatedTokenAddressSync(mint,new PublicKey(wallet)))).amount.toString();}catch{}return {wallet,test:amount};}));}
-if(process.argv[2]==='prepare'){
- assert.equal(cfg.paused,true);const release=await fetch('https://soldoku.com/api/release').then(r=>r.json());assert.equal(release.commit,'0b3055bebe3d700c7c77fc869214261ab05d8817');
+if(['prepare','diagnose'].includes(process.argv[2])){
+ assert.equal(cfg.paused,true);const release=await fetch('https://soldoku.com/api/release').then(r=>r.json());assert.equal(release.commit,process.env.SEEKER_EXPECTED_RELEASE??'0b3055bebe3d700c7c77fc869214261ab05d8817');
  const p=await api('/proof',{wallet:key.publicKey.toBase58()});const auth=await api('/authorize',{id:p.id,signature:bs58.encode(nacl.sign.detached(new TextEncoder().encode(p.message),key.secretKey))});
  const s={actor:auth.actor,rooms:[],before:await amounts(),release:release.commit};save(s);
  try{
   await pause('0');
-  for(const name of ['Seeker funded winner','Seeker funded refund']){
+  for(const name of process.argv[2]==='diagnose'?['Seeker relay diagnostic']:['Seeker funded winner','Seeker funded refund']){
    const gate=await api('/check',{actor:s.actor});await api('/check/verify',{actor:s.actor,id:gate.id,value:gate.target});
    const room=await api('/create',{actor:s.actor,gateId:gate.id,mode:'tokens',mint:cfg.mint,stakeUnits:'1000000',level:'easy',durationMs:300000,name});
    s.rooms.push({code:room.code,name,startsAt:room.funded.startsAt,endsAt:room.endsAt});save(s);

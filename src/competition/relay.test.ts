@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Keypair, SystemProgram, Transaction, TransactionInstruction } from "@solana/web3.js";
+import { ComputeBudgetProgram, Keypair, SystemProgram, Transaction, TransactionInstruction } from "@solana/web3.js";
 import { COMPETITION_DEVNET_MINT, assertRelayedCompetitionTransaction, competitionInstructions, type RelayBinding } from "./escrow";
 
 const program = Keypair.generate().publicKey;
@@ -20,6 +20,26 @@ function pack(instructions: Transaction["instructions"], signers: Keypair[]) {
 }
 const seconds = (ms: number) => BigInt(ms / 1000);
 describe("relayed competition transactions", () => {
+  it("accepts a serialized wallet-signed join with bounded compute-budget settings", () => {
+    const signed = pack([ComputeBudgetProgram.setComputeUnitLimit({ units: 300000 }),
+      ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 10000 }), ix.join(player.publicKey)], [player]);
+    expect(() => assertRelayedCompetitionTransaction(Transaction.from(signed.serialize()), binding)).not.toThrow();
+  });
+  it("rejects malformed, duplicate, account-bearing and excessive compute budgets", () => {
+    const limit = ComputeBudgetProgram.setComputeUnitLimit({ units: 300000 });
+    const price = ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 10000 });
+    const invalid = [
+      [limit, limit], [price, price],
+      [ComputeBudgetProgram.setComputeUnitLimit({ units: 1400001 })],
+      [ComputeBudgetProgram.setComputeUnitLimit({ units: 0 })],
+      [ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1000000 })],
+      [new TransactionInstruction({ programId: ComputeBudgetProgram.programId, keys: [], data: Buffer.from([2]) })],
+      [new TransactionInstruction({ programId: ComputeBudgetProgram.programId, keys: [], data: Buffer.from([1,0,0,0,0]) })],
+      [new TransactionInstruction({ ...limit, keys: [{ pubkey: player.publicKey, isSigner: false, isWritable: false }] })],
+    ];
+    for (const budget of invalid) expect(() => assertRelayedCompetitionTransaction(pack([...budget, ix.join(player.publicKey)], [player]), binding)).toThrow(/compute|Compute|priority/);
+    expect(() => assertRelayedCompetitionTransaction(pack([limit,price], [player]),binding)).toThrow(/requested action/);
+  });
   it("accepts the creator open-and-join and rejects a substituted amount, room, or extra instruction", () => {
     const good = pack([
       ix.open(player.publicKey, authority.publicKey, 1_000_000n, seconds(startsAt), seconds(endsAt), seconds(refundAt)),
