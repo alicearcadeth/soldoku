@@ -5,7 +5,7 @@
 | Item | Value |
 |------|--------|
 | Hosted release | soldoku.com + www `/api/release` = `d9a182a` `dirty:false` |
-| GitHub main (pre-evidence push) | `e79f6ee` |
+| GitHub main (evidence tip) | `b406ab6` (docs only; live remains `d9a182a`) |
 | APK | `com.sudoku.game` 0.1.0 (loads hosted site) |
 | Pause / card / Mainnet | paused · card disabled · Devnet only |
 | Script | `scripts/seeker-authorize-return.mjs` |

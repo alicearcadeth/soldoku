@@ -107,7 +107,8 @@ Existing funded rooms still listed via `/api/competitions` (e.g. `BFF6D992` refu
 - Authorize-return physical pass on free room `CA64EA8C` (`AUTHORIZE-RETURN.md`, `authorize-return.json`, `40-*` / `30-*` screenshots)
 - Tests run: `pendingTx`, `settlement`, `walletCall` — 38 passed (earlier close-out)
 - Prior evidence pushes: `3e8504f`, `e79f6ee` on private `github/main` (docs only; live Worker remains `d9a182a`)
-- This evidence push + backup follow commit (see git tip after push)
+- Authorize evidence push: `b406ab6` on private `github/main` (docs/scripts only; live Worker remains `d9a182a`)
+- Backup: `C:\Soldoku-reconstruct\backups\soldoku-main-2026-10-09-b406ab6` (+ `soldoku-b406ab6.bundle`)
 
 ## 9. Verdicts
 
