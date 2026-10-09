@@ -36,7 +36,7 @@ Living snapshot. Historical evidence folders keep their original wording; this f
 
 ## Gaps
 
-1. Fresh message on `d9a182a`: wait for natural session expiry (~2026-10-10 14:01 ICT estimate) or use another owner wallet; then Join a new free room. Do not clear storage.
+1. Fresh message on `d9a182a`: session **still valid** as of 2026-10-09 18:18 ICT (`EXPIRY-CONFIRMATION.md`). Wait until after **2026-10-10 14:05 ICT** (or use another owner wallet), re-probe, then `seeker-fresh-message.mjs`. Do not clear storage.
 2. Owner may authorize invites using `docs/pilot/FREE-COMPETITION-PILOT.md` — no invites under this phase alone.
 3. Bounded funded Devnet physical plan still needs separate pause-lift auth. Do not clear Soldoku/wallet app data.
 

@@ -1,0 +1,98 @@
+{
+  "name": "competition-session-probe",
+  "startedAt": "2026-10-09T11:18:20.902Z",
+  "hostedRelease": "d9a182a90f00487c5a08506f0db3a5987207b9fe",
+  "wallClock": {
+    "nowUtc": "2026-10-09T11:18:20.902Z",
+    "estimateAuthorizeUtc": "2026-10-09T07:01:39.208Z",
+    "estimateExpiresUtc": "2026-10-10T07:01:39.208Z",
+    "estimateExpiresIct": "2026-10-10 14:01:39 +07:00",
+    "hoursUntilEstimate": 19.72,
+    "estimateExpired": false,
+    "releaseDirty": false
+  },
+  "storageReadable": false,
+  "storageNote": "APK not debuggable; localStorage.sudoku.competitionSession not readable via run-as",
+  "phases": [
+    {
+      "name": "home",
+      "status": "passed",
+      "texts": [
+        "PAPER GRID",
+        "Settings",
+        "E3DQ…DpJn",
+        "Soldoku",
+        "Play a solo game, race a friend, or climb the competition leaderboard.",
+        "DEVNET · TEST TOKENS · NO CASH VALUE",
+        "Continue game",
+        "New game",
+        "SOLO Play classic A quiet game. Pause whenever you want.",
+        "FREE Practice No wallet required. Same grid, two players.",
+        "LEADERBOARD Compete Free rooms: join with a wallet message, then Start. Fastest correct finish ranks.",
+        "How to play",
+        "About this beta"
+      ],
+      "connected": true,
+      "at": "2026-10-09T11:18:30.900Z"
+    },
+    {
+      "name": "create-path",
+      "status": "tapped",
+      "texts": [
+        "Home",
+        "Settings",
+        "ONE GRID. YOUR FASTEST FINISH.",
+        "Compete",
+        "Same Sudoku. One attempt per wallet. Fastest correct finish wins.",
+        "Browse rooms",
+        "Create competition",
+        "Room name",
+        "1. Choose the mode",
+        "Free competition",
+        "For tokens",
+        "One attempt per wallet. Connecting is free.",
+        "Difficulty",
+        "Easy",
+        "Medium",
+        "Hard",
+        "Expert",
+        "2. Set the stake",
+        "Free entry · no deposit",
+        "3. Set the competition period",
+        "1 Day",
+        "1 Week",
+        "Custom Duration",
+        "Your timer starts when you start your game.",
+        "Ends approximately 10/10/2026, 6:18:50 PM. The creator can extend it only before another player joins.",
+        "Create room",
+        "Previous two-player races &amp; refunds"
+      ],
+      "hadCreateRoom": true,
+      "at": "2026-10-09T11:18:50.603Z"
+    },
+    {
+      "name": "probe-result",
+      "status": "session-still-valid",
+      "sessionLikelyValid": true,
+      "readyForFreshMessage": false,
+      "estimateExpired": false,
+      "sawNativeMwa": false,
+      "sawSeedVault": false,
+      "sawSliderOrCreate": true,
+      "sawVerifyBusy": false,
+      "note": "identity() reached create gate without Seed Vault — competition session still valid; do not claim fresh message yet",
+      "at": "2026-10-09T11:18:57.842Z"
+    }
+  ],
+  "finishedAt": "2026-10-09T11:18:57.842Z",
+  "verdict": {
+    "sessionLikelyValid": true,
+    "readyForFreshMessage": false,
+    "estimateExpired": false,
+    "sawNativeMwa": false,
+    "sawSeedVault": false,
+    "sawSliderOrCreate": true,
+    "sawVerifyBusy": false,
+    "note": "identity() reached create gate without Seed Vault — competition session still valid; do not claim fresh message yet"
+  }
+}

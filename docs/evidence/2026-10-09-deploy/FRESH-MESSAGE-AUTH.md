@@ -40,6 +40,15 @@ A prior Seed Vault message approve → return **did** succeed on hosted **`f4619
 
 After expiry, open a **new** free room (stake 0) where this wallet is not already a participant, or use Join on a room that still offers Join after session miss — then expect Seed Vault **message** (not a deposit tx). Prefer reject-then-approve if practical; keep evidence separate.
 
+## Expiry confirmation (2026-10-09 ~18:18 ICT)
+
+See `EXPIRY-CONFIRMATION.md` + `session-probe.json`.
+
+- Direct `expires` read: **impossible** (non-debuggable APK).
+- Behavioural probe: Create room → gate dialog **without** Seed Vault → **session still valid**.
+- Estimated expiry remains **2026-10-10 14:01:39 ICT**; ~19.7h remaining at probe time.
+
 ## This phase outcome
 
-Fresh physical message authorization on `d9a182a`: **unverified** (blocked on safe invalidation: wait for expiry or owner alternate wallet). Pilot prep continues without claiming a fresh signature.
+Fresh physical message authorization on `d9a182a`: **unverified** — session not yet expired; no alternate wallet used.  
+Ready script after unblock: `scripts/seeker-fresh-message.mjs` (requires `SEEKER_ROOM`).
