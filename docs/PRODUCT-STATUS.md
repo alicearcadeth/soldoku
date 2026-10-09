@@ -32,7 +32,7 @@ Living snapshot. Historical evidence folders keep their original wording; this f
 | Fresh Seed Vault message authorize on live tip | Seeker + `d9a182a` | **Passed** (`BTzc…fY9r` → `D878A8E1`) — `FRESH-MESSAGE-PASSED.md` |
 | Full Join → play → LB | Seeker + prior `f4619a4` | Passed historically — `7:50.6 · rank 2` |
 | Funded deposit / claim / refund on device | — | **Untested** this phase |
-| External-player pilot | — | **Not started** |
+| External-player pilot | live `d9a182a` | **OPEN** — owner invites 3–5; agent ops in `docs/evidence/2026-10-09-free-pilot/` |
 
 ## Gaps
 

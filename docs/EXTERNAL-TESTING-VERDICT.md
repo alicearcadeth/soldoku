@@ -16,10 +16,10 @@ Agent/internal evidence only. **Not** external-user validation.
 - Invitees must understand TEST has no cash value and funded entry is paused.
 - Clearing Soldoku storage can drop local `sudoku.pendingEscrow` bytes; do not treat that as safe.
 
-## Owner gate before invites
+## Owner gate / pilot
 
-Owner may authorize a **3–5** free pilot via `docs/pilot/FREE-COMPETITION-PILOT.md`; do **not** invite until that separate go-ahead.
+**OPEN** (owner-authorized): 3–5 guided free pilot on live `d9a182a`, guide `be453d6`, MWA-only. Rooms `D878A8E1` / `9793822F`. Agent does not contact testers — `docs/evidence/2026-10-09-free-pilot/`.
 
-Deploy of Get-wallet fix `a907d1a`: **not necessary** for that guided cohort (use MWA only); recommended on next authorized release — `GET-WALLET-FIX-REVIEW.md`.
+Deploy of Get-wallet fix `a907d1a`: not required for this cohort; **P0** for next release — `GET-WALLET-FIX-REVIEW.md` / `NEXT-RELEASE.md`.
 
 Funded entry remains paused; card execution remains disabled.

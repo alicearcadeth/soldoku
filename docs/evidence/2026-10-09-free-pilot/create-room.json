@@ -1,0 +1,78 @@
+{
+  "name": "create-free-pilot-room",
+  "startedAt": "2026-10-09T12:27:04.262Z",
+  "hostedRelease": "d9a182a90f00487c5a08506f0db3a5987207b9fe",
+  "releaseDirty": false,
+  "paused": true,
+  "cluster": "devnet",
+  "roomName": "Pilot Free Easy",
+  "phases": [
+    {
+      "name": "preflight",
+      "status": "passed",
+      "commit": "d9a182a",
+      "paused": true,
+      "cluster": "devnet",
+      "at": "2026-10-09T12:27:04.263Z"
+    },
+    {
+      "name": "home",
+      "status": "warn",
+      "texts": [
+        "Home",
+        "Settings",
+        "ONE GRID. YOUR FASTEST FINISH.",
+        "Room D878A8E1",
+        "Room code: ",
+        "D878A8E1",
+        "← Back to Rooms",
+        "Game mode",
+        "Sudoku · medium",
+        "Token",
+        "None · free entry",
+        "Stake per player",
+        "0",
+        "Approx. USD",
+        "$0.00",
+        "Competition period",
+        "1 day",
+        "Participants",
+        "1 · open entry",
+        "Status"
+      ],
+      "at": "2026-10-09T12:27:41.469Z"
+    },
+    {
+      "name": "compete",
+      "status": "failed",
+      "texts": [
+        "Home",
+        "Settings",
+        "ONE GRID. YOUR FASTEST FINISH.",
+        "Room D878A8E1",
+        "Room code: ",
+        "D878A8E1",
+        "← Back to Rooms",
+        "Game mode",
+        "Sudoku · medium",
+        "Token",
+        "None · free entry",
+        "Stake per player",
+        "0",
+        "Approx. USD",
+        "$0.00",
+        "Competition period",
+        "1 day",
+        "Participants",
+        "1 · open entry",
+        "Status",
+        "Active",
+        "Best completion",
+        "No finishes yet",
+        "Ends 10/10/2026, 7:03:48 PM. No fixed player limit.",
+        "One attempt only. Your timer starts when you press Start challenge."
+      ],
+      "at": "2026-10-09T12:27:41.470Z"
+    }
+  ]
+}
