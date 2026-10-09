@@ -29,4 +29,9 @@ Artifact: `wallet-sheet-probe.json`.
 
 ## Live status
 
-Fix is in source / git after commit. Seeker WebView will show it only after the hosted release is redeployed.
+Fix is in source / git (`a907d1a`). Seeker WebView will show it only after the hosted release is redeployed. Live remains `d9a182a` as of this review.
+
+## Review complete
+
+- Unit tests: **4/4 passed**.
+- Pilot deploy gate: **not required** for a guided 3–5 free pilot if invitees use MWA only — see `GET-WALLET-FIX-REVIEW.md`.

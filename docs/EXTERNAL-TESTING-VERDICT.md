@@ -18,6 +18,8 @@ Agent/internal evidence only. **Not** external-user validation.
 
 ## Owner gate before invites
 
-Owner may authorize a small free pilot via `docs/pilot/FREE-COMPETITION-PILOT.md`; do **not** invite until that separate go-ahead.
+Owner may authorize a **3–5** free pilot via `docs/pilot/FREE-COMPETITION-PILOT.md`; do **not** invite until that separate go-ahead.
 
-Authorize wording: existing-session join passed; **fresh physical message on `d9a182a` passed** (alt wallet). See `FRESH-MESSAGE-PASSED.md`.
+Deploy of Get-wallet fix `a907d1a`: **not necessary** for that guided cohort (use MWA only); recommended on next authorized release — `GET-WALLET-FIX-REVIEW.md`.
+
+Funded entry remains paused; card execution remains disabled.

@@ -17,6 +17,7 @@ Use one form per session. Do not collect seed phrases, full wallet screenshots w
 - [ ] Complete a free challenge  
 - [ ] Read leaderboard / result  
 - [ ] Cancel a wallet prompt and return  
+- [ ] (Seeker) Used Mobile Wallet Adapter — not Get wallet / download  
 
 ## Outcomes
 

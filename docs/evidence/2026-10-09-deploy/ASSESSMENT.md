@@ -122,6 +122,6 @@ Existing funded rooms still listed via `/api/competitions` (e.g. `BFF6D992` refu
 
 ## Owner actions still needed
 
-1. Authorize invites separately using `docs/pilot/FREE-COMPETITION-PILOT.md`.
-2. Optional: deploy wallet Get-wallet UI fix (`a907d1a`) so Connect sheet stays clear on Seeker.
+1. Authorize invites separately using `docs/pilot/FREE-COMPETITION-PILOT.md` (cap 3–5).
+2. Deploy of Get-wallet fix (`a907d1a`): **not required** before that guided free pilot; see `GET-WALLET-FIX-REVIEW.md`. Redeploy when owner next authorizes a release.
 3. Do **not** clear app/wallet data; do not lift pause / enable card / Mainnet.

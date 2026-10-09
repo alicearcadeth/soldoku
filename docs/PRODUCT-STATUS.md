@@ -7,7 +7,7 @@ Living snapshot. Historical evidence folders keep their original wording; this f
 | Line | Identity | Notes |
 |------|----------|-------|
 | **Deployed (live)** | `d9a182a` via soldoku.com + www `/api/release` | Dirty: false; Worker `ecaf2e9f-…` + pause secret `b7bda8cd-…` |
-| **main (GitHub)** | `d9a182a` Merge PR #2 | Pause UX, walletCall hang fix, Join/Start copy, pilot docs |
+| **main (GitHub)** | ahead of live (includes `a907d1a` Get-wallet fix + evidence) | Live web still `d9a182a` until owner deploys |
 | **PR #2** | **MERGED** | https://github.com/alicearcadeth/soldoku/pull/2 |
 | **APK tested** | `com.sudoku.game` 0.1.0 / SHA-256 `bf427627…` | Shell loads **live** web (`d9a182a`) |
 
@@ -16,7 +16,7 @@ Living snapshot. Historical evidence folders keep their original wording; this f
 | Surface | State |
 |---------|-------|
 | Classic / Practice | Available on live |
-| Free competitions | Available; existing-session join→Start on `CA64EA8C` passed on `d9a182a`; fresh Seed Vault message on this tip unverified (see AUTHORIZE-RETURN.md) |
+| Free competitions | Available on live; physical free auth verified on `d9a182a` (see AUTHORIZE-RETURN / FRESH-MESSAGE-PASSED) |
 | Funded Devnet entry | **Paused**. Claims/refunds/settlement + room reads remain |
 | Card funding | Foundations **deployed-but-disabled** (not unreleased) |
 | Mainnet / real payments | Off |
@@ -36,7 +36,7 @@ Living snapshot. Historical evidence folders keep their original wording; this f
 
 ## Gaps
 
-1. Fresh message on `d9a182a` closed via alt wallet (`FRESH-MESSAGE-PASSED.md`). Optional: redeploy `a907d1a` wallet-sheet fix so Get-wallet links stay hidden.
+1. Get-wallet UI fix (`a907d1a`) reviewed; **not required** before a guided 3–5 free pilot — see `GET-WALLET-FIX-REVIEW.md`. Redeploy when owner next authorizes a release.
 2. Owner may authorize invites using `docs/pilot/FREE-COMPETITION-PILOT.md` — no invites under this phase alone.
 3. Bounded funded Devnet physical plan still needs separate pause-lift auth. Do not clear Soldoku/wallet app data.
 

@@ -20,11 +20,12 @@ TEST tokens have **no cash value**. Funded entry is **paused**. Card execution i
 ## Free competition steps
 
 1. Home → **Compete**.
-2. Browse rooms or enter an 8-character room code → open the room. Confirm stake **0**.
-3. **Join room** → approve the Soldoku identity **message** in your wallet / Seed Vault (Devnet). Cancel returns you to the app; try Join again.
-4. **Start challenge** begins the timer. Leaving the app does **not** stop the competition timer.
-5. Finish the grid. Your time and rank appear on the room leaderboard (ranks can change until the room ends).
-6. Share only the **room code** the owner gave you — do not invite others unless the owner asks.
+2. Connect with **Mobile Wallet Adapter** (**Detected · connect**). Do **not** tap **Get wallet ↗** / Phantom download — on the current live build that can open a download page even when a wallet is already installed.
+3. Browse rooms or enter an 8-character room code → open the room. Confirm stake **0**.
+4. **Join room** → approve the Soldoku identity **message** in your wallet / Seed Vault (Devnet). Cancel returns you to the app; try Join again.
+5. **Start challenge** begins the timer. Leaving the app does **not** stop the competition timer.
+6. Finish the grid. Your time and rank appear on the room leaderboard (ranks can change until the room ends).
+7. Share only the **room code** the owner gave you — do not invite others unless the owner asks.
 
 ## Creating a free room (owner / invited creators)
 
