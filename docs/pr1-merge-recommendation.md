@@ -1,25 +1,36 @@
 # PR #1 merge recommendation
 
-**Verdict: ready with stated limitations — recommend merge; do not auto-deploy.**
+**Verdict: ready with explicitly accepted limitations — recommend merge; do not deploy.**
 
-Reviewed PR head: `1f4fe5668664f2ccc15ec97509a8d7d42f043d1a`  
-Parent foundation commit: `3d4a12a1b47d9a9788776eaef22c4c4de4d0353c`  
-Base: `main` @ `ee6e0d0`. CI: no status checks configured (`statusCheckRollup: []`). Wrangler deploy is manual (`npx wrangler deploy`); merge does **not** deploy.
+Reviewed PR head (this document’s commit will update the tip): see git `HEAD` on `reconstruct-2026-10-08`.  
+Design/behavior review baseline: `1f4fe5668664f2ccc15ec97509a8d7d42f043d1a`  
+Card foundations parent: `3d4a12a1b47d9a9788776eaef22c4c4de4d0353c`  
+Deployed release (unchanged): `f4619a4d194ca03eef84df04080df38c7d6bad25`  
+Base: `main` @ `ee6e0d0`.  
 
-## Why acceptable
+CI: no status checks (`statusCheckRollup: []`). No `.github` workflows that deploy. Wrangler deploy is manual (`npx wrangler deploy --config wrangler.soldoku.jsonc`). **Merge does not deploy and does not activate payments.**
 
-- Settlement recovery commits through `f4619a4` are the verified deployed Devnet path; card foundations on top are disabled by construction.
-- Payment / delivery / escrow lanes stay distinct; provider events cannot finalize entry; public `/api/funding/card` stays 403 for POST; credentials do not enable execution.
-- Competition pause, claims, and refunds remain available; fresh Devnet cron + refund evidence recorded.
-- Browser production build shows “Card funding unavailable” without simulation controls; DEV `?fiatSandbox` preview only.
+## Design / behavior (reviewed)
 
-## Residual risks / future gates
+- Payment, delivery, and escrow lanes stay distinct; `admitsCompetitionEntrant` requires escrow `entry-finalized` plus match-funded fiat — provider completion alone never admits.
+- `/api/funding/card` prepares D1 tables (`persistenceReady`) but POST stays 403; credentials / `FIAT_FUNDING_MODE` cannot enable external execution.
+- Local-test adapter is gated; production UI excludes simulation; DEV `?fiatSandbox` preview only.
+- Idempotent checkout keys, event dedupe, quote expiry → refund-review, late/short/failed delivery, refund-vs-card-reversal copy covered in unit + browser fixtures.
+- Competition pause, settlement recovery, claims, and refunds remain on the verified path through `f4619a4`.
 
-- Provider approval, webhooks, hosted UI/CSP allowlists, and real-value authorization remain external.
-- D1 intent tables are prepared on the card route but no live checkout writes occur while disabled.
-- Physical Seeker path unverified (see `seeker-validation-checklist.md`).
-- `processedEventIds` is bounded; durable dedupe is `(provider, event_id)` uniqueness when activated.
+## Browser runner
+
+Original Chrome evidence kept under `docs/evidence/2026-10-09-card-funding-browser/` (`results.json` passed; see `EXIT-CODE.md`).  
+Clean rerun (exit **0**): `docs/evidence/2026-10-09-card-funding-browser-rerun/`.  
+Proves simulated/disabled UI only — not real payments or Seeker/hardware wallets.
+
+## Residual limitations (accepted)
+
+- Provider approval, webhooks, CSP allowlists, and real-value authorization remain external.
+- D1 intent writes do not occur while disabled (schema prepare only).
+- Physical Seeker checklist unverified (`docs/seeker-validation-checklist.md`).
+- Funded entry remains paused on the deployed Worker.
 
 ## Keep unreleased
 
-Do **not** deploy card-foundation Worker/UI changes without separate authorization. Deployed release remains `f4619a4` until an explicit deploy.
+Do **not** deploy card-foundation Worker/UI changes without separate authorization. Keep `SUDOKU_COMPETITION_PAUSED` until an explicit reopen.
