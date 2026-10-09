@@ -2,7 +2,7 @@
 
 **Verdict: ready with explicitly accepted limitations — recommend merge; do not deploy.**
 
-Reviewed PR head: `7ad88ae8bbd1f63e0115d0472f2a98519a35e4c1`  
+Reviewed PR head: `2b4dabe09ee25a412d31665fda5e4ee7224973e1` (browser-runner fix `7ad88ae`)  
 Design/behavior review baseline: `1f4fe5668664f2ccc15ec97509a8d7d42f043d1a`  
 Card foundations parent: `3d4a12a1b47d9a9788776eaef22c4c4de4d0353c`  
 Deployed release (unchanged): `f4619a4d194ca03eef84df04080df38c7d6bad25`  
