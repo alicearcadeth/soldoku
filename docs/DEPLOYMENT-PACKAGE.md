@@ -19,8 +19,8 @@
 
 ## Remaining (not authorized by deploy prompt)
 
-- Fresh Seed Vault message on live `d9a182a` (unverified; natural expiry or other wallet — see FRESH-MESSAGE-AUTH.md)
-- Owner go-ahead for invites (`docs/pilot/FREE-COMPETITION-PILOT.md`)
+- Owner go-ahead for invites (`docs/pilot/FREE-COMPETITION-PILOT.md`, cap 3–5)
+- Optional next deploy: Get-wallet fix `a907d1a` (not required for guided free pilot — `GET-WALLET-FIX-REVIEW.md`)
 - Pause lift / funded physical / card enable / Mainnet
 
 ## Rollback
