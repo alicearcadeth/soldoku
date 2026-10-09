@@ -24,7 +24,7 @@ for(const room of rooms){
  const before=(await getAccount(c,ata,'finalized')).amount;
  let replay;
  if(process.argv.includes('--replay-finalized')){
-  try{const signature=await c.sendRawTransaction(found.tx.transaction.serialize(),{skipPreflight:false});assert.equal(signature,found.row.signature);replay={signature};}catch(error){const message=String(error.message);assert.match(message,/already processed|Blockhash not found|blockhash.*not.*found/i);replay={rejected:message};}
+  try{const wire=await fetch('https://api.devnet.solana.com',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'getTransaction',params:[found.row.signature,{encoding:'base64',commitment:'finalized',maxSupportedTransactionVersion:0}]})}).then(r=>r.json());assert.equal(wire.error,undefined);assert.equal(wire.result.transaction[1],'base64');const signature=await c.sendRawTransaction(Buffer.from(wire.result.transaction[0],'base64'),{skipPreflight:false});assert.equal(signature,found.row.signature);replay={signature};}catch(error){const message=String(error.message);assert.match(message,/already processed|Blockhash not found|blockhash.*not.*found/i);replay={rejected:message};}
  }
  const after=(await getAccount(c,ata,'finalized')).amount;
  assert.equal(after,before,'Finalized replay changed wallet TEST balance');
@@ -34,3 +34,4 @@ for(const room of rooms){
 }
 writeFileSync('docs/evidence/2026-10-09-seeker-relay-fixed-physical/physical-claim-replay.json',JSON.stringify({observedAt:new Date().toISOString(),receipts},null,2));
 console.log(JSON.stringify(receipts.map(({code,signature,confirmationStatus,replayDelta,vaultAmount})=>({code,signature,confirmationStatus,replayDelta,vaultAmount}))));
+

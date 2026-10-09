@@ -49,7 +49,8 @@ if(['prepare','diagnose'].includes(process.argv[2])){
   assert.deepEqual(await amounts(),before);s.duplicateDelta='0';save(s);
  }
  const rooms=await Promise.all(s.rooms.map(r=>api('/sync',{code:r.code,actor:s.actor})));
- const evidence={release:s.release,observedAt:new Date().toISOString(),paused:(await fetch('https://soldoku.com/api/competitions/config').then(r=>r.json())).paused,before:s.before,balances:await amounts(),rooms:rooms.map((r,i)=>({code:r.code,name:r.name,participants:r.participants,endsAt:r.endsAt,funded:r.funded,leaderboard:r.leaderboard,ownerDeposit:s.rooms[i].ownerDeposit,ownerRefund:s.rooms[i].ownerRefund}))};
+ const currentRelease=await fetch('https://soldoku.com/api/release').then(r=>r.json());
+ const evidence={release:currentRelease.commit,roomCreationRelease:s.release,observedAt:new Date().toISOString(),paused:(await fetch('https://soldoku.com/api/competitions/config').then(r=>r.json())).paused,before:s.before,balances:await amounts(),rooms:rooms.map((r,i)=>({code:r.code,name:r.name,participants:r.participants,endsAt:r.endsAt,funded:r.funded,leaderboard:r.leaderboard,ownerDeposit:s.rooms[i].ownerDeposit,ownerRefund:s.rooms[i].ownerRefund}))};
  // Do not publish signed transaction bytes or authentication sessions.
  for(const r of evidence.rooms){if(r.funded?.settlement)delete r.funded.settlement.serialized;for(const a of r.funded?.settlementAlso??[])delete a.serialized;}
  for(const r of evidence.rooms){const id=Buffer.alloc(8);id.writeBigUInt64LE(BigInt(r.funded.id));const escrow=PublicKey.findProgramAddressSync([Buffer.from('competition'),id],new PublicKey(cfg.program))[0];const vault=getAssociatedTokenAddressSync(new PublicKey(cfg.mint),escrow,true);r.escrow=escrow.toBase58();r.vault=vault.toBase58();r.vaultAmount=(await getAccount(c,vault,'finalized')).amount.toString();if(r.funded.settlementSignature && r.funded.settlementSignature!=='chain-closed')r.settlementChainStatus=(await c.getSignatureStatuses([r.funded.settlementSignature],{searchTransactionHistory:true})).value[0];}
@@ -57,4 +58,5 @@ if(['prepare','diagnose'].includes(process.argv[2])){
  evidence.duplicateDelta=s.duplicateDelta??null;
  writeFileSync(`${out}/chain-state.json`,JSON.stringify(evidence,null,2));console.log(JSON.stringify(evidence));
 }
+
 

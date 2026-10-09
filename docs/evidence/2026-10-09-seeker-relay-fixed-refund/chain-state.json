@@ -1,6 +1,7 @@
 {
-  "release": "eb14d0d8b733fc7d4dd00a583a5ff9c867ab6836",
-  "observedAt": "2026-10-09T14:50:47.121Z",
+  "release": "88a40f8e49591e8d3c69bf395a6ac5186207e3fe",
+  "roomCreationRelease": "eb14d0d8b733fc7d4dd00a583a5ff9c867ab6836",
+  "observedAt": "2026-10-09T15:09:39.205Z",
   "paused": true,
   "before": [
     {
@@ -15,7 +16,7 @@
   "balances": [
     {
       "wallet": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
-      "test": "18000000"
+      "test": "21000000"
     },
     {
       "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
@@ -60,7 +61,7 @@
       "ownerRefund": "2fwixThWXDZHDS5jAkkxWCmEopbetnDs9LzEuEzh918U5WLh1EJWq5CqaP2pR9un3jVAHAeDP5muwG1S8CAwJCRk",
       "escrow": "H2TJmpAgAcBFp2gAUKeK1S7ue4CehAxB7BPj62Ec46G9",
       "vault": "799p6YUSacNXqRV8efudrpToceQwm8cqYQGm4DFxLKwB",
-      "vaultAmount": "1000000",
+      "vaultAmount": "0",
       "settlementChainStatus": {
         "confirmationStatus": "finalized",
         "confirmations": null,
