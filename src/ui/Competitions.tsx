@@ -109,7 +109,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
   const locked = useRef(false);
   const latestRoom = useRef<CompetitionView | null>(null); latestRoom.current = room;
   const lastChainSync = useRef(0);
-  const [fundingConfig, setFundingConfig] = useState<(FundedConfig & { cluster: "devnet" | "localnet"; testerFaucet?: boolean }) | null>(null);
+  const [fundingConfig, setFundingConfig] = useState<(FundedConfig & { cluster: "devnet" | "localnet"; testerFaucet?: boolean; paused?: boolean }) | null>(null);
   const [fundingReason, setFundingReason] = useState("Checking competition availability…");
   const [fundNote, setFundNote] = useState<string | null>(null);
   const [receipt, setReceipt] = useState<{ code: string; signature: string; cluster: string } | null>(() => {
@@ -117,7 +117,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
   });
   useEffect(() => {
     let stopped = false;
-    void api<FundedConfig & { enabled: boolean; cluster: "devnet" | "localnet"; testerFaucet?: boolean; reason?: string }>("/api/competitions/config").then(result => {
+    void api<FundedConfig & { enabled: boolean; paused?: boolean; cluster: "devnet" | "localnet"; testerFaucet?: boolean; reason?: string }>("/api/competitions/config").then(result => {
       if (stopped) return;
       if (result.enabled) setFundingConfig(result); else setFundingReason(result.reason ?? "Token competitions are unavailable.");
     }).catch(err => { if (!stopped) setFundingReason(err instanceof Error ? err.message : "Token competitions are unavailable."); });
@@ -372,6 +372,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
           <TokenStake onChange={changeStake} supportedMint={fundingConfig?.mint} />
           <p className="choice-note">Devnet only · TEST deposits. Other tokens are amount previews.</p>
           <p className="choice-note" role="status">Card funding unavailable. Competition entry still requires a wallet-signed TEST deposit.</p>
+          {fundingConfig?.paused && <p className="choice-note" role="status">New funded rooms are paused. Claims, refunds, and settlement still work. Free competitions remain available.</p>}
           {import.meta.env.DEV && new URLSearchParams(window.location.search).has("fiatSandbox") && (
             <AddFunds stakeAtomic={stakeBaseUnits(stake, fundingConfig?.decimals ?? 6)} wallet={wallet.address} roomCode={roomCode || "sandbox"} />
           )}
@@ -380,7 +381,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
         </> : <p className="quote-total">Free entry · no deposit</p>}
         <h2>3. Set the {mode === "tokens" && fundingConfig ? "registration" : "competition"} period</h2><Duration value={period} onChange={setPeriod} funded={mode === "tokens" && Boolean(fundingConfig)} />
         <p className="choice-note">Ends approximately {Number.isFinite(period) ? new Date(now + period + (mode === "tokens" && fundingConfig ? fundingConfig.playMs + 30000 : 0)).toLocaleString() : "—"}. The creator can extend it only before another player joins.</p>
-        {mode === "tokens" && !fundingConfig ? <button className="primary" disabled={Boolean(busy)} onClick={() => { setMode("free"); setError(null); }}>Switch to free competition</button> : <button className="primary" disabled={Boolean(busy) || (mode === "tokens" && (!token || token.mint !== fundingConfig?.mint || !stake))} onClick={() => void prepareCreate()}>Create room</button>}
+        {mode === "tokens" && !fundingConfig ? <button className="primary" disabled={Boolean(busy)} onClick={() => { setMode("free"); setError(null); }}>Switch to free competition</button> : <button className="primary" disabled={Boolean(busy) || (mode === "tokens" && (Boolean(fundingConfig?.paused) || !token || token.mint !== fundingConfig?.mint || !stake))} onClick={() => void prepareCreate()}>{mode === "tokens" && fundingConfig?.paused ? "Funded rooms paused" : "Create room"}</button>}
         {mode === "tokens" && fundingConfig && token && token.mint !== fundingConfig.mint && <p className="choice-note" role="status">{token.symbol === "SOL" ? "SOL covers network fees. This escrow accepts TEST stakes only." : `${token.symbol} is preview only. This escrow accepts TEST stakes only.`} Choose TEST in the token picker to create a room.</p>}
       </section> : <section className="stack">
         {fundingConfig && <details><summary>Need test funds?</summary><TesterFunds busy={Boolean(busy)} note={fundNote} faucet={Boolean(fundingConfig.testerFaucet)} onRequest={() => void requestTesterFunds()} /></details>}

@@ -1,29 +1,32 @@
-# Deferred Seeker validation checklist
+# Seeker validation checklist
 
-Physical Seeker / Seed Vault testing remains **deferred**. Each item stays **unverified** until performed on device. Do not treat mock wallets or browser adapters as Seeker evidence.
+Physical Seeker / Seed Vault testing status. Do not treat mock wallets or browser adapters as Seeker evidence. Serials redacted in committed artifacts.
+
+Evidence: `docs/evidence/2026-10-09-seeker/` (deployed web `f4619a4` via APK).
 
 ## Identity and launch
 
-- [ ] Unverified — APK package `com.sudoku.game`, release URL `https://soldoku.com/`, certificate SHA-256 matches release record
-- [ ] Unverified — App launches to home without crash; Compete route loads
+- [x] Verified — APK package `com.sudoku.game` `0.1.0` / `1`, SHA-256 matches release record; loads `https://soldoku.com/`
+- [x] Verified — App launches; Home / Compete routes load (cold restore may open Continue game)
 
 ## Wallet session
 
-- [ ] Unverified — Wallet discovery / connect via mobile wallet adapter
-- [ ] Unverified — Message proof for competition session authorize
+- [x] Verified — Wallet discovery / MWA “Detected · connect”
+- [ ] Unverified — Message proof for competition session authorize (owner signing boundary)
 - [ ] Unverified — User cancels connect/sign; app recovers without stuck busy state
-- [ ] Unverified — Approval of deposit transaction and return from wallet to app
+- [x] Verified — MWA bottom sheet handoff from Soldoku; return showed truncated wallet on home
 - [ ] Unverified — Account switch: previous session not reused for new wallet
-- [ ] Unverified — Background / foreground, lock / unlock, process restart + pending deposit recovery
+- [x] Verified — Background / foreground and process kill → Classic pause/continue recovery
+- [ ] Unverified — Pending deposit recovery after interrupt (no funded deposit this pass)
 
 ## Controlled Devnet competition (pause policy applies)
 
-- [ ] Unverified — Deposit of TEST into a funded room (requires authorized brief unpause if still paused)
-- [ ] Unverified — Observe settlement (cron or finalize) with real signature
-- [ ] Unverified — Winner claim transfers expected pool once
-- [ ] Unverified — Refund path where applicable; duplicate claim transfers nothing
+- [ ] Unverified — Deposit of TEST into a funded room (requires authorized brief unpause)
+- [ ] Unverified — Observe settlement (cron or finalize) with real signature on device journey
+- [ ] Unverified — Winner claim transfers expected pool once (device)
+- [ ] Unverified — Refund path where applicable; duplicate claim transfers nothing (device)
 - [ ] Unverified — Pending transaction recovery after interrupt
 
 ## Notes
 
-Keep `SUDOKU_COMPETITION_PAUSED=1` unless the owner opens a controlled window. Do not reset wallet data or bypass security warnings to force a pass.
+Keep `SUDOKU_COMPETITION_PAUSED=1` unless the owner opens a controlled window. Do not reset wallet data or bypass security warnings to force a pass. Product fix: expose `paused` on `/api/competitions/config` and surface it in Create → For tokens (unreleased until deploy).
