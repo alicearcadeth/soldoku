@@ -9,10 +9,12 @@ import {
   createCardFundingIntent,
   disabledProductionAdapter,
   localTestAdapter,
+  markDeliveryFailed,
   markDepositApproval,
   markDepositFailed,
   markDepositSubmitted,
   markDepositUnknown,
+  markPaymentUnknown,
   noteEscrowAdmission,
   observeAssetDelivery,
   selectCardFundingAdapter,
@@ -182,6 +184,41 @@ describe("card funding foundations", () => {
     expect(replay.ok).toBe(true);
     if (!replay.ok) throw new Error(replay.error);
     expect(replay.duplicate).toBe(true);
+  });
+
+  it("expires late provider confirmation after quote expiry without a second checkout", () => {
+    const started = intent({ nowMs: now });
+    const late = applyNormalizedEvent(started, {
+      id: "late-pay",
+      kind: "provider-confirmed",
+      orderId: "order-late",
+      observedAt: now + 31 * 60 * 1000,
+    });
+    expect(late.intent.payment).toBe("refund-review");
+    expect(late.intent.delivery).toBe("not-started");
+    expect(admitsCompetitionEntrant(late.intent)).toBe(false);
+  });
+
+  it("records pending/unknown payment and failed delivery without admitting", () => {
+    const opened = localTestAdapter().createCheckout({
+      existing: null,
+      sessionActor: "actor",
+      destinationWallet: wallet,
+      roomCode: "ROOM0001",
+      cluster: "localnet",
+      assetMint: mint,
+      assetDecimals: 6,
+      expectedBaseUnits: 1_000_000n,
+      registrationDeadlineAt: now + 60_000,
+      nowMs: now,
+    });
+    expect(opened.ok).toBe(true);
+    if (!opened.ok) throw new Error(opened.error);
+    const unknown = markPaymentUnknown(opened.intent, now + 1);
+    expect(unknown.payment).toBe("pending-unknown");
+    const failed = markDeliveryFailed(unknown, now + 2);
+    expect(failed.delivery).toBe("failed");
+    expect(admitsCompetitionEntrant(failed)).toBe(false);
   });
 
   it("keeps mock funding from admitting a real entrant without vault coverage", () => {

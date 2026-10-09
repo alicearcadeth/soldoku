@@ -5,6 +5,7 @@ import { runCoach } from "./coach/run";
 import { verifyClassic, verifyHistoryList, verifyName } from "./match/identity";
 import { decideQuote, orderUrl } from "./solana/dflow";
 import { cardFundingCapabilities, disabledProductionAdapter } from "./solana/cardFunding";
+import { ensureCardFundingTables } from "./solana/cardFundingPersist";
 import { capabilityBody, sandboxSessionBody, webhookBody } from "./solana/fundingProviders";
 import { applySettleSignatures, settledChainUpdate, settleSignaturesIn } from "./solana/recover";
 import { createCompetitionStore } from "./competition/store";
@@ -394,9 +395,11 @@ async function fundingWebhook(request: Request, env: Env): Promise<Response> {
 
 /** Card checkout stays unavailable. Credentials or FIAT_FUNDING_MODE cannot open this route. */
 async function cardFundingDisabled(request: Request, env: Env): Promise<Response> {
+  // Schema is prepared early so later activation can persist without replacing the model.
+  await ensureCardFundingTables(env.DB);
   const caps = cardFundingCapabilities(env.SOLANA_CLUSTER === "localnet" ? "localnet" : "devnet");
   if (request.method === "GET") {
-    return Response.json({ ...caps, funded: false, admitsEntrant: false }, { headers: { "cache-control": "no-store" } });
+    return Response.json({ ...caps, funded: false, admitsEntrant: false, persistenceReady: true }, { headers: { "cache-control": "no-store" } });
   }
   if (request.method !== "POST") {
     return Response.json({ error: "Card funding is unavailable.", funded: false, admitsEntrant: false }, { status: 405 });

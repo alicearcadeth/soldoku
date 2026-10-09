@@ -11,6 +11,7 @@ import { blockSecondApproval, readPending, recoveryMessage, rememberPending, sig
 import { cellLabel } from "./boardInput";
 import { DialogFrame } from "./dialogFocus";
 import { SettingsSheet } from "./SettingsSheet";
+import { AddFunds } from "./AddFunds";
 import { TokenStake } from "./TokenStake";
 import { useWalletSession } from "./WalletSession";
 
@@ -370,6 +371,10 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
         <h2>2. Set the stake</h2>{mode === "tokens" ? <>
           <TokenStake onChange={changeStake} supportedMint={fundingConfig?.mint} />
           <p className="choice-note">Devnet only · TEST deposits. Other tokens are amount previews.</p>
+          <p className="choice-note" role="status">Card funding unavailable. Competition entry still requires a wallet-signed TEST deposit.</p>
+          {import.meta.env.DEV && new URLSearchParams(window.location.search).has("fiatSandbox") && (
+            <AddFunds stakeAtomic={stakeBaseUnits(stake, fundingConfig?.decimals ?? 6)} wallet={wallet.address} roomCode={roomCode || "sandbox"} />
+          )}
           {!fundingConfig && <p className="choice-note" role="status">{fundingReason}</p>}
           {fundingConfig && <details><summary>Rules & test funds</summary><p>Everyone starts together and has {durationText(fundingConfig.playMs)} to finish. The unique fastest finish wins the pool. Ties or no finishes refund everyone. Refunds unlock after {durationText(fundingConfig.graceMs)} if settlement fails.</p><TesterFunds busy={Boolean(busy)} note={fundNote} faucet={Boolean(fundingConfig.testerFaucet)} onRequest={() => void requestTesterFunds()} /></details>}
         </> : <p className="quote-total">Free entry · no deposit</p>}

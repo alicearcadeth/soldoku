@@ -6,9 +6,11 @@ import {
   cardFundingCapabilities,
   cardFundingStatusLabel,
   localTestAdapter,
+  markDeliveryFailed,
   markDepositApproval,
   markDepositFailed,
   markDepositSubmitted,
+  markPaymentUnknown,
   noteEscrowAdmission,
   observeAssetDelivery,
   type CardFundingIntent,
@@ -128,10 +130,12 @@ export function AddFunds({ stakeAtomic, wallet, roomCode = "sandbox" }: { stakeA
         <button type="button" className="text" onClick={() => provider("verification-required")} disabled={!record}>Simulate verification</button>
         <button type="button" className="text" onClick={() => provider("expired")} disabled={!record}>Simulate expiry</button>
         <button type="button" className="text" onClick={() => provider("refund-review")} disabled={!record}>Simulate provider refund review</button>
+        <button type="button" className="text" onClick={() => record && save(markPaymentUnknown(record, Date.now()))} disabled={!record}>Simulate pending/unknown payment</button>
         <button type="button" className="text" onClick={() => deliver("ok")} disabled={!record}>Simulate asset received</button>
         <button type="button" className="text" onClick={() => deliver("short")} disabled={!record}>Simulate short delivery</button>
         <button type="button" className="text" onClick={() => deliver("late")} disabled={!record}>Simulate late delivery</button>
         <button type="button" className="text" onClick={() => deliver("wrong-wallet")} disabled={!record}>Simulate wrong wallet</button>
+        <button type="button" className="text" onClick={() => record && save(markDeliveryFailed(record, Date.now()))} disabled={!record}>Simulate delivery failed</button>
         <button type="button" className="text" onClick={() => deposit("gas")} disabled={!record}>Simulate insufficient SOL</button>
         <button type="button" className="secondary" onClick={() => deposit("vault-no")} disabled={record?.delivery !== "received" && record?.escrow !== "approval-needed" && record?.escrow !== "pending"}>Deposit rejected</button>
         <button type="button" className="primary" onClick={() => deposit("vault-ok")} disabled={record?.delivery !== "received" && record?.escrow !== "approval-needed" && record?.escrow !== "pending"}>Preview separate deposit approval</button>
@@ -140,9 +144,11 @@ export function AddFunds({ stakeAtomic, wallet, roomCode = "sandbox" }: { stakeA
       {record && (
         <p className="choice-note">
           Lanes — payment: {record.payment}; delivery: {record.delivery}; escrow: {record.escrow}.
-          Card refunds are not escrow refunds.
+          Payment confirmed is not asset delivered; asset delivered is not competition entry.
+          Escrow stake refunds do not reverse a card charge.
         </p>
       )}
+      <p className="choice-note">Return to competition with the Compete navigation. Preview state recovers from this browser storage only.</p>
     </section>
   );
 }

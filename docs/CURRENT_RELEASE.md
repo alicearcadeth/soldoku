@@ -10,6 +10,7 @@ Public app: https://soldoku.com/ and https://www.soldoku.com/
 | Release tag | `release/devnet-f4619a4-2026-10-09` |
 | Private branch with reconstruct history | `reconstruct-2026-10-08` |
 | Card-funding foundations | Pushed as unreleased source only; external execution disabled; not deployed |
+| PR #1 | Open review against `main`; merge does not auto-deploy |
 
 This is the Devnet Soldoku beta. Stakes are TEST and have no cash value. Mainnet staking is not enabled. New testers obtain Devnet SOL and TEST from the in-app test-funds control. See [testers.md](testers.md).
 

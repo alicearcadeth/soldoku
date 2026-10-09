@@ -144,6 +144,13 @@ export type CardFundingAdapter = {
 };
 
 const OPEN_PAYMENT = new Set<PaymentLane>(["preparing", "awaiting-provider", "verification-required", "processing", "pending-unknown"]);
+/** Intent body keeps a bounded recent window; durable dedupe is `(provider, event_id)` in D1. */
+const MAX_PROCESSED_EVENT_IDS = 64;
+
+function rememberEventIds(existing: string[], eventId: string): string[] {
+  const next = existing.includes(eventId) ? existing : [...existing, eventId];
+  return next.length > MAX_PROCESSED_EVENT_IDS ? next.slice(next.length - MAX_PROCESSED_EVENT_IDS) : next;
+}
 
 export function cardFundingCapabilities(cluster: "devnet" | "localnet" = "devnet"): CardFundingCapabilities {
   return {
@@ -250,11 +257,26 @@ export function applyNormalizedEvent(intent: CardFundingIntent, event: Normalize
   duplicate: boolean;
 } {
   if (intent.processedEventIds.includes(event.id)) return { intent, duplicate: true };
+  if (intent.escrow === "entry-finalized") {
+    return { intent: touch(intent, event.observedAt, { processedEventIds: rememberEventIds(intent.processedEventIds, event.id) }), duplicate: false };
+  }
   if (intent.providerOrderId && event.orderId && intent.providerOrderId !== event.orderId) {
     return {
       intent: touch(intent, event.observedAt, {
         payment: "refund-review",
-        processedEventIds: [...intent.processedEventIds, event.id],
+        processedEventIds: rememberEventIds(intent.processedEventIds, event.id),
+      }),
+      duplicate: false,
+    };
+  }
+  const quoteExpired = intent.quoteExpiresAt != null && event.observedAt >= intent.quoteExpiresAt
+    && (event.kind === "provider-confirmed" || event.kind === "processing" || event.kind === "verification-required");
+  if (quoteExpired && intent.payment !== "provider-confirmed" && intent.delivery === "not-started") {
+    return {
+      intent: touch(intent, event.observedAt, {
+        payment: event.kind === "provider-confirmed" ? "refund-review" : "expired",
+        processedEventIds: rememberEventIds(intent.processedEventIds, event.id),
+        providerOrderId: event.orderId ?? intent.providerOrderId,
       }),
       duplicate: false,
     };
@@ -278,7 +300,6 @@ export function applyNormalizedEvent(intent: CardFundingIntent, event: Normalize
   if (event.kind === "expired") payment = "expired";
   if (event.kind === "provider-confirmed") payment = "provider-confirmed";
   if (event.kind === "refund-review") payment = "refund-review";
-  if (intent.escrow === "entry-finalized") payment = intent.payment;
   return {
     intent: touch(intent, event.observedAt, {
       fiat: fiatNext.state,
@@ -286,10 +307,23 @@ export function applyNormalizedEvent(intent: CardFundingIntent, event: Normalize
       providerOrderId: event.orderId ?? intent.providerOrderId,
       paymentTxId: event.orderId ?? intent.paymentTxId,
       delivery: payment === "provider-confirmed" && intent.delivery === "not-started" ? "pending" : intent.delivery,
-      processedEventIds: [...intent.processedEventIds, event.id],
+      processedEventIds: rememberEventIds(intent.processedEventIds, event.id),
     }),
     duplicate: false,
   };
+}
+
+/** Lost provider response: keep recovery without inventing success or opening a second charge. */
+export function markPaymentUnknown(intent: CardFundingIntent, nowMs: number): CardFundingIntent {
+  if (intent.payment === "provider-confirmed" || intent.payment === "declined" || intent.payment === "cancelled" || intent.payment === "expired" || intent.payment === "unavailable") {
+    return intent;
+  }
+  return touch(intent, nowMs, { payment: "pending-unknown" });
+}
+
+export function markDeliveryFailed(intent: CardFundingIntent, nowMs: number): CardFundingIntent {
+  if (intent.delivery === "received" || intent.escrow === "entry-finalized") return intent;
+  return touch(intent, nowMs, { delivery: "failed" });
 }
 
 export function observeAssetDelivery(intent: CardFundingIntent, observation: AssetDeliveryObservation, nowMs: number): CardFundingIntent {

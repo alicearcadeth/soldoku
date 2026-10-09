@@ -263,7 +263,7 @@ describe("Worker leaderboard persistence", () => {
     };
     const caps = await worker.fetch(new Request("https://soldoku.test/api/funding/card"), env);
     expect(caps.status).toBe(200);
-    expect(await caps.json()).toMatchObject({ available: false, externalExecution: false, funded: false, admitsEntrant: false });
+    expect(await caps.json()).toMatchObject({ available: false, externalExecution: false, funded: false, admitsEntrant: false, persistenceReady: true });
     const created = await worker.fetch(new Request("https://soldoku.test/api/funding/card", {
       method: "POST",
       headers: { "content-type": "application/json" },
