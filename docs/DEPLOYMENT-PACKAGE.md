@@ -20,7 +20,7 @@
 
 - **Branch:** `seeker-product-2026-10-09`  
 - **PR:** https://github.com/alicearcadeth/soldoku/pull/2  
-- **Reviewed tip:** see `git rev-parse HEAD` on that branch after push  
+- **Reviewed tip:** `6accfca24ba58391e3e99fff8da0f941bb10185b`  
 - **Live today:** `f4619a4` (unchanged until authorized deploy)  
 - **Backup:** `C:\Soldoku-reconstruct\backups\soldoku-2026-10-09-1551-39f7eea` (plus later backups if created)
 

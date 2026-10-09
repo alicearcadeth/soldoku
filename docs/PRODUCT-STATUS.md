@@ -8,7 +8,7 @@ Living snapshot. Historical evidence folders keep their original wording; this f
 |------|----------|-------|
 | **Deployed (live)** | `f4619a4` via `https://soldoku.com/api/release` | Dirty: false |
 | **main (GitHub)** | `5ead4e6` Merge PR #1 | Settlement recovery + disabled card foundations |
-| **PR #2 head** | `seeker-product-2026-10-09` | Pause UX, walletCall hang fix (+ hasFocus), Join/Start copy, pilot docs — **not merged, not deployed** |
+| **PR #2 head** | `6accfca` on `seeker-product-2026-10-09` | Pause UX, walletCall hang fix (+ hasFocus), Join/Start copy, pilot docs — **not merged, not deployed** |
 | **APK tested** | `com.sudoku.game` 0.1.0 / SHA-256 `bf427627…` (`docs/evidence/2026-10-09-seeker/APK-IDENTITY.md`) | Loads **live** web (`f4619a4`), not PR #2 assets |
 
 ## Availability
