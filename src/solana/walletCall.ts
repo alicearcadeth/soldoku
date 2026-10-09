@@ -12,16 +12,22 @@ export function walletCall<T>(pending: Promise<T>, graceMs = 8000, capMs = 25000
       sheetUp = true;
       returnedAt = 0;
     };
-    const onFocus = () => {
+    /** Focus alone is unreliable on Seeker after Seed Vault; clear the sheet flag when the page is shown again. */
+    const onReturned = () => {
       sheetUp = false;
+      check();
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") sheetUp = false;
       check();
     };
     const stop = () => {
       settled = true;
       window.clearInterval(watch);
-      document.removeEventListener("visibilitychange", check);
+      document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("blur", onBlur);
-      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("focus", onReturned);
+      window.removeEventListener("pageshow", onReturned);
     };
     const fail = () => {
       if (settled) return;
@@ -47,9 +53,10 @@ export function walletCall<T>(pending: Promise<T>, graceMs = 8000, capMs = 25000
       if (now - returnedAt >= graceMs) fail();
     };
     const watch = window.setInterval(check, 250);
-    document.addEventListener("visibilitychange", check);
+    document.addEventListener("visibilitychange", onVisibility);
     window.addEventListener("blur", onBlur);
-    window.addEventListener("focus", onFocus);
+    window.addEventListener("focus", onReturned);
+    window.addEventListener("pageshow", onReturned);
     pending.then(
       (value) => {
         if (settled) return;

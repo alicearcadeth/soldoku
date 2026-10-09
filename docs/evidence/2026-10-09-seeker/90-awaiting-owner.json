@@ -1,0 +1,8 @@
+{
+  "top": [
+    "topResumedActivity=ActivityRecord{70306901 u0 com.solanamobile.wallet/.MWABottomSheetActivity t42}"
+  ],
+  "texts": [],
+  "walletSheet": true,
+  "instruction": "On the Seeker now: if a Seed Vault / Solana Mobile Wallet prompt asks to sign a MESSAGE for Soldoku, Approve it (Devnet identity only — not a deposit). Stay on that prompt until it completes, then return to Soldoku."
+}

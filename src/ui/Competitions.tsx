@@ -171,13 +171,21 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
     if (cached) { setSession(cached); return cached; }
     setBusy("Verify your wallet identity");
     const proof = await api<{ id: string; message: string }>("/api/competitions/proof", { wallet: address });
-    const signature = await signPlayMessage(new TextEncoder().encode(proof.message));
-    if (!signature) throw new Error("Choose a wallet that supports message signing.");
-    if (connectedAddress() !== address) throw new Error("Your wallet changed. Try again with the current account.");
-    const next = await api<Session>("/api/competitions/authorize", { id: proof.id, signature: bs58.encode(signature) });
-    localStorage.setItem("sudoku.competitionSession", JSON.stringify(next));
-    setSession(next);
-    return next;
+    try {
+      const signature = await signPlayMessage(new TextEncoder().encode(proof.message));
+      if (!signature) throw new Error("Choose a wallet that supports message signing.");
+      if (connectedAddress() !== address) throw new Error("Your wallet changed. Try again with the current account.");
+      const next = await api<Session>("/api/competitions/authorize", { id: proof.id, signature: bs58.encode(signature) });
+      localStorage.setItem("sudoku.competitionSession", JSON.stringify(next));
+      setSession(next);
+      return next;
+    } catch (error) {
+      const text = error instanceof Error ? error.message : "";
+      if (/session timeout/i.test(text)) {
+        throw new Error("Wallet signing timed out. Approve the message in Seed Vault, or try Join again.");
+      }
+      throw error;
+    }
   }
   async function requestTesterFunds() {
     await action("Requesting test funds", async () => {

@@ -29,8 +29,10 @@ This is agent-observed internal product testing. Not external usability validati
 | Wallet discovery (MWA) | passed | Detected · connect |
 | MWA handoff | passed | `MWABottomSheetActivity` from Soldoku |
 | Connection result | passed | Truncated wallet on home |
-| Message proof / authorize | needs-owner | Competition session sign |
-| Wallet sheet Close/cancel | blocked | Secure lock before re-test |
+| Free room detail `61702E42` | passed | View room → Weekend Sprint, Back to Rooms, share/copy |
+| Join → MWA / Seed Vault | passed handoff | `MWABottomSheetActivity` → `seedvaultimpl` authorize |
+| Message proof / authorize | failed/stuck | After return, UI stayed on “Verify your wallet identity…” with Join disabled (`walletCall` sheet flag) |
+| Wallet sheet Close/cancel | passed (earlier) | Home wallet chip → Close |
 | Account switch | not tested | |
 | Lock → PIN unlock | needs-owner | Secure keyguard; automation must not enter PIN |
 | Funded Devnet deposit | not tested | Pause held; no unpause requested |
@@ -44,6 +46,6 @@ This is agent-observed internal product testing. Not external usability validati
 
 Public `/api/funding/card` → `Unknown request` on live Worker. No production provider requests from device journey.
 
-## Continuation blocker (current)
+## Authorize hang (observed)
 
-`mDreamingLockscreen=true` — Seeker shows **Unlock with PIN or fingerprint**. No Seed Vault reset or data clear attempted. Resume physical journeys after owner unlocks and opens Soldoku.
+Joining free room `61702E42` opened Solana Mobile Wallet / Seed Vault. After return to Soldoku, status remained **Verify your wallet identity…** and **Join room** stayed `enabled=false` until force-stop. Root cause: `walletCall` treated the MWA sheet as still covering when Seeker did not deliver `focus` after Seed Vault; `sheetCapMs` is 10 minutes. Fix on product branch: clear sheet flag on `pageshow` / `visibilitychange` visible + clearer timeout copy (unreleased — phone still loads `f4619a4`).
