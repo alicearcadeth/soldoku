@@ -104,7 +104,8 @@ Existing funded rooms still listed via `/api/competitions` (e.g. `BFF6D992` refu
 - Seeker helper scripts (no product runtime change required; no defect fix beyond documentation honesty)
 - Status docs updated to merged/deployed identity
 - Tests run: `pendingTx`, `settlement`, `walletCall` — 38 passed
-- Commit/push/backup recorded in git log after push
+- Pushed commit: `3e8504f` on private `github/main` (docs/evidence only; live Worker remains `d9a182a`)
+- Backup: `C:\Soldoku-reconstruct\backups\soldoku-main-2026-10-09-3e8504f` (+ `soldoku-3e8504f.bundle` verified)
 
 ## 9. Verdicts
 
