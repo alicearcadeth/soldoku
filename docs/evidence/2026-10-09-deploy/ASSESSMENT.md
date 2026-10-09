@@ -64,8 +64,8 @@ Assumption rejected: a script named `postdeploy` does not prove deploy. Deploy i
 |----------|--------------|----------|
 | Connect → MWA → BACK → usable Soldoku | **Passed** | `lifecycle-preserve.json` `wallet-cancel-return` path `native-mwa`; also postdeploy wallet-pause |
 | Join → in-app Connect Close → room (no hang) | **Passed** | `seeker-postdeploy.json` join-cancel-return |
-| Competition join → Start challenge without Verify hang | **Passed** (`CA64EA8C`, 3→4) | See `AUTHORIZE-RETURN.md`. Connect used MWA; join reused day-long competition session (no fresh Seed Vault message sheet observed). |
-| Fresh Seed Vault message-sign on Join | **Not re-observed** | Would need session clear/expiry (not authorized this phase) |
+| Existing-session join → Start without Verify hang | **Passed** (`CA64EA8C`, 3→4) | See `AUTHORIZE-RETURN.md`. Connect used MWA; join reused competition session. |
+| Fresh Seed Vault message-sign on Join (`d9a182a`) | **Unverified** | No safe invalidation without storage clear; see `FRESH-MESSAGE-AUTH.md` |
 | Duplicate join after success | **Passed** | Join not offered; Start challenge only |
 
 ## 5. State-preserving lifecycle (`d9a182a`)
@@ -107,20 +107,21 @@ Existing funded rooms still listed via `/api/competitions` (e.g. `BFF6D992` refu
 - Authorize-return physical pass on free room `CA64EA8C` (`AUTHORIZE-RETURN.md`, `authorize-return.json`, `40-*` / `30-*` screenshots)
 - Tests run: `pendingTx`, `settlement`, `walletCall` — 38 passed (earlier close-out)
 - Prior evidence pushes: `3e8504f`, `e79f6ee` on private `github/main` (docs only; live Worker remains `d9a182a`)
-- Authorize evidence push: `b406ab6` on private `github/main` (docs/scripts only; live Worker remains `d9a182a`)
-- Backup: `C:\Soldoku-reconstruct\backups\soldoku-main-2026-10-09-b406ab6` (+ `soldoku-b406ab6.bundle`)
+- Authorize evidence push: `b406ab6` / tip note `83c3901` on private `github/main` (docs/scripts only; live Worker remains `d9a182a`)
+- Backup: `C:\Soldoku-reconstruct\backups\soldoku-main-2026-10-09-83c3901` (+ bundle)
+- Verdict correction + pilot pack + fresh-message analysis: see `FRESH-MESSAGE-AUTH.md`, `docs/pilot/FREE-COMPETITION-PILOT.md` (this push; live still `d9a182a`)
 
 ## 9. Verdicts
 
 | Surface | Verdict |
 |---------|---------|
 | Classic / Practice | **Ready** on deployed shell+`d9a182a` (pause/bg/Continue observed; Practice not re-exercised this close-out — prior Seeker evidence) |
-| Free competition | **Limited ready** — join registration + Start state on `d9a182a` for `CA64EA8C` passed; fresh Seed Vault message path optional retest (session reuse) |
+| Free competition | **Limited ready** — existing-session join on `CA64EA8C` passed; fresh message on `d9a182a` unverified; pilot pack in `docs/pilot/FREE-COMPETITION-PILOT.md` |
 | Funded Devnet | **Paused / hold** — create/deposit paused; historical rooms readable; no new physical funded tx |
 | Card funding | **Deployed-disabled** — not unreleased; execution blocked |
 
 ## Owner actions still needed
 
-1. Optional: after competition session expiry (or a future authorized single-key clear of `sudoku.competitionSession` only), re-run Join → Seed Vault **message** to close the last instrumentation gap.
-2. Authorize any external free pilot separately — do not invite under this phase.
+1. Fresh message on `d9a182a`: after natural expiry (~2026-10-10 14:01 ICT estimate) or with another owner wallet, Join a new free room → Seed Vault **message** → return. Disconnect alone is insufficient. Do not clear storage.
+2. Authorize invites separately using `docs/pilot/FREE-COMPETITION-PILOT.md`.
 3. Do **not** clear app/wallet data; do not lift pause / enable card / Mainnet.

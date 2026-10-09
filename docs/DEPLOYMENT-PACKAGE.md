@@ -19,8 +19,8 @@
 
 ## Remaining (not authorized by deploy prompt)
 
-- Optional: fresh Seed Vault message-sign retest after session expiry (join→Start already passed on `CA64EA8C`)
-- External invites
+- Fresh Seed Vault message on live `d9a182a` (unverified; natural expiry or other wallet — see FRESH-MESSAGE-AUTH.md)
+- Owner go-ahead for invites (`docs/pilot/FREE-COMPETITION-PILOT.md`)
 - Pause lift / funded physical / card enable / Mainnet
 
 ## Rollback

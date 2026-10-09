@@ -32,7 +32,7 @@ Command attempted: `pm clear --cache-only com.sudoku.game` (Soldoku only). Hung 
 | join-cancel (in-app Connect Close) | passed | Physical; **not** Seed Vault message cancel |
 | funded-pause-ui | passed | **Browser-only** |
 | Classic pause / bg / Continue | passed | Physical `d9a182a` |
-| free join → Start (`CA64EA8C`) | passed | 3→4 participants; no Verify hang; see AUTHORIZE-RETURN.md |
-| fresh Seed Vault message on Join | not observed | Session reuse likely; optional retest |
+| existing-session join → Start (`CA64EA8C`) | passed | 3→4; no Verify hang; AUTHORIZE-RETURN.md |
+| fresh Seed Vault message on `d9a182a` | unverified | FRESH-MESSAGE-AUTH.md; natural expiry or other wallet |
 
 Pre-deploy full Join→play→LB on `61702E42` remains under `docs/evidence/2026-10-09-seeker/` against hosted **`f4619a4`**.

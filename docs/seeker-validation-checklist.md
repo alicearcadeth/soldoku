@@ -15,8 +15,8 @@ Evidence: `docs/evidence/2026-10-09-seeker/` (`f4619a4` full play) and `docs/evi
 
 - [x] Verified — MWA discovery “Detected · connect”
 - [x] Verified — MWA handoff to Solana Mobile Wallet bottom sheet; return showed truncated wallet
-- [x] Verified — Free-room join → Start challenge on `CA64EA8C` (`d9a182a`); see AUTHORIZE-RETURN.md
-- [ ] Unverified — Fresh Seed Vault **message** sheet on Join (session reuse likely; optional after expiry)
+- [x] Verified — Existing-session free-room join → Start on `CA64EA8C` (`d9a182a`); AUTHORIZE-RETURN.md
+- [ ] Unverified — Fresh Seed Vault **message** on live `d9a182a` (FRESH-MESSAGE-AUTH.md; wait expiry or other wallet)
 - [x] Verified — User cancels connect; app recovers without stuck busy (post-deploy wallet-cancel)
 - [ ] Unverified — Account switch
 - [x] Verified — Background / foreground and process kill → Classic pause/continue recovery

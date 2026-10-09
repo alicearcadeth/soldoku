@@ -246,7 +246,9 @@
   ],
   "finishedAt": "2026-10-09T10:56:53.229Z",
   "verdict": {
-    "authorizePassed": true,
-    "gapClosed": true
+    "existingSessionJoinPassed": true,
+    "freshMessageAuthorizeObserved": false,
+    "gapClosed": false,
+    "note": "Physical joining with an existing session passed; fresh physical message authorization on d9a182a remains unverified."
   }
 }

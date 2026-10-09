@@ -1,11 +1,17 @@
 # Free-room authorize / return — `d9a182a` (2026-10-09)
 
-## Identities (reconfirmed before test)
+## Corrected result (authoritative)
+
+**Physical joining with an existing session passed; fresh physical message authorization on this release remains unverified.**
+
+Do not treat the `CA64EA8C` join as proof that a Seed Vault **message** signature occurred on live `d9a182a`. No wallet message sheet was observed during Join.
+
+## Identities (reconfirmed)
 
 | Item | Value |
 |------|--------|
 | Hosted release | soldoku.com + www `/api/release` = `d9a182a` `dirty:false` |
-| GitHub main (evidence tip) | `b406ab6` (docs only; live remains `d9a182a`) |
+| GitHub tip (docs) | `83c3901` (and later evidence commits); live Worker remains `d9a182a` |
 | APK | `com.sudoku.game` 0.1.0 (loads hosted site) |
 | Pause / card / Mainnet | paused · card disabled · Devnet only |
 | Script | `scripts/seeker-authorize-return.mjs` |
@@ -20,31 +26,29 @@
 | Join path copy | “Join verifies your wallet with a **message signature** (no deposit…)” |
 | Participants before | **3** (API + UI) |
 | Participants after | **4** (API + UI) |
-| Approving wallet (sanitized) | Home chip `E3DQ…DpJn` after connect |
+| Wallet (sanitized) | Home chip `E3DQ…DpJn` after connect |
 | Prior LB | `8VYT…7J8G` (unchanged #1) |
 
 ## Results
 
 | Check | Status | Notes |
 |-------|--------|-------|
-| Wallet connect → MWA → owner approve → Soldoku | **passed** | `MWABottomSheetActivity` observed; chip `E3DQ…DpJn` |
-| Join → Start challenge, no Verify hang | **passed** | Join gone; Start challenge; ~3s after tap |
+| Wallet connect → MWA → owner approve → Soldoku | **passed** | `MWABottomSheetActivity`; chip `E3DQ…DpJn` |
+| Join with **existing** `sudoku.competitionSession` → Start challenge | **passed** | Join gone; Start challenge; ~3s; no Verify hang |
 | Participant +1 exactly | **passed** | 3 → 4 |
-| Force-stop relaunch persistence | **passed** | Start challenge, Join not offered, count 4 |
-| Duplicate join | **passed** | Join not offered (idempotent joined UI) |
+| Force-stop relaunch persistence | **passed** | Start challenge; Join not offered; count 4 |
+| Duplicate join | **passed** | Join not offered |
 | Background return | **passed** | Usable room UI |
-| Fresh Seed Vault **message** sheet on Join | **not observed** | Join completed without `seedvault` / MWA top activity. Consistent with reuse of valid `sudoku.competitionSession` (server sessions last ~1 day). Connect-phase MWA was observed; join-phase message re-sign was not. |
+| Fresh Seed Vault **message** on Join (this release) | **unverified** | Join completed without `seedvault` / MWA as top activity |
 
-## Interpretation
+## Why Join skipped Seed Vault
 
-- **Registration + return UI on `d9a182a`:** pass (no hang, correct Start state, count +1).
-- **Strict “Join → Seed Vault message approve → return” replay:** not instrumentally confirmed this run (session cache). Prior hang was specifically on that message-return path; live JS still contains the `pageshow`/`hasFocus` fix.
-- Forcing a fresh message would require clearing `sudoku.competitionSession` or waiting for expiry — **not done** (no storage clear authorized).
+`Competitions.identity()` reuses `localStorage.sudoku.competitionSession` when `wallet` matches and `expires > now + 5s` (`src/ui/Competitions.tsx`). Server sessions last `DAY_MS` (~24h) after `/api/competitions/authorize` (`src/competition/store.ts`). Disconnect clears the play-wallet connection only — **not** the competition session (see `FRESH-MESSAGE-AUTH.md`).
 
 ## Verdict
 
 | Question | Answer |
 |----------|--------|
-| Successful physical join + return on current release? | **Yes** |
-| Remaining free-competition authorization gap closed? | **Mostly** — join/registration/no-hang closed; fresh message Seed Vault path still an optional retest |
-| Small free-competition pilot technically ready for owner auth? | **Yes, limited** — with the session-reuse caveat above; no external invite under this prompt |
+| Existing-session physical join + return on `d9a182a`? | **Passed** |
+| Fresh physical message approval + return on `d9a182a`? | **Unverified** |
+| Small free-competition pilot technically ready? | **Limited yes** — join/persistence proven with session cache; fresh-message path still open; no invites under this prompt |

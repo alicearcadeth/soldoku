@@ -16,7 +16,7 @@ Living snapshot. Historical evidence folders keep their original wording; this f
 | Surface | State |
 |---------|-------|
 | Classic / Practice | Available on live |
-| Free competitions | Available; cancel-return + join→Start on `CA64EA8C` verified on `d9a182a` (see AUTHORIZE-RETURN.md; session-reuse caveat) |
+| Free competitions | Available; existing-session join→Start on `CA64EA8C` passed on `d9a182a`; fresh Seed Vault message on this tip unverified (see AUTHORIZE-RETURN.md) |
 | Funded Devnet entry | **Paused**. Claims/refunds/settlement + room reads remain |
 | Card funding | Foundations **deployed-but-disabled** (not unreleased) |
 | Mainnet / real payments | Off |
@@ -28,16 +28,17 @@ Living snapshot. Historical evidence folders keep their original wording; this f
 | Classic pause / bg / Continue | Seeker + `d9a182a` | Passed (`docs/evidence/2026-10-09-deploy/`) |
 | Free room browse / LB read | Seeker + `d9a182a` | Passed (`61702E42`) |
 | Wallet connect cancel / MWA BACK | Seeker + `d9a182a` | Passed |
-| Join → Start challenge, count +1, no hang | Seeker + `d9a182a` | Passed (`CA64EA8C`); fresh Seed Vault message sheet not re-observed (session cache) |
+| Existing-session join → Start, count +1, no hang | Seeker + `d9a182a` | Passed (`CA64EA8C`) |
+| Fresh Seed Vault message authorize on live tip | Seeker + `d9a182a` | Unverified — see `FRESH-MESSAGE-AUTH.md` |
 | Full Join → play → LB | Seeker + prior `f4619a4` | Passed historically — `7:50.6 · rank 2` |
 | Funded deposit / claim / refund on device | — | **Untested** this phase |
 | External-player pilot | — | **Not started** |
 
 ## Gaps
 
-1. Optional: retest fresh message Seed Vault after session expiry.
-2. Bounded funded Devnet physical plan still needs separate pause-lift auth.
-3. Do not clear Soldoku/wallet app data during testing (`pm clear --cache-only` was attempted once; outcome unknown — see deploy ASSESSMENT).
+1. Fresh message on `d9a182a`: wait for natural session expiry (~2026-10-10 14:01 ICT estimate) or use another owner wallet; then Join a new free room. Do not clear storage.
+2. Owner may authorize invites using `docs/pilot/FREE-COMPETITION-PILOT.md` — no invites under this phase alone.
+3. Bounded funded Devnet physical plan still needs separate pause-lift auth. Do not clear Soldoku/wallet app data.
 
 ## Evidence index
 

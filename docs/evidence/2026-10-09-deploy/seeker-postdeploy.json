@@ -118,7 +118,7 @@
       "verifyHang": false,
       "connectMwaObserved": true,
       "joinSeedVaultMessageObserved": false,
-      "note": "Join registered + Start challenge. Fresh Seed Vault message sheet not seen (likely day-long competitionSession reuse). Detail: AUTHORIZE-RETURN.md",
+      "note": "Existing-session join passed; fresh Seed Vault message on d9a182a unverified. AUTHORIZE-RETURN.md + FRESH-MESSAGE-AUTH.md",
       "at": "2026-10-09T10:56:24.613Z"
     }
   ],
@@ -127,6 +127,6 @@
     "Interrupted pm-clear+verify run remains inconclusive; later passes do not rewrite it.",
     "join-cancel-return is in-app Connect Close, not Seed Vault message authorization cancel.",
     "Pre-deploy 61702E42 full play evidence is f4619a4-hosted, not d9a182a approve-return proof.",
-    "CA64EA8C join pass does not by itself prove a fresh Seed Vault message-sign cycle."
+    "Physical joining with an existing session passed; fresh physical message authorization on this release remains unverified."
   ]
 }
