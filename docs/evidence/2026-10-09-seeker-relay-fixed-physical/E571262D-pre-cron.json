@@ -1,0 +1,40 @@
+{
+  "observedAt": "2026-10-09T14:44:55.374Z",
+  "room": {
+    "code": "E571262D",
+    "name": "Seeker relay diagnostic",
+    "level": "easy",
+    "createdAt": 1791554929472,
+    "endsAt": 1791557060000,
+    "durationMs": 330528,
+    "participants": 2,
+    "status": "ended",
+    "token": {
+      "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+      "symbol": "TEST",
+      "name": "Soldoku Token (Devnet)",
+      "priceUsd": 0,
+      "updatedAt": 0
+    },
+    "stake": 1,
+    "bestMs": null,
+    "funded": {
+      "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+      "authority": "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N",
+      "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+      "decimals": 6,
+      "playMs": 1800000,
+      "graceMs": 3600000,
+      "id": "12751992574235001959",
+      "stakeUnits": "1000000",
+      "startsAt": 1791555260000,
+      "refundAt": 1791560660000,
+      "chainStatus": "open",
+      "confirmedParticipants": 2,
+      "chainTime": 0,
+      "winner": null
+    },
+    "leaderboard": [],
+    "you": null
+  }
+}

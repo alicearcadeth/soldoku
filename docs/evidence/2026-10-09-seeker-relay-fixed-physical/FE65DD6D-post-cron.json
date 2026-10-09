@@ -1,0 +1,59 @@
+{
+  "observedAt": "2026-10-09T14:45:41.720Z",
+  "room": {
+    "code": "FE65DD6D",
+    "name": "Seeker relay diagnostic",
+    "level": "easy",
+    "createdAt": 1791554700086,
+    "endsAt": 1791556831000,
+    "durationMs": 330914,
+    "participants": 2,
+    "status": "ended",
+    "token": {
+      "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+      "symbol": "TEST",
+      "name": "Soldoku Token (Devnet)",
+      "priceUsd": 0,
+      "updatedAt": 0
+    },
+    "stake": 1,
+    "bestMs": 447318,
+    "funded": {
+      "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+      "authority": "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N",
+      "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+      "decimals": 6,
+      "playMs": 1800000,
+      "graceMs": 3600000,
+      "id": "1750908185996671568",
+      "stakeUnits": "1000000",
+      "startsAt": 1791555031000,
+      "refundAt": 1791560431000,
+      "chainStatus": "awarded",
+      "confirmedParticipants": 2,
+      "chainTime": 1791556831000,
+      "winner": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+      "settlement": {
+        "phase": "unknown",
+        "winner": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+        "signature": "44AjHgcAwQQXKMoQBLunN9ZP9Sukn8aWg3MapobfuLjw1fhWLiffxEmrjr4eKSKdGmk38e5NEL9n9Mtn5t4Z29co",
+        "blockhash": "CCw7inM5ixKfsrGThLBhc487QnRSxWgGDrVMbQkhae23",
+        "lastValidBlockHeight": 496445995,
+        "preparedAt": 1791557120622,
+        "note": "unknown"
+      },
+      "settlementAlso": [],
+      "settlementAlert": "Settlement is unknown."
+    },
+    "leaderboard": [
+      {
+        "name": "E3DQ…DpJn",
+        "wallet": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+        "you": false,
+        "completedMs": 447318,
+        "rank": 1
+      }
+    ],
+    "you": null
+  }
+}

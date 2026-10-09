@@ -1,6 +1,6 @@
 {
   "release": "eb14d0d8b733fc7d4dd00a583a5ff9c867ab6836",
-  "observedAt": "2026-10-09T14:10:47.151Z",
+  "observedAt": "2026-10-09T14:50:47.121Z",
   "paused": true,
   "before": [
     {
@@ -19,7 +19,7 @@
     },
     {
       "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
-      "test": "32000000"
+      "test": "33000000"
     }
   ],
   "rooms": [
@@ -39,18 +39,48 @@
         "stakeUnits": "1000000",
         "startsAt": 1791555260000,
         "refundAt": 1791560660000,
-        "chainStatus": "open",
+        "chainStatus": "refunding",
         "confirmedParticipants": 2,
-        "chainTime": 0,
-        "winner": null
+        "chainTime": 1791557060000,
+        "winner": null,
+        "settlement": {
+          "phase": "confirmed",
+          "winner": "",
+          "signature": "3MmmMNXAyta9rk2Wwhr1ruyJyhQRpQdBxvfJzGxf7gZvDZv57BkooG5DGQhWhywZ1k38yPhm1Rp1vkGjzHjSmQGy",
+          "blockhash": "EQrwdJs6fR2Dyc3td79LthTaDRtUcwXi4kcKxVo6UTfd",
+          "lastValidBlockHeight": 496446006,
+          "preparedAt": 1791557124280,
+          "note": "unknown"
+        },
+        "settlementAlert": "",
+        "settlementSignature": "3MmmMNXAyta9rk2Wwhr1ruyJyhQRpQdBxvfJzGxf7gZvDZv57BkooG5DGQhWhywZ1k38yPhm1Rp1vkGjzHjSmQGy"
       },
       "leaderboard": [],
       "ownerDeposit": "2djmuqB5rcFiFSr4EhAcKGxEqMkLG7FjiEdXzM89Ykw48ayvPwt2o7wmUghgHDwdxgSe9hQ4KqMKwjH35f2bvZzW",
+      "ownerRefund": "2fwixThWXDZHDS5jAkkxWCmEopbetnDs9LzEuEzh918U5WLh1EJWq5CqaP2pR9un3jVAHAeDP5muwG1S8CAwJCRk",
       "escrow": "H2TJmpAgAcBFp2gAUKeK1S7ue4CehAxB7BPj62Ec46G9",
       "vault": "799p6YUSacNXqRV8efudrpToceQwm8cqYQGm4DFxLKwB",
-      "vaultAmount": "2000000",
-      "duplicateRejected": false
+      "vaultAmount": "1000000",
+      "settlementChainStatus": {
+        "confirmationStatus": "finalized",
+        "confirmations": null,
+        "err": null,
+        "slot": 509213132,
+        "status": {
+          "Ok": null
+        }
+      },
+      "duplicateRejected": true,
+      "ownerRefundChainStatus": {
+        "confirmationStatus": "finalized",
+        "confirmations": null,
+        "err": null,
+        "slot": 509213460,
+        "status": {
+          "Ok": null
+        }
+      }
     }
   ],
-  "duplicateDelta": null
+  "duplicateDelta": "0"
 }

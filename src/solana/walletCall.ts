@@ -21,6 +21,10 @@ export function walletCall<T>(pending: Promise<T>, graceMs = 8000, capMs = 25000
       pageForeground = true;
       check();
     };
+    // A real interaction with the visible page proves the native sheet no longer covers it.
+    const onInteraction = () => {
+      if (document.visibilityState === "visible") onReturned();
+    };
     const onVisibility = () => {
       if (document.visibilityState === "visible") {
         sheetUp = false;
@@ -35,6 +39,7 @@ export function walletCall<T>(pending: Promise<T>, graceMs = 8000, capMs = 25000
       window.removeEventListener("blur", onBlur);
       window.removeEventListener("focus", onReturned);
       window.removeEventListener("pageshow", onReturned);
+      window.removeEventListener("pointerdown", onInteraction, true);
     };
     const fail = () => {
       if (settled) return;
@@ -65,6 +70,7 @@ export function walletCall<T>(pending: Promise<T>, graceMs = 8000, capMs = 25000
     window.addEventListener("blur", onBlur);
     window.addEventListener("focus", onReturned);
     window.addEventListener("pageshow", onReturned);
+    window.addEventListener("pointerdown", onInteraction, true);
     pending.then(
       (value) => {
         if (settled) return;
@@ -79,3 +85,4 @@ export function walletCall<T>(pending: Promise<T>, graceMs = 8000, capMs = 25000
     );
   });
 }
+

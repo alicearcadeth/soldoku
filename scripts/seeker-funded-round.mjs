@@ -39,7 +39,7 @@ if(['prepare','diagnose'].includes(process.argv[2])){
 }else{
  const s=JSON.parse(readFileSync(file,'utf8'));
  if(process.argv[2]==='pause'){await pause('1');s.pausedRestored=true;save(s);console.log('PAUSE RESTORED');}
- if(process.argv[2]==='refund-other'){const r=s.rooms[1];r.ownerRefund=await relay(r.code,s.actor,'claim');save(s);}
+ if(process.argv[2]==='refund-other'){const r=s.rooms[1]??s.rooms[0];r.ownerRefund=await relay(r.code,s.actor,'claim');save(s);}
  if(process.argv[2]==='cleanup-solo'){
   for(const r of s.rooms){const state=await api('/sync',{code:r.code,actor:s.actor});if(state.participants!==1||state.you?.claimed)continue;assert(Date.now()>=state.funded.startsAt,'solo refund not available before registration closes');r.ownerRefund=await relay(r.code,s.actor,'claim');save(s);console.log(`Solo stake refunded: ${r.code}`);}
  }
@@ -57,3 +57,4 @@ if(['prepare','diagnose'].includes(process.argv[2])){
  evidence.duplicateDelta=s.duplicateDelta??null;
  writeFileSync(`${out}/chain-state.json`,JSON.stringify(evidence,null,2));console.log(JSON.stringify(evidence));
 }
+

@@ -1,0 +1,51 @@
+{
+  "observedAt": "2026-10-09T14:45:41.821Z",
+  "room": {
+    "code": "E571262D",
+    "name": "Seeker relay diagnostic",
+    "level": "easy",
+    "createdAt": 1791554929472,
+    "endsAt": 1791557060000,
+    "durationMs": 330528,
+    "participants": 2,
+    "status": "ended",
+    "token": {
+      "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+      "symbol": "TEST",
+      "name": "Soldoku Token (Devnet)",
+      "priceUsd": 0,
+      "updatedAt": 0
+    },
+    "stake": 1,
+    "bestMs": null,
+    "funded": {
+      "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+      "authority": "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N",
+      "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+      "decimals": 6,
+      "playMs": 1800000,
+      "graceMs": 3600000,
+      "id": "12751992574235001959",
+      "stakeUnits": "1000000",
+      "startsAt": 1791555260000,
+      "refundAt": 1791560660000,
+      "chainStatus": "open",
+      "confirmedParticipants": 2,
+      "chainTime": 1791557060000,
+      "winner": null,
+      "settlement": {
+        "phase": "unknown",
+        "winner": "",
+        "signature": "3MmmMNXAyta9rk2Wwhr1ruyJyhQRpQdBxvfJzGxf7gZvDZv57BkooG5DGQhWhywZ1k38yPhm1Rp1vkGjzHjSmQGy",
+        "blockhash": "EQrwdJs6fR2Dyc3td79LthTaDRtUcwXi4kcKxVo6UTfd",
+        "lastValidBlockHeight": 496446006,
+        "preparedAt": 1791557124280,
+        "note": "unknown"
+      },
+      "settlementAlso": [],
+      "settlementAlert": "Settlement is unknown."
+    },
+    "leaderboard": [],
+    "you": null
+  }
+}

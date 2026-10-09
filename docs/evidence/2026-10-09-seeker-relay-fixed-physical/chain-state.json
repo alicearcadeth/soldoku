@@ -1,6 +1,6 @@
 {
   "release": "eb14d0d8b733fc7d4dd00a583a5ff9c867ab6836",
-  "observedAt": "2026-10-09T14:06:55.383Z",
+  "observedAt": "2026-10-09T14:50:42.740Z",
   "paused": true,
   "before": [
     {
@@ -15,7 +15,7 @@
   "balances": [
     {
       "wallet": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
-      "test": "19000000"
+      "test": "18000000"
     },
     {
       "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
@@ -39,16 +39,44 @@
         "stakeUnits": "1000000",
         "startsAt": 1791555031000,
         "refundAt": 1791560431000,
-        "chainStatus": "open",
+        "chainStatus": "awarded",
         "confirmedParticipants": 2,
-        "chainTime": 0,
-        "winner": null
+        "chainTime": 1791556831000,
+        "winner": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+        "settlement": {
+          "phase": "confirmed",
+          "winner": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+          "signature": "44AjHgcAwQQXKMoQBLunN9ZP9Sukn8aWg3MapobfuLjw1fhWLiffxEmrjr4eKSKdGmk38e5NEL9n9Mtn5t4Z29co",
+          "blockhash": "CCw7inM5ixKfsrGThLBhc487QnRSxWgGDrVMbQkhae23",
+          "lastValidBlockHeight": 496445995,
+          "preparedAt": 1791557120622,
+          "note": "unknown"
+        },
+        "settlementAlert": "",
+        "settlementSignature": "44AjHgcAwQQXKMoQBLunN9ZP9Sukn8aWg3MapobfuLjw1fhWLiffxEmrjr4eKSKdGmk38e5NEL9n9Mtn5t4Z29co"
       },
-      "leaderboard": [],
+      "leaderboard": [
+        {
+          "name": "E3DQ…DpJn",
+          "wallet": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+          "you": false,
+          "completedMs": 447318,
+          "rank": 1
+        }
+      ],
       "ownerDeposit": "4D2GJZS7k2wiuZ3vrosGsNLkLAgPPK1VviKW2nCw2R3i2xwtdwrUPKEtmGnWpaGP44cf5veKQ6WFezK86Nprtphp",
       "escrow": "9CnVK49t9ezyDAs4ZZ2of7iakjvdPzbkB8MagkFqnUwq",
       "vault": "FYAP98pn47GFz4jSKDGhRYuSHMgMaU99Ssk8dGYjtmhG",
       "vaultAmount": "2000000",
+      "settlementChainStatus": {
+        "confirmationStatus": "finalized",
+        "confirmations": null,
+        "err": null,
+        "slot": 509213122,
+        "status": {
+          "Ok": null
+        }
+      },
       "duplicateRejected": false
     }
   ],

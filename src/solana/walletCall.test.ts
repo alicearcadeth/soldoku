@@ -486,3 +486,27 @@ describe("wallet call", () => {
     await expect(settled).resolves.toBe("session timeout");
   });
 });
+
+// A visible WebView can miss focus/pageshow when returning from a native wallet.
+describe("wallet call interaction recovery", () => {
+  afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
+  it("releases a stale sheet wait after actual page interaction without focus events", async () => {
+    vi.useFakeTimers();
+    const listeners = new Map<string, Set<() => void>>();
+    const add = (name: string, listener: () => void) => {
+      const set = listeners.get(name) ?? new Set(); set.add(listener); listeners.set(name, set);
+    };
+    vi.stubGlobal("document", { visibilityState: "visible", hasFocus: () => false,
+      addEventListener: () => undefined, removeEventListener: () => undefined });
+    vi.stubGlobal("window", { setTimeout, clearTimeout, setInterval, clearInterval,
+      addEventListener: add, removeEventListener: (name: string, listener: () => void) => listeners.get(name)?.delete(listener) });
+    const result = walletCall(new Promise(() => undefined), 8000, 25000, 600000).catch((error: Error) => error.message);
+    listeners.get("blur")?.forEach(listener => listener());
+    await vi.advanceTimersByTimeAsync(60000);
+    listeners.get("pointerdown")?.forEach(listener => listener());
+    await vi.advanceTimersByTimeAsync(8000);
+    const snapshot = await Promise.race([result, Promise.resolve("still waiting")]);
+    expect(snapshot).toBe("session timeout");
+    expect(listeners.get("pointerdown")?.size).toBe(0);
+  });
+});
