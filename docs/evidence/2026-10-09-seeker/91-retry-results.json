@@ -1,0 +1,25 @@
+{
+  "messageProof": "passed",
+  "note": "Join 61702E42 after force-stop; Seed Vault passcode; Start challenge shown; participants 4",
+  "walletCancelClose": {
+    "opened": true,
+    "closed": true,
+    "after": [
+      "PAPER GRID",
+      "Settings",
+      "E3DQ…DpJn",
+      "Soldoku",
+      "Play a solo game, race a friend, or climb the competition leaderboard.",
+      "DEVNET · TEST TOKENS · NO CASH VALUE",
+      "Continue game",
+      "New game",
+      "SOLO Play classic A quiet game. Pause whenever you want.",
+      "FREE Practice No wallet required. Same grid, two players.",
+      "LEADERBOARD Compete One attempt. Open entry. Fastest correct completion wins.",
+      "How to play",
+      "About this beta"
+    ],
+    "onSoldoku": true,
+    "at": "2026-10-09T07:01:39.208Z"
+  }
+}

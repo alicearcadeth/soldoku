@@ -31,8 +31,12 @@ This is agent-observed internal product testing. Not external usability validati
 | Connection result | passed | Truncated wallet on home |
 | Free room detail `61702E42` | passed | View room → Weekend Sprint, Back to Rooms, share/copy |
 | Join → MWA / Seed Vault | passed handoff | `MWABottomSheetActivity` → `seedvaultimpl` authorize |
-| Message proof / authorize | failed/stuck | After return, UI stayed on “Verify your wallet identity…” with Join disabled (`walletCall` sheet flag) |
-| Wallet sheet Close/cancel | passed (earlier) | Home wallet chip → Close |
+| Message proof / authorize | passed (retry) | After force-stop + owner passcode: Join → Seed Vault → return shows **Start challenge**; participants 3→4 (`91-*`) |
+| Wallet sheet Close/cancel | passed | Home `E3DQ…DpJn` → Connect wallet sheet → **Close** → home (`91-sheet` / `91-closed`) |
+| Start challenge + moves | passed | Room `61702E42`; entered 3 cells then continued (`92c-*`) |
+| Bg / reopen recovery | passed | HOME → relaunch; probe digits 7/4/8 still on board; timer continued |
+| Complete + leaderboard | passed | Finished **7:50.6 · rank 2**; LB shows `E3DQ…DpJn · You` under `FTwf…xAVt` 0:25.7 |
+| Reject new wallet/sign + return | passed | Connect sheet Close; MWA connect → BACK cancel sheet → Soldoku home (`92d-*`, `92e-*`) |
 | Account switch | not tested | |
 | Lock → PIN unlock | needs-owner | Secure keyguard; automation must not enter PIN |
 | Funded Devnet deposit | not tested | Pause held; no unpause requested |
@@ -46,6 +50,23 @@ This is agent-observed internal product testing. Not external usability validati
 
 Public `/api/funding/card` → `Unknown request` on live Worker. No production provider requests from device journey.
 
-## Authorize hang (observed)
+## Authorize hang (observed) + retry
 
-Joining free room `61702E42` opened Solana Mobile Wallet / Seed Vault. After return to Soldoku, status remained **Verify your wallet identity…** and **Join room** stayed `enabled=false` until force-stop. Root cause: `walletCall` treated the MWA sheet as still covering when Seeker did not deliver `focus` after Seed Vault; `sheetCapMs` is 10 minutes. Fix on product branch: clear sheet flag on `pageshow` / `visibilitychange` visible + clearer timeout copy (unreleased — phone still loads `f4619a4`).
+**Earlier (stuck):** Joining free room `61702E42` opened Solana Mobile Wallet / Seed Vault. After return to Soldoku, status remained **Verify your wallet identity…** and **Join room** stayed `enabled=false` until force-stop. Root cause: `walletCall` treated the MWA sheet as still covering when Seeker did not deliver `focus` after Seed Vault; `sheetCapMs` is 10 minutes. Fix on product branch: clear sheet flag on `pageshow` / `visibilitychange` visible + clearer timeout copy (unreleased — phone still loads `f4619a4`).
+
+**Retry after owner force-stop (passed):** Cold rejoin (`seeker-rejoin-sign.mjs`) → room detail → **Join room** → MWA sheet → Seed Vault passcode UI → return to Soldoku with **Start challenge** (Join gone), participants **4 · open entry**. Then home wallet chip → sheet **Close**. Artifacts: `90-*`, `91-*`, `91-retry-results.json`.
+
+## Challenge play (61702E42) — same session
+
+Feedback loop: `scripts/seeker-challenge-start.mjs` + `scripts/seeker-challenge-play.mjs` (board parsed from narrow digit UI nodes; pad = wide `1`–`9` buttons). Results: `92-challenge-results.json`.
+
+| Phase | Status |
+|-------|--------|
+| Start challenge | passed (session cached; no new sign) |
+| Enter moves | passed (3 cells) |
+| Background / reopen | passed |
+| Complete puzzle | passed — **7:50.6 · rank 2** |
+| Leaderboard | passed — You `#2 E3DQ…DpJn` |
+| Reject wallet request | passed — MWA sheet BACK / Connect Close → home |
+
+Phone left **disconnected** after reject tests (Connect wallet on home). No deposit / funded path.
