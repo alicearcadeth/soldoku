@@ -20,7 +20,7 @@
 
 - **Branch:** `seeker-product-2026-10-09`  
 - **PR:** https://github.com/alicearcadeth/soldoku/pull/2  
-- **Reviewed tip:** `6accfca24ba58391e3e99fff8da0f941bb10185b`  
+- **Reviewed tip:** `3f8426e4ca88c0b4e33014b2be3e6c5983a9a3c5` (product fix `6accfca` + doc pins)  
 - **Live today:** `f4619a4` (unchanged until authorized deploy)  
 - **Backup:** `C:\Soldoku-reconstruct\backups\soldoku-2026-10-09-1551-39f7eea` (plus later backups if created)
 
