@@ -253,6 +253,31 @@ describe("Worker leaderboard persistence", () => {
       expect(transaction).not.toHaveBeenCalled();
     } finally { vi.mocked(competitionChain).mockReset(); }
   });
+  it("keeps card funding unavailable and refuses checkout creation", async () => {
+    const env = {
+      DB: database(),
+      ASSETS: { fetch: async () => new Response("asset") },
+      FIAT_FUNDING_MODE: "sandbox",
+      MOONPAY_PUBLISHABLE_KEY: "pk_test_example",
+      MOONPAY_SECRET_KEY: "sk_test_example",
+    };
+    const caps = await worker.fetch(new Request("https://soldoku.test/api/funding/card"), env);
+    expect(caps.status).toBe(200);
+    expect(await caps.json()).toMatchObject({ available: false, externalExecution: false, funded: false, admitsEntrant: false });
+    const created = await worker.fetch(new Request("https://soldoku.test/api/funding/card", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        destinationWallet: "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+        roomCode: "ABCD1234",
+        expectedBaseUnits: "1000000",
+      }),
+    }), env);
+    expect(created.status).toBe(403);
+    expect(await created.json()).toMatchObject({ funded: false, admitsEntrant: false, available: false, externalExecution: false });
+    const report = await worker.fetch(new Request("https://soldoku.test/api/funding/capabilities"), env);
+    expect(await report.json()).toMatchObject({ cardFunding: { available: false, externalExecution: false }, cardFundingAdapter: "disabled-production" });
+  });
   it("sends isolation headers and a script policy only on HTML", async () => {
     const env = { DB: database(), ASSETS: { fetch: async () => new Response("<!doctype html><script>\nconst ready = true;\n</script>", { headers: { "content-type": "text/html" } }) } };
     const page = await worker.fetch(new Request("https://soldoku.test/"), env);

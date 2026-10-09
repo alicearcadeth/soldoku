@@ -2,7 +2,18 @@
 
 Public app: https://soldoku.com/ and https://www.soldoku.com/
 
+## Deployed versus unreleased
+
+| Identity | Value |
+|----------|--------|
+| Deployed source (both domains) | `f4619a4d194ca03eef84df04080df38c7d6bad25` |
+| Release tag | `release/devnet-f4619a4-2026-10-09` |
+| Private branch with reconstruct history | `reconstruct-2026-10-08` |
+| Card-funding foundations | Pushed as unreleased source only; external execution disabled; not deployed |
+
 This is the Devnet Soldoku beta. Stakes are TEST and have no cash value. Mainnet staking is not enabled. New testers obtain Devnet SOL and TEST from the in-app test-funds control. See [testers.md](testers.md).
+
+Deferred: physical Seeker validation (real connect, message signing, deposit, claim/refund, lifecycle, recovery) remains on the backlog and does not block this phase.
 
 The Android shell package is `com.sudoku.game`. Its release URL is `https://soldoku.com/`. A rebuilt APK may replace `submission/sudoku-clockin.apk` only when its certificate SHA-256 is `28e197708d1dc9de80f1e23939352bcd6a80e1171717055205f5394a622c5553`.
 

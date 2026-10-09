@@ -1,4 +1,5 @@
 import { applyProviderEvent, createFiatSession, type FiatRecord, type ProviderEvent } from "./fiatFunding";
+import { activationRequirements, selectCardFundingAdapter } from "./cardFunding";
 import { createMoonpaySession, interpretMoonpayStatus, moonpayDestination, moonpayEnvironment, verifyMoonpayWebhook, type MoonpayKeys } from "./moonpay";
 import { prohibitedForWagering, PUBLIC_FIAT_WAGERING, selectableForSandbox } from "./providerPolicy";
 
@@ -101,13 +102,17 @@ export async function moonpayWebhookEvent(keys: Pick<MoonpayKeys, "webhookKey">,
   };
 }
 
-export function capabilityBody(env: { DFLOW_API_KEY?: string; MOONPAY_PUBLISHABLE_KEY?: string; FIAT_FUNDING_MODE?: string }) {
+export function capabilityBody(env: { DFLOW_API_KEY?: string; MOONPAY_PUBLISHABLE_KEY?: string; FIAT_FUNDING_MODE?: string; SUDOKU_CARD_FUNDING_MODE?: string }) {
+  const cardAdapter = selectCardFundingAdapter(env.SUDOKU_CARD_FUNDING_MODE);
   return {
     ...fundingCapabilityReport({
       dflowConfigured: Boolean(env.DFLOW_API_KEY),
       moonpayPublishableKey: env.MOONPAY_PUBLISHABLE_KEY ?? "",
     }),
     sandboxCheckout: env.FIAT_FUNDING_MODE === "sandbox",
+    cardFunding: cardAdapter.capabilities(),
+    cardFundingActivation: activationRequirements(),
+    cardFundingAdapter: cardAdapter.id,
   };
 }
 

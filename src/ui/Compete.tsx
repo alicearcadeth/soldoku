@@ -868,8 +868,11 @@ export function Compete({ onExit, initialMode = "practice" }: Props) {
         {mode === "staked" && wallet && balances && (
           <p className="choice-note">{walletBalanceCopy(balances.sol, balances.token)}</p>
         )}
+        {mode === "staked" && (
+          <p className="choice-note" role="status">Card funding unavailable. Competition entry still requires a wallet-signed TEST deposit.</p>
+        )}
         {mode === "staked" && import.meta.env.DEV && new URLSearchParams(window.location.search).has("fiatSandbox") && (
-          <AddFunds stakeAtomic={stake} wallet={wallet} />
+          <AddFunds stakeAtomic={stake} wallet={wallet} roomCode={seat?.code || codeInput || "sandbox"} />
         )}
         {mode === "staked" && localnet && (
           <button type="button" className={shortClock ? "on" : ""} aria-pressed={shortClock} onClick={() => setShortClock((value) => !value)}>

@@ -1,0 +1,121 @@
+{
+  "announcedAt": "2026-10-09T02:08:28.021Z",
+  "announcement": "Brief Devnet funding window for a controlled two-wallet scheduled settlement round on soldoku.com. Pause restores immediately after controlled deposits finalize. Gameplay, cron settlement, claims, and refunds continue while paused.",
+  "origin": "https://soldoku.com/",
+  "cluster": "devnet",
+  "mode": "refund",
+  "players": [
+    "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+    "5Yj8tfWFSucMUyYZVdCRNFSw1QF3C1MbG7dbo8vFkkar"
+  ],
+  "transactions": [
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "signature": "2ichTi5ktsZWsXFQtGMRppvETnVDs8f5j6KY7LZK4Ee6cor6bFUjYjyP7H484xVU1F6U7dXVwAV4PGZ6LpLQNP1J",
+      "action": "deposit",
+      "explorer": "https://explorer.solana.com/tx/2ichTi5ktsZWsXFQtGMRppvETnVDs8f5j6KY7LZK4Ee6cor6bFUjYjyP7H484xVU1F6U7dXVwAV4PGZ6LpLQNP1J?cluster=devnet",
+      "at": "2026-10-09T02:08:42.897Z"
+    },
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "signature": "5s42HnGAyankYazYnZpX3QfscR1K7k8n9DbNWRwni1F96oXd8ySBg67Np3cr8cWEjiG1zmMXFArJB9Z1iJ33nCwP",
+      "action": "claim",
+      "explorer": "https://explorer.solana.com/tx/5s42HnGAyankYazYnZpX3QfscR1K7k8n9DbNWRwni1F96oXd8ySBg67Np3cr8cWEjiG1zmMXFArJB9Z1iJ33nCwP?cluster=devnet",
+      "at": "2026-10-09T02:10:23.506Z"
+    }
+  ],
+  "cron": {},
+  "pause": {
+    "before": {
+      "paused": true,
+      "status": 400,
+      "error": "New funded rooms are paused. Claims, refunds, and settlement still work."
+    },
+    "unpauseAttempt": {
+      "status": 0,
+      "stdout": "\n ⛅️ wrangler 4.149.0\n────────────────────\n🌀 Creating the secret for the Worker \"soldoku\"\n✨ Success! Uploaded secret SUDOKU_COMPETITION_PAUSED\n",
+      "stderr": ""
+    },
+    "afterUnpause": {
+      "paused": false,
+      "status": 400,
+      "error": "Connect your wallet and verify your competition session again."
+    },
+    "refundRestore": {
+      "status": 0,
+      "stdout": "\n ⛅️ wrangler 4.149.0\n────────────────────\n🌀 Creating the secret for the Worker \"soldoku\"\n✨ Success! Uploaded secret SUDOKU_COMPETITION_PAUSED\n",
+      "stderr": ""
+    },
+    "afterRefundRestore": {
+      "paused": true,
+      "status": 400,
+      "error": "New funded rooms are paused. Claims, refunds, and settlement still work."
+    },
+    "finalProbe": {
+      "paused": true,
+      "status": 400,
+      "error": "New funded rooms are paused. Claims, refunds, and settlement still work."
+    }
+  },
+  "passed": true,
+  "config": {
+    "enabled": true,
+    "cluster": "devnet",
+    "testerFaucet": true,
+    "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+    "authority": "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N",
+    "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+    "decimals": 6,
+    "playMs": 1800000,
+    "graceMs": 3600000
+  },
+  "balancesBefore": [
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "test": "34000000"
+    },
+    {
+      "wallet": "5Yj8tfWFSucMUyYZVdCRNFSw1QF3C1MbG7dbo8vFkkar",
+      "test": "11000000"
+    }
+  ],
+  "refund": {
+    "code": "BFF6D992",
+    "funded": {
+      "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+      "authority": "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N",
+      "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+      "decimals": 6,
+      "playMs": 1800000,
+      "graceMs": 3600000,
+      "id": "14840165444290998466",
+      "stakeUnits": "1000000",
+      "startsAt": 1791511809000,
+      "refundAt": 1791517209000,
+      "chainStatus": "pending",
+      "confirmedParticipants": 0,
+      "chainTime": 0,
+      "winner": null
+    },
+    "endsAt": 1791513609000,
+    "depositsFinalizedAt": "2026-10-09T02:08:46.242Z",
+    "claimSignature": "5s42HnGAyankYazYnZpX3QfscR1K7k8n9DbNWRwni1F96oXd8ySBg67Np3cr8cWEjiG1zmMXFArJB9Z1iJ33nCwP",
+    "chainStatus": "refunding",
+    "delta": "0",
+    "duplicateRejected": {
+      "status": 400,
+      "error": "Your escrow claim is already complete."
+    }
+  },
+  "balancesAfter": [
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "test": "34000000"
+    },
+    {
+      "wallet": "5Yj8tfWFSucMUyYZVdCRNFSw1QF3C1MbG7dbo8vFkkar",
+      "test": "11000000"
+    }
+  ],
+  "finishedAt": "2026-10-09T02:10:29.492Z"
+}

@@ -4,6 +4,7 @@ import { playEvent } from "./coach/play";
 import { runCoach } from "./coach/run";
 import { verifyClassic, verifyHistoryList, verifyName } from "./match/identity";
 import { decideQuote, orderUrl } from "./solana/dflow";
+import { cardFundingCapabilities, disabledProductionAdapter } from "./solana/cardFunding";
 import { capabilityBody, sandboxSessionBody, webhookBody } from "./solana/fundingProviders";
 import { applySettleSignatures, settledChainUpdate, settleSignaturesIn } from "./solana/recover";
 import { createCompetitionStore } from "./competition/store";
@@ -86,6 +87,7 @@ async function handleFetch(request: Request, env: Env): Promise<Response> {
     if (url.pathname === "/api/funding/capabilities") return Response.json(capabilityBody(env));
     if (url.pathname === "/api/funding/session") return fundingSession(request, env);
     if (url.pathname === "/api/funding/webhook") return fundingWebhook(request, env);
+    if (url.pathname === "/api/funding/card") return cardFundingDisabled(request, env);
     try {
       const matches = await loadApi(env);
       const body = request.method === "GET" ? {} : await request.json().catch(() => ({}));
@@ -388,6 +390,51 @@ async function fundingWebhook(request: Request, env: Env): Promise<Response> {
   if (request.method !== "POST") return Response.json({ error: "Webhooks are posted by the provider.", funded: false }, { status: 405 });
   const result = await webhookBody(env, await request.text(), request.headers.get("Moonpay-Signature-V2"));
   return Response.json(result.body, { status: result.status });
+}
+
+/** Card checkout stays unavailable. Credentials or FIAT_FUNDING_MODE cannot open this route. */
+async function cardFundingDisabled(request: Request, env: Env): Promise<Response> {
+  const caps = cardFundingCapabilities(env.SOLANA_CLUSTER === "localnet" ? "localnet" : "devnet");
+  if (request.method === "GET") {
+    return Response.json({ ...caps, funded: false, admitsEntrant: false }, { headers: { "cache-control": "no-store" } });
+  }
+  if (request.method !== "POST") {
+    return Response.json({ error: "Card funding is unavailable.", funded: false, admitsEntrant: false }, { status: 405 });
+  }
+  try {
+    const body = await request.json().catch(() => ({})) as {
+      destinationWallet?: string; roomCode?: string; assetMint?: string; expectedBaseUnits?: string; registrationDeadlineAt?: number;
+    };
+    const adapter = disabledProductionAdapter();
+    const opened = adapter.createCheckout({
+      existing: null,
+      sessionActor: null,
+      destinationWallet: String(body.destinationWallet || "11111111111111111111111111111111"),
+      roomCode: String(body.roomCode || "DISABLED"),
+      cluster: env.SOLANA_CLUSTER === "localnet" ? "localnet" : "devnet",
+      assetMint: String(body.assetMint ?? env.SUDOKU_COMPETITION_MINT ?? "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4"),
+      assetDecimals: 6,
+      expectedBaseUnits: BigInt(String(body.expectedBaseUnits ?? "1000000")),
+      registrationDeadlineAt: typeof body.registrationDeadlineAt === "number" ? body.registrationDeadlineAt : null,
+      nowMs: Date.now(),
+    });
+    return Response.json({
+      error: opened.ok ? "Card funding unavailable." : opened.error,
+      funded: false,
+      admitsEntrant: false,
+      available: false,
+      externalExecution: false,
+      intent: opened.ok ? null : opened.intent ?? null,
+    }, { status: 403 });
+  } catch (error) {
+    return Response.json({
+      error: error instanceof Error ? error.message : "Card funding is unavailable.",
+      funded: false,
+      admitsEntrant: false,
+      available: false,
+      externalExecution: false,
+    }, { status: 403 });
+  }
 }
 
 async function saveClassic(request: Request, env: Env): Promise<Response> {
