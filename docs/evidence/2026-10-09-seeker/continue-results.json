@@ -1,0 +1,126 @@
+{
+  "startedAt": "2026-10-09T06:23:50.248Z",
+  "scenarios": [
+    {
+      "name": "hosted-release-manifest",
+      "status": "passed",
+      "commit": "f4619a4d194ca03eef84df04080df38c7d6bad25",
+      "at": "2026-10-09T06:23:50.325Z"
+    },
+    {
+      "name": "cold-to-home",
+      "status": "failed",
+      "texts": [
+        "Friday, Oct 9",
+        "92°F",
+        "Gemini",
+        "Google",
+        "Wallet",
+        "Play Store",
+        "Meet",
+        "dApp Store",
+        "Phone",
+        "Messages",
+        "Chrome",
+        "Camera"
+      ],
+      "at": "2026-10-09T06:24:02.790Z"
+    },
+    {
+      "name": "loads-expected-product-shell",
+      "status": "failed",
+      "hasDevnet": false,
+      "at": "2026-10-09T06:24:02.790Z"
+    },
+    {
+      "name": "classic-controls",
+      "status": "failed",
+      "texts": [
+        "Friday, Oct 9",
+        "92°F",
+        "Gemini",
+        "Google",
+        "Wallet",
+        "Play Store",
+        "Meet",
+        "dApp Store",
+        "Phone",
+        "Messages",
+        "Chrome",
+        "Camera"
+      ],
+      "at": "2026-10-09T06:24:06.195Z"
+    },
+    {
+      "name": "classic-input-notes-undo",
+      "status": "failed",
+      "texts": [
+        "Friday, Oct 9",
+        "92°F",
+        "Gemini",
+        "Google",
+        "Wallet",
+        "Play Store",
+        "Meet",
+        "dApp Store",
+        "Phone",
+        "Messages",
+        "Chrome",
+        "Camera"
+      ],
+      "at": "2026-10-09T06:24:21.167Z"
+    },
+    {
+      "name": "lock-unlock-recovery",
+      "status": "passed",
+      "texts": [
+        "dtac.Better Together",
+        "100%",
+        "Unlock with PIN or fingerprint",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "0",
+        "Emergency",
+        "1:24",
+        "Charged"
+      ],
+      "at": "2026-10-09T06:24:29.127Z"
+    },
+    {
+      "name": "compete-browse",
+      "status": "failed",
+      "texts": [],
+      "at": "2026-10-09T06:24:37.045Z"
+    },
+    {
+      "name": "free-room-detail",
+      "status": "failed",
+      "reason": "View room not found",
+      "at": "2026-10-09T06:24:37.045Z"
+    },
+    {
+      "name": "wallet-sheet-cancel-close",
+      "status": "blocked",
+      "reason": "No connect/wallet chip to open sheet",
+      "at": "2026-10-09T06:24:43.977Z"
+    },
+    {
+      "name": "funded-room-read-only",
+      "status": "blocked",
+      "reason": "Room code entry UI not reached",
+      "at": "2026-10-09T06:24:51.213Z"
+    }
+  ],
+  "hostedReleaseProbe": {
+    "commit": "f4619a4d194ca03eef84df04080df38c7d6bad25",
+    "dirty": false
+  },
+  "finishedAt": "2026-10-09T06:24:51.213Z"
+}

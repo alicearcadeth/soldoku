@@ -1,8 +1,9 @@
 # Physical Seeker product test — 2026-10-09
 
-**Web environment under test:** installed APK loads `https://soldoku.com/` = deployed **`f4619a4`** (not unreleased `main` card UI).  
+**Web environment under test:** installed APK loads `https://soldoku.com/` = deployed **`f4619a4`** (not unreleased `main` / PR #2 UI).  
 **Device:** Seeker, Android 16 (serial redacted).  
-**APK:** `com.sudoku.game` `0.1.0` / `versionCode` 1. Pulled base.apk SHA-256 `bf4276273dc43f1609c464171180676dbf0f933c3da79f767eede8fb352a200c` (matches release record).  
+**APK identity:** see `APK-IDENTITY.md` — device pull and recovery copy both SHA-256 `bf4276273dc43f1609c464171180676dbf0f933c3da79f767eede8fb352a200c`.  
+**Ignored local copy (not committed):** `submission/soldoku-clockin.apk` (gitignored `*.apk`; copied from recovery for tooling only).  
 **Wallets present:** Seed Vault impl `1.1.1`, Solana Mobile Wallet (MWA host).
 
 This is agent-observed internal product testing. Not external usability validation.
@@ -11,31 +12,38 @@ This is agent-observed internal product testing. Not external usability validati
 
 | Scenario | Status | Notes |
 |----------|--------|-------|
-| Cold launch / relaunch | passed | Restores in-progress Classic (“Continue game”); Home reachable |
+| Hosted `/api/release` = f4619a4 | passed | Reconfirmed 2026-10-09 |
+| Cold launch / relaunch | passed | Restores Classic Continue; Home reachable (earlier pass) |
 | Home navigation | passed | Brand, mode cards, DEVNET pill |
 | Android Back | passed | Practice → home; pause sheet dismiss |
 | Settings | passed | Reachable from home/header |
-| Classic gameplay controls | passed | Pause, Notes, Undo, keypad visible |
-| Pause / timer / bg-fg | passed | Pause sheet; launcher Home → return recovers |
-| Practice entry | passed | FREE RACE / create-join UI |
-| Compete browse / room cards | passed | Active free rooms listed; View/Join |
-| Create → For tokens (deployed) | passed* | Form shown; **no** unreleased “Card funding unavailable” (expected on f4619a4) |
-| Card simulation absent | passed | No Simulate controls on device |
-| Wallet discovery (MWA) | passed | “Mobile Wallet Adapter · Detected · connect” |
-| MWA handoff | passed | `com.solanamobile.wallet/.MWABottomSheetActivity` launched from Soldoku |
-| Connection result | passed | Home shows truncated wallet `E3DQ…DpJn` after handoff |
-| Message proof / authorize | needs-owner | Competition session sign not completed in this pass |
-| Cancel / reject connect | not tested | Connection succeeded before cancel path exercised |
-| Account switch | not tested | Single account on device this session |
-| Funded Devnet deposit | not tested | Pause kept; no new unpause window requested |
-| Settlement / claim / refund on device | not tested | Prior API/cron evidence remains separate |
-| Offline / reconnect | partial | Wifi toggle; home still rendered (SW/cache) |
-| Process recreate (Classic pause) | passed | After `am kill`, relaunch restores pause sheet / Continue state |
-| Free room detail deep-link | blocked this pass | Cold restore opened Classic pause before Compete navigation completed |
-| Unreleased pause banner UX | fixed in source | Config lacked `paused`; see product PR (not on phone until deploy) |
+| Classic gameplay controls | passed | Pause, Notes, Undo, keypad |
+| Classic digit / notes / undo | passed (earlier) / blocked (later) | Later automation hit secure lock screen |
+| Pause / timer / bg-fg | passed | Pause sheet; launcher Home → return |
+| Process recreate | passed | `am kill` → pause/continue restore |
+| Practice entry | passed | FREE RACE UI |
+| Compete browse / room cards | passed | Active free rooms; View/Join |
+| Free room detail | passed (browse) / blocked (re-run) | Re-run stopped on lock screen before View room |
+| Create → For tokens (deployed) | passed* | No unreleased card-unavailable copy (expected on f4619a4) |
+| Card simulation absent | passed | No Simulate controls |
+| Wallet discovery (MWA) | passed | Detected · connect |
+| MWA handoff | passed | `MWABottomSheetActivity` from Soldoku |
+| Connection result | passed | Truncated wallet on home |
+| Message proof / authorize | needs-owner | Competition session sign |
+| Wallet sheet Close/cancel | blocked | Secure lock before re-test |
+| Account switch | not tested | |
+| Lock → PIN unlock | needs-owner | Secure keyguard; automation must not enter PIN |
+| Funded Devnet deposit | not tested | Pause held; no unpause requested |
+| Funded room read-only | blocked this re-run | Lock; prior API evidence for BFF6D992 separate |
+| Offline / reconnect | partial | Wifi toggle; cached home |
+| Pause banner (unreleased) | source fixed | PR #2; not on phone until deploy |
 
-\* Deployed product does not yet expose pause in `/api/competitions/config`; create still fails server-side when paused.
+\* Deployed create still fails server-side when paused; UI notice is PR #2 only.
 
 ## Card foundations
 
-Public `/api/funding/card` → `Unknown request` on live Worker. Capabilities show fiat providers `configured: false`. No production provider requests from device journey.
+Public `/api/funding/card` → `Unknown request` on live Worker. No production provider requests from device journey.
+
+## Continuation blocker (current)
+
+`mDreamingLockscreen=true` — Seeker shows **Unlock with PIN or fingerprint**. No Seed Vault reset or data clear attempted. Resume physical journeys after owner unlocks and opens Soldoku.
