@@ -1,6 +1,7 @@
 import { Brand } from "./ui/Brand";
 import { useEffect, useState } from "react";
 import { playerFacingError } from "./ui/boardInput";
+import { ABOUT_FUNDED_ROOMS, HELP_FUNDED_ROOMS } from "./ui/copy";
 import { ClassicGame } from "./ui/ClassicGame";
 import { Compete } from "./ui/Compete";
 import { Competitions } from "./ui/Competitions";
@@ -262,7 +263,7 @@ function HowToPlay({ onClose }: { onClose: () => void }) {
       <p>Notes pencils in a candidate. It does not fill the cell.</p>
       <p>A wrong digit counts as a mistake. The game stays playable.</p>
       <p>Practice is a free two-player race. Compete is a leaderboard: everyone plays the same grid once per wallet, and the fastest correct completion wins when the room closes. Your timer starts when you begin the challenge.</p>
-      <p>Leaderboard rooms currently have free entry. Token selection and USD estimates are available for planning; token deposits and payouts are not enabled for these rooms.</p>
+      <p>{HELP_FUNDED_ROOMS}</p>
       <button className="primary" type="button" onClick={onClose}>Close</button>
     </DialogFrame>
   );
@@ -297,7 +298,7 @@ function About({ onClose }: { onClose: () => void }) {
     <DialogFrame id="about-title" onClose={onClose}>
         <h2 id="about-title">About this beta</h2>
         <p>Classic is a solo Sudoku game on this device. No wallet.</p>
-        <p>Leaderboard competitions allow open entry until the deadline. Each wallet gets one timed attempt at the same grid. Rankings stay provisional until the room closes. A creator can extend the period only before another participant joins. Current leaderboard entry is free; token prices are market estimates.</p>
+        <p>{ABOUT_FUNDED_ROOMS}</p>
         <p>Practice is a free race. Create a room and share the code, or use Quick Match. No tokens move. A listed room leaves the public list after 20 minutes if nobody joins. A private code lasts about two hours.</p>
         <p>Previous two-player token races lock the same entry for both players: 1, 2, or 5 Devnet test tokens. Those tokens have no cash value. A Seeker uses the mobile wallet. A desktop browser can connect a wallet that supports the Wallet Standard. The entry is fixed when the room opens. If the other player never deposits, a refund opens when the join window ends. If a match cannot finish, either player can refund after the settle deadline, and both entries return. There is no conversion on this beta: deposit the test token for this room. A quote is not a deposit.</p>
         <p className="choice-note">This is a Devnet beta. It is not real-money play, a store release, or a security audit.</p>

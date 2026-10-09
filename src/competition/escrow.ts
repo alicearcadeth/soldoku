@@ -1,4 +1,4 @@
-import { PublicKey, SystemProgram, TransactionInstruction, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
+import { PublicKey, SystemProgram, Transaction, TransactionInstruction, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
 import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync } from "@solana/spl-token";
 
 export const COMPETITION_TEST_MINT = new PublicKey("7VaC5xJULHGQzsZsyUCaZ7BbLGNDENLjXiPbfbbRY84j");
@@ -66,4 +66,52 @@ export function competitionInstructions(program: PublicKey, id: bigint, mint = C
         writable(getAssociatedTokenAddressSync(mint, wallet)), writable(vault), readonly(TOKEN_PROGRAM_ID)]);
     },
   };
+}
+export type RelayBinding = {
+  action: "deposit" | "extend" | "claim"; wallet: string; roomId: string; mint: string; stake: string;
+  authority: string; owner: string; startsAt: number; endsAt: number; refundAt: number; program: string;
+};
+/** Reject a relay whose fee payer, program, room, mint, stake, deadlines, authority, or action differ from the room. */
+export function assertRelayedCompetitionTransaction(tx: Transaction, binding: RelayBinding) {
+  const program = new PublicKey(binding.program);
+  const wallet = new PublicKey(binding.wallet);
+  const mint = new PublicKey(binding.mint);
+  const authority = new PublicKey(binding.authority);
+  if (!tx.feePayer?.equals(wallet)) throw new Error("Competition transaction fee payer does not match this wallet.");
+  const built = competitionInstructions(program, BigInt(binding.roomId), mint);
+  const seconds = (ms: number) => BigInt(Math.floor(ms / 1000));
+  const stake = BigInt(binding.stake);
+  const expectedAta = getAssociatedTokenAddressSync(mint, wallet);
+  let matched = false;
+  for (const instruction of tx.instructions) {
+    if (instruction.programId.equals(ASSOCIATED_TOKEN_PROGRAM_ID)) {
+      const ata = instruction.keys[1]?.pubkey;
+      const owner = instruction.keys[2]?.pubkey;
+      const tokenMint = instruction.keys[3]?.pubkey;
+      if (!ata?.equals(expectedAta) || !owner?.equals(wallet) || !tokenMint?.equals(mint)) throw new Error("The claim destination or token account is a different entrant.");
+      continue;
+    }
+    if (!instruction.programId.equals(program)) throw new Error("Unrelated instructions cannot be relayed by the competition API.");
+    const tag = instruction.data[0];
+    if (!instruction.keys[0]?.pubkey.equals(built.room)) throw new Error("This transaction is for a different competition room.");
+    if (binding.action === "deposit" && tag !== 0 && tag !== 1) throw new Error("This transaction does not match the requested action.");
+    if (binding.action === "extend" && tag !== 2) throw new Error("This transaction does not match the requested action.");
+    if (binding.action === "claim" && tag !== 4 && tag !== 5) throw new Error("This transaction does not match the requested action.");
+    if (tag === 0) {
+      const opened = instruction.data.readBigUInt64LE(9);
+      const join = instruction.data.readBigInt64LE(17);
+      const deadline = instruction.data.readBigInt64LE(25);
+      const refund = instruction.data.readBigInt64LE(33);
+      if (opened !== stake || join !== seconds(binding.startsAt) || deadline !== seconds(binding.endsAt) || refund !== seconds(binding.refundAt) || !instruction.keys[2]?.pubkey.equals(authority)) {
+        throw new Error("Open instruction does not match this room's amount or deadline.");
+      }
+    }
+    if (tag === 1 && !instruction.keys[1]?.pubkey.equals(built.entry(wallet))) throw new Error("The join entry belongs to a different entrant.");
+    if (tag === 1 || tag === 4 || tag === 5) {
+      if (!instruction.keys[2]?.pubkey.equals(mint) || !instruction.keys[3]?.pubkey.equals(expectedAta)) throw new Error("The claim destination or token account is a different entrant.");
+    }
+    if ((tag === 4 || tag === 5) && !instruction.keys[1]?.pubkey.equals(built.entry(wallet))) throw new Error("The claim destination or token account is a different entrant.");
+    matched = true;
+  }
+  if (!matched) throw new Error("This transaction does not match the requested action.");
 }

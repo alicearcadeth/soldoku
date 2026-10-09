@@ -1,0 +1,164 @@
+{
+  "announcedAt": "2026-10-09T01:20:34.777Z",
+  "announcement": "Brief Devnet funding window for a controlled two-wallet scheduled settlement round on soldoku.com. Pause restores immediately after controlled deposits finalize. Gameplay, cron settlement, claims, and refunds continue while paused.",
+  "origin": "https://soldoku.com/",
+  "cluster": "devnet",
+  "mode": "winner+optional-refund",
+  "players": [
+    "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+    "5Yj8tfWFSucMUyYZVdCRNFSw1QF3C1MbG7dbo8vFkkar"
+  ],
+  "transactions": [
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "signature": "1mMd9nWNmAMv9iLBaqxdfFmGym1ZvSC6MPeF37ej3aEeEwmjCfms9J7JKNzgndKszBUZJpgFaTNDth6KfK32yKB",
+      "action": "deposit",
+      "explorer": "https://explorer.solana.com/tx/1mMd9nWNmAMv9iLBaqxdfFmGym1ZvSC6MPeF37ej3aEeEwmjCfms9J7JKNzgndKszBUZJpgFaTNDth6KfK32yKB?cluster=devnet",
+      "at": "2026-10-09T01:20:50.832Z"
+    },
+    {
+      "wallet": "5Yj8tfWFSucMUyYZVdCRNFSw1QF3C1MbG7dbo8vFkkar",
+      "signature": "rGVBKxXr1LHfwSKeAc1CSpwb3m2jJsfDVKiJD8J5qLPiyQM4g6sykeGg8b9VXtuqvhgxR8XCRUybH6sXpPQUARg",
+      "action": "deposit",
+      "explorer": "https://explorer.solana.com/tx/rGVBKxXr1LHfwSKeAc1CSpwb3m2jJsfDVKiJD8J5qLPiyQM4g6sykeGg8b9VXtuqvhgxR8XCRUybH6sXpPQUARg?cluster=devnet",
+      "at": "2026-10-09T01:21:01.273Z"
+    },
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "signature": "4KFwSYCvSjBJewx2xC6gzuXfn7QvH7tJhUmb7Kbty2mifNANrqX8aeQ8NCgoGKsPmNAEzyhfCtzjxYpEGmxD6VS8",
+      "action": "claim",
+      "explorer": "https://explorer.solana.com/tx/4KFwSYCvSjBJewx2xC6gzuXfn7QvH7tJhUmb7Kbty2mifNANrqX8aeQ8NCgoGKsPmNAEzyhfCtzjxYpEGmxD6VS8?cluster=devnet",
+      "at": "2026-10-09T02:06:31.265Z"
+    }
+  ],
+  "cron": {
+    "poll": {
+      "at": "2026-10-09T02:01:04.457Z",
+      "chainStatus": "awarded",
+      "settlementPhase": "confirmed",
+      "settlementSignature": "hHQo97tifZYpUJWZ9X6cDoFnLStWUCK3d1BukGZhA24ysaQEc7FBaCPt12H8NbQynxKksvuSNa2wfhUj2YVmMcE",
+      "settlementAlert": "",
+      "endsAt": 1791510738000,
+      "now": 1791511264457
+    },
+    "confirmedAt": "2026-10-09T02:01:04.458Z",
+    "signature": "hHQo97tifZYpUJWZ9X6cDoFnLStWUCK3d1BukGZhA24ysaQEc7FBaCPt12H8NbQynxKksvuSNa2wfhUj2YVmMcE",
+    "explorer": "https://explorer.solana.com/tx/hHQo97tifZYpUJWZ9X6cDoFnLStWUCK3d1BukGZhA24ysaQEc7FBaCPt12H8NbQynxKksvuSNa2wfhUj2YVmMcE?cluster=devnet",
+    "chainStatus": "awarded",
+    "chainConfirmation": "finalized",
+    "chainErr": null,
+    "laterPoll": {
+      "at": "2026-10-09T02:06:27.383Z",
+      "settlementSignature": "hHQo97tifZYpUJWZ9X6cDoFnLStWUCK3d1BukGZhA24ysaQEc7FBaCPt12H8NbQynxKksvuSNa2wfhUj2YVmMcE",
+      "phase": "confirmed",
+      "chainStatus": "awarded",
+      "alert": ""
+    }
+  },
+  "pause": {
+    "before": {
+      "paused": true,
+      "status": 400,
+      "error": "New funded rooms are paused. Claims, refunds, and settlement still work."
+    },
+    "unpauseAttempt": {
+      "status": 0,
+      "stdout": "\n ⛅️ wrangler 4.149.0\n────────────────────\n🌀 Creating the secret for the Worker \"soldoku\"\n✨ Success! Uploaded secret SUDOKU_COMPETITION_PAUSED\n",
+      "stderr": ""
+    },
+    "afterUnpause": {
+      "paused": false,
+      "status": 400,
+      "error": "Connect your wallet and verify your competition session again."
+    },
+    "restoreAttempt": {
+      "status": 0,
+      "stdout": "\n ⛅️ wrangler 4.149.0\n────────────────────\n🌀 Creating the secret for the Worker \"soldoku\"\n✨ Success! Uploaded secret SUDOKU_COMPETITION_PAUSED\n",
+      "stderr": ""
+    },
+    "afterRestore": {
+      "paused": true,
+      "status": 400,
+      "error": "New funded rooms are paused. Claims, refunds, and settlement still work."
+    },
+    "finalProbe": {
+      "paused": true,
+      "status": 400,
+      "error": "New funded rooms are paused. Claims, refunds, and settlement still work."
+    }
+  },
+  "passed": true,
+  "config": {
+    "enabled": true,
+    "cluster": "devnet",
+    "testerFaucet": true,
+    "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+    "authority": "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N",
+    "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+    "decimals": 6,
+    "playMs": 1800000,
+    "graceMs": 3600000
+  },
+  "balancesBefore": [
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "test": "33000000"
+    },
+    {
+      "wallet": "5Yj8tfWFSucMUyYZVdCRNFSw1QF3C1MbG7dbo8vFkkar",
+      "test": "12000000"
+    }
+  ],
+  "code": "821DB68C",
+  "funded": {
+    "id": "16271680663468066042",
+    "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+    "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+    "stakeUnits": "1000000",
+    "startsAt": 1791508938000,
+    "endsAt": 1791510738000,
+    "refundAt": 1791514338000,
+    "playMs": 1800000
+  },
+  "depositsFinalizedAt": "2026-10-09T01:21:05.345Z",
+  "escrow": "5zpsWnjf99yE2tXSQoseXCqUxgZwwAxDfLS6s9UqJyZY",
+  "vault": "DnRy8MgFSyYRUtuPsU2FKhSgKnA7ZqaQNDaQ3jVHEFQT",
+  "leaderboard": [
+    {
+      "name": "JCVs…kGM7",
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "you": true,
+      "completedMs": 29942,
+      "rank": 1
+    },
+    {
+      "name": "5Yj8…kkar",
+      "wallet": "5Yj8tfWFSucMUyYZVdCRNFSw1QF3C1MbG7dbo8vFkkar",
+      "you": false,
+      "completedMs": 42706,
+      "rank": 2
+    }
+  ],
+  "acceptedResultAt": "2026-10-09T01:23:00.402Z",
+  "claim": {
+    "signature": "4KFwSYCvSjBJewx2xC6gzuXfn7QvH7tJhUmb7Kbty2mifNANrqX8aeQ8NCgoGKsPmNAEzyhfCtzjxYpEGmxD6VS8",
+    "winnerDelta": "1000000",
+    "loserDelta": "-1000000",
+    "duplicateRejected": {
+      "status": 400,
+      "error": "Your escrow claim is already complete."
+    },
+    "duplicateDelta": "0"
+  },
+  "balancesAfter": [
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "test": "34000000"
+    },
+    {
+      "wallet": "5Yj8tfWFSucMUyYZVdCRNFSw1QF3C1MbG7dbo8vFkkar",
+      "test": "11000000"
+    }
+  ],
+  "finishedAt": "2026-10-09T02:06:39.355Z"
+}

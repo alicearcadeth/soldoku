@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { depositActionLabel, shortAddress, walletBalanceCopy, walletStatusDetail } from "./copy";
+import { ABOUT_FUNDED_ROOMS, depositActionLabel, HELP_FUNDED_ROOMS, shortAddress, walletBalanceCopy, walletStatusDetail } from "./copy";
 
 describe("player-facing money labels", () => {
   it("names the deposit amount without calling a wallet balance a deposit", () => {
@@ -8,6 +8,14 @@ describe("player-facing money labels", () => {
     expect(depositActionLabel(null, true)).toBe("Check deposit");
     expect(walletBalanceCopy(1_500_000_000, "3000000")).toContain("not a match deposit");
     expect(walletBalanceCopy(1_500_000_000, "3000000")).toContain("3 test tokens");
+  });
+
+  it("describes funded rooms as Devnet TEST and other symbols as previews", () => {
+    expect(HELP_FUNDED_ROOMS).toMatch(/Devnet TEST/);
+    expect(HELP_FUNDED_ROOMS).toMatch(/amount previews/);
+    expect(HELP_FUNDED_ROOMS).not.toMatch(/not enabled/);
+    expect(ABOUT_FUNDED_ROOMS).toMatch(/Devnet TEST/);
+    expect(ABOUT_FUNDED_ROOMS).toMatch(/amount previews/);
   });
 
   it("separates wallet handoff from escrow confirmation", () => {

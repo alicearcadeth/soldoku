@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "exitCode": 0,
+  "out": "docs/evidence/2026-10-09-card-funding-browser-rerun",
+  "scenarios": [
+    "production-unavailable",
+    "dev-preview-lanes"
+  ],
+  "providerHits": [],
+  "proves": "simulated/disabled UI only — not real payments or physical-wallet operation"
+}

@@ -75,6 +75,9 @@ describe("funding providers", () => {
     expect(JSON.stringify(report)).not.toContain(secret);
     expect(report.sandboxCheckout).toBe(true);
     expect(report.publicWagering).toBe(false);
+    expect(report.cardFunding).toMatchObject({ available: false, externalExecution: false });
+    expect(report.cardFundingAdapter).toBe("disabled-production");
+    expect(report.cardFundingActivation.length).toBeGreaterThan(3);
     const blocked = await sandboxSessionBody({}, { matchId: "ROOM", wallet, expectedAtomic: "1000000" });
     expect(blocked.status).toBe(403);
     expect(blocked.body.funded).toBe(false);

@@ -3,7 +3,8 @@ import nacl from "tweetnacl";
 import bs58 from "bs58";
 import { generatePuzzle } from "../engine/generate";
 import { LEVELS, type Puzzle } from "../engine/types";
-import { DAY_MS, type CompetitionView, type CompetitionSummary, type FundedConfig, type FundedTerms, type VerifiedChainRoom } from "./types";
+import { DAY_MS, type CompetitionView, type CompetitionSummary, type FundedConfig, type FundedTerms, type SettlementAttempt, type VerifiedChainRoom } from "./types";
+import { TESTER_COOLDOWN_MS } from "./testerFunds";
 import { competitionOutcome } from "./outcome";
 
 type Entrant = { actor: string; name: string; startedAt: number | null; completedMs: number | null; values: number[]; sequence: number; lastMoveAt: number; claimed?: boolean };
@@ -247,6 +248,18 @@ export function createCompetitionStore(now = Date.now, onSave?: (raw: string) =>
       return Boolean(funded && funded.chainStatus === "open" && !funded.settlementSignature && funded.confirmedParticipants >= 1 && at >= item.endsAt && at < funded.refundAt);
     }).map(item => item.code);
   }
+  function receiptReconciliationCodes() {
+    return rooms.filter(item => {
+      const funded = item.funded;
+      if (!funded) return false;
+      const attempts = [funded.settlement, ...(funded.settlementAlso ?? [])].filter((entry): entry is SettlementAttempt => Boolean(entry));
+      const unresolved = attempts.some(entry => entry.phase === "prepared" || entry.phase === "broadcast" || entry.phase === "unknown");
+      const synthetic = funded.settlementSignature === "chain-closed";
+      const confirmed = Boolean(funded.settlementSignature && funded.settlementSignature !== "chain-closed" && attempts.some(entry => entry.signature === funded.settlementSignature && entry.phase === "confirmed"));
+      if (confirmed || (funded.settlementClosure === "external" && !unresolved && !synthetic)) return false;
+      return synthetic || unresolved;
+    }).map(item => item.code);
+  }
   function settlementContext(code: unknown) {
     const item = room(code);
     if (!item.funded) throw new Error("This room has no escrow.");
@@ -255,7 +268,57 @@ export function createCompetitionStore(now = Date.now, onSave?: (raw: string) =>
   }
   function faucetContext(session: unknown) {
     const wallet = actor(session);
-    return { wallet, lastGrantAt: grants.find(item => item.wallet === wallet)?.at ?? null, now: now() };
+    const at = now();
+    return { wallet, lastGrantAt: grants.find(item => item.wallet === wallet)?.at ?? null, now: at,
+      recentGrants: grants.filter(item => at - item.at < TESTER_COOLDOWN_MS).length };
+  }
+  function settlementAttempts(code: unknown): SettlementAttempt[] {
+    const funded = room(code).funded;
+    if (!funded) return [];
+    return [funded.settlement, ...(funded.settlementAlso ?? [])].filter((item): item is SettlementAttempt => Boolean(item));
+  }
+  function settlementAttempt(code: unknown) { return room(code).funded?.settlement; }
+  function stageSettlement(code: unknown, attempt: SettlementAttempt) {
+    const funded = room(code).funded;
+    if (!funded) throw new Error("This room has no escrow.");
+    const retained = settlementAttempts(code).filter(item => item.signature !== attempt.signature);
+    const live = retained.filter(item => item.phase !== "failed" && item.phase !== "expired" && item.phase !== "confirmed");
+    if (live.length) {
+      funded.settlement = live[0];
+      funded.settlementAlso = [...retained.filter(item => item.signature !== live[0].signature), attempt];
+    } else {
+      funded.settlement = attempt;
+      funded.settlementAlso = retained;
+    }
+    save();
+  }
+  function completeSettlement(code: unknown, signature: string) {
+    const funded = room(code).funded;
+    if (!funded) throw new Error("This room has no escrow.");
+    if (signature === "chain-closed") throw new Error("A closed escrow is not a settlement receipt.");
+    funded.settlementSignature = signature;
+    delete funded.settlementClosure;
+    const attempts = settlementAttempts(code).map(item => item.signature === signature ? { ...item, phase: "confirmed" as const } : item);
+    const confirmed = attempts.find(item => item.signature === signature);
+    const rest = attempts.filter(item => item.signature !== signature);
+    if (confirmed) {
+      funded.settlement = confirmed;
+      funded.settlementAlso = rest.length ? rest : undefined;
+    }
+    save();
+  }
+  function recordExternalClosure(code: unknown) {
+    const funded = room(code).funded;
+    if (!funded) throw new Error("This room has no escrow.");
+    if (funded.settlementSignature === "chain-closed") delete funded.settlementSignature;
+    if (!funded.settlementSignature) funded.settlementClosure = "external";
+    save();
+  }
+  function setSettlementAlert(code: unknown, note: string) {
+    const funded = room(code).funded;
+    if (!funded) throw new Error("This room has no escrow.");
+    funded.settlementAlert = note;
+    save();
   }
   function reserveFaucet(wallet: string, at: number) {
     grants = grants.filter(item => item.wallet !== wallet);
@@ -268,5 +331,5 @@ export function createCompetitionStore(now = Date.now, onSave?: (raw: string) =>
     grants = next;
     save();
   }
-  return { route, snapshot, replace, syncChain, fundingContext, rememberSettlement, dueSettlementCodes, settlementContext, faucetContext, reserveFaucet, releaseFaucet };
+  return { route, snapshot, replace, syncChain, fundingContext, rememberSettlement, dueSettlementCodes, receiptReconciliationCodes, settlementContext, faucetContext, reserveFaucet, releaseFaucet, settlementAttempt, settlementAttempts, stageSettlement, completeSettlement, recordExternalClosure, setSettlementAlert };
 }

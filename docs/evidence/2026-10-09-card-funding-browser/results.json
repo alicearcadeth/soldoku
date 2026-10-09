@@ -1,0 +1,28 @@
+{
+  "browser": "Google Chrome (Playwright channel=chrome)",
+  "startedAt": "2026-10-09T05:07:57.365Z",
+  "scenarios": [
+    {
+      "name": "production-unavailable",
+      "origin": "http://127.0.0.1:4179/",
+      "unavailableCopy": true,
+      "previewAbsent": true,
+      "simulateAbsent": true,
+      "providerHits": []
+    },
+    {
+      "name": "dev-preview-lanes",
+      "origin": "http://127.0.0.1:5188/?fiatSandbox=1",
+      "previewPresent": true,
+      "providerHits": [],
+      "reloadRecovered": true,
+      "chromePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+    }
+  ],
+  "network": {
+    "paymentProviderHosts": [],
+    "blockedOrAbsent": true
+  },
+  "passed": true,
+  "finishedAt": "2026-10-09T05:08:24.527Z"
+}

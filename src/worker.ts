@@ -1,11 +1,15 @@
+import { createHash } from "node:crypto";
 import { feedbackAllowed, feedbackNote } from "./coach/feedback";
 import { playEvent } from "./coach/play";
 import { runCoach } from "./coach/run";
 import { verifyClassic, verifyHistoryList, verifyName } from "./match/identity";
 import { decideQuote, orderUrl } from "./solana/dflow";
+import { cardFundingCapabilities, disabledProductionAdapter } from "./solana/cardFunding";
+import { ensureCardFundingTables } from "./solana/cardFundingPersist";
 import { capabilityBody, sandboxSessionBody, webhookBody } from "./solana/fundingProviders";
 import { applySettleSignatures, settledChainUpdate, settleSignaturesIn } from "./solana/recover";
 import { createCompetitionStore } from "./competition/store";
+import { advanceRoomSettlement, mergeSettlementFields, type SettlementPersist } from "./competition/settlement";
 import { marketTokens } from "./competition/market";
 import { competitionChain, type CompetitionEnvironment } from "./competition/chain";
 import { prepareCompetitionRequest, type CompetitionRequest } from "./competition/funded";
@@ -56,6 +60,11 @@ export default {
     await settleDueCompetitions(env);
   },
   async fetch(request: Request, env: Env): Promise<Response> {
+    return withSecurityHeaders(await handleFetch(request, env));
+  },
+};
+
+async function handleFetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     if (url.pathname === "/api/release") {
       if (request.method !== "GET") return Response.json({ error: "Use GET for release information." }, { status: 405 });
@@ -79,6 +88,7 @@ export default {
     if (url.pathname === "/api/funding/capabilities") return Response.json(capabilityBody(env));
     if (url.pathname === "/api/funding/session") return fundingSession(request, env);
     if (url.pathname === "/api/funding/webhook") return fundingWebhook(request, env);
+    if (url.pathname === "/api/funding/card") return cardFundingDisabled(request, env);
     try {
       const matches = await loadApi(env);
       const body = request.method === "GET" ? {} : await request.json().catch(() => ({}));
@@ -116,8 +126,30 @@ export default {
       const message = error instanceof Error ? error.message : "Request failed";
       return Response.json({ error: message }, { status: 400 });
     }
-  },
-};
+}
+
+function nullBodyStatus(status: number): boolean {
+  return status === 101 || status === 204 || status === 205 || status === 304;
+}
+
+async function withSecurityHeaders(response: Response): Promise<Response> {
+  const headers = new Headers(response.headers);
+  headers.set("x-content-type-options", "nosniff");
+  headers.set("referrer-policy", "no-referrer");
+  if (nullBodyStatus(response.status)) {
+    return new Response(null, { status: response.status, statusText: response.statusText, headers });
+  }
+  const type = headers.get("content-type") ?? "";
+  if (type.includes("text/html")) {
+    const html = await response.clone().text();
+    const script = html.match(/<script>([\s\S]*?)<\/script>/);
+    const hash = script ? createHash("sha256").update(script[1].replaceAll("\r\n", "\n")).digest("base64") : "";
+    headers.set("content-security-policy", `script-src 'self'${hash ? ` 'sha256-${hash}'` : ""}; frame-ancestors 'none'`);
+    return new Response(html, { status: response.status, statusText: response.statusText, headers });
+  }
+  if (!headers.get("content-security-policy")?.includes("frame-ancestors")) headers.set("content-security-policy", "frame-ancestors 'none'");
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
 
 async function finishCompetition(env: Env, store: { snapshot(): string }, prepared: CompetitionRequest, stored: string | null): Promise<Response> {
   const headers = { "cache-control": "no-store" };
@@ -132,27 +164,49 @@ async function finishCompetition(env: Env, store: { snapshot(): string }, prepar
   }
 }
 
-async function persistCompetitionSnapshot(env: Env, next: string, expected: string | null) {
-  if (next === expected) return;
-  await env.DB.prepare("INSERT INTO competition_state (id, body) VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET body = excluded.body WHERE body = ?").bind(next, expected ?? "").run();
+async function persistCompetitionSnapshot(env: Env, next: string, expected: string | null): Promise<"saved" | "conflict" | "unchanged" | "error"> {
+  if (next === expected) return "unchanged";
+  try {
+    const written = await env.DB.prepare("INSERT INTO competition_state (id, body) VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET body = excluded.body WHERE body = ?").bind(next, expected ?? "").run();
+    if ((written.meta?.changes ?? 0) < 1) return "conflict";
+    return "saved";
+  } catch {
+    return "error";
+  }
+}
+
+function competitionPersist(env: Env, store: { snapshot(): string; replace(raw: string | null): void }, expected: { body: string | null }, codes: string[]): SettlementPersist {
+  return async () => {
+    const status = await persistCompetitionSnapshot(env, store.snapshot(), expected.body);
+    if (status === "saved") { expected.body = store.snapshot(); return "saved"; }
+    if (status === "unchanged") return "saved";
+    if (status !== "conflict") return "error";
+    const fresh = await env.DB.prepare("SELECT body FROM competition_state WHERE id = 1").first<{ body: string }>();
+    const base = fresh?.body ?? "";
+    if (!base) return "conflict";
+    store.replace(mergeSettlementFields(base, store.snapshot(), codes));
+    const retry = await persistCompetitionSnapshot(env, store.snapshot(), base);
+    if (retry === "saved" || retry === "unchanged") { expected.body = store.snapshot(); return "saved"; }
+    return "conflict";
+  };
 }
 
 async function settleDueCompetitions(env: Env): Promise<{ settled: string[] }> {
   const chain = competitionChain(env);
-  if (!chain) return { settled: [] };
+  const prepareSettlement = chain?.prepareSettlement;
+  const broadcastSettlement = chain?.broadcastSettlement;
+  const observeSettlement = chain?.observeSettlement;
+  if (!chain || !prepareSettlement || !broadcastSettlement || !observeSettlement) return { settled: [] };
   await env.DB.prepare("CREATE TABLE IF NOT EXISTS competition_state (id INTEGER PRIMARY KEY, body TEXT NOT NULL)").run();
   const row = await env.DB.prepare("SELECT body FROM competition_state WHERE id = 1").first<{ body: string }>();
   const store = createCompetitionStore(Date.now, undefined, chain.config);
   store.replace(row?.body ?? null);
+  const expected = { body: row?.body ?? null };
   const settled: string[] = [];
-  for (const code of store.dueSettlementCodes()) {
-    let signature: string | null;
-    try { signature = await chain.settle(store.settlementContext(code)); }
-    catch { continue; }
-    store.rememberSettlement(code, signature ?? "chain-closed");
-    settled.push(code);
+  for (const code of [...new Set([...store.dueSettlementCodes(), ...store.receiptReconciliationCodes()])]) {
+    const report = await advanceRoomSettlement(store, { read: chain.read, prepareSettlement, broadcastSettlement, observeSettlement }, code, competitionPersist(env, store, expected, [code]), Date.now());
+    if (report.confirmed) settled.push(code);
   }
-  if (settled.length) await persistCompetitionSnapshot(env, store.snapshot(), row?.body ?? null);
   return { settled };
 }
 
@@ -172,11 +226,18 @@ async function competitions(request: Request, env: Env): Promise<Response> {
       const row = await env.DB.prepare("SELECT body FROM competition_state WHERE id = 1").first<{ body: string }>();
       const store = createCompetitionStore(Date.now, undefined, chain?.config);
       store.replace(row?.body ?? null);
-      const prepared = await prepareCompetitionRequest(store, chain, request.method, url, body);
+      const expected = { body: row?.body ?? null };
+      const prepared = await prepareCompetitionRequest(store, chain, request.method, url, body, {
+        paused: env.SUDOKU_COMPETITION_PAUSED === "1",
+        persist: competitionPersist(env, store, expected, [String(body.code ?? "")]),
+      });
       const next = store.snapshot();
       if (request.method === "GET" || next === row?.body) return await finishCompetition(env, store, prepared, row?.body ?? null);
       const written = await env.DB.prepare("INSERT INTO competition_state (id, body) VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET body = excluded.body WHERE body = ?").bind(next, row?.body ?? "").run();
-      if ((written.meta?.changes ?? 0) > 0) return await finishCompetition(env, store, prepared, next);
+      if ((written.meta?.changes ?? 0) > 0) {
+        expected.body = next;
+        return await finishCompetition(env, store, prepared, next);
+      }
     }
     return Response.json({ error: "Room changed. Try the action again." }, { status: 409 });
   } catch (error) {
@@ -330,6 +391,53 @@ async function fundingWebhook(request: Request, env: Env): Promise<Response> {
   if (request.method !== "POST") return Response.json({ error: "Webhooks are posted by the provider.", funded: false }, { status: 405 });
   const result = await webhookBody(env, await request.text(), request.headers.get("Moonpay-Signature-V2"));
   return Response.json(result.body, { status: result.status });
+}
+
+/** Card checkout stays unavailable. Credentials or FIAT_FUNDING_MODE cannot open this route. */
+async function cardFundingDisabled(request: Request, env: Env): Promise<Response> {
+  // Schema is prepared early so later activation can persist without replacing the model.
+  await ensureCardFundingTables(env.DB);
+  const caps = cardFundingCapabilities(env.SOLANA_CLUSTER === "localnet" ? "localnet" : "devnet");
+  if (request.method === "GET") {
+    return Response.json({ ...caps, funded: false, admitsEntrant: false, persistenceReady: true }, { headers: { "cache-control": "no-store" } });
+  }
+  if (request.method !== "POST") {
+    return Response.json({ error: "Card funding is unavailable.", funded: false, admitsEntrant: false }, { status: 405 });
+  }
+  try {
+    const body = await request.json().catch(() => ({})) as {
+      destinationWallet?: string; roomCode?: string; assetMint?: string; expectedBaseUnits?: string; registrationDeadlineAt?: number;
+    };
+    const adapter = disabledProductionAdapter();
+    const opened = adapter.createCheckout({
+      existing: null,
+      sessionActor: null,
+      destinationWallet: String(body.destinationWallet || "11111111111111111111111111111111"),
+      roomCode: String(body.roomCode || "DISABLED"),
+      cluster: env.SOLANA_CLUSTER === "localnet" ? "localnet" : "devnet",
+      assetMint: String(body.assetMint ?? env.SUDOKU_COMPETITION_MINT ?? "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4"),
+      assetDecimals: 6,
+      expectedBaseUnits: BigInt(String(body.expectedBaseUnits ?? "1000000")),
+      registrationDeadlineAt: typeof body.registrationDeadlineAt === "number" ? body.registrationDeadlineAt : null,
+      nowMs: Date.now(),
+    });
+    return Response.json({
+      error: opened.ok ? "Card funding unavailable." : opened.error,
+      funded: false,
+      admitsEntrant: false,
+      available: false,
+      externalExecution: false,
+      intent: opened.ok ? null : opened.intent ?? null,
+    }, { status: 403 });
+  } catch (error) {
+    return Response.json({
+      error: error instanceof Error ? error.message : "Card funding is unavailable.",
+      funded: false,
+      admitsEntrant: false,
+      available: false,
+      externalExecution: false,
+    }, { status: 403 });
+  }
 }
 
 async function saveClassic(request: Request, env: Env): Promise<Response> {

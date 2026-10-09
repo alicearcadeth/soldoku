@@ -1,7 +1,8 @@
 import { Connection, Keypair, PublicKey, SystemProgram, SYSVAR_CLOCK_PUBKEY, Transaction, type TransactionInstruction } from "@solana/web3.js";
 import { createAssociatedTokenAccountIdempotentInstruction, createMintToInstruction, getAssociatedTokenAddressSync, getMint } from "@solana/spl-token";
+import bs58 from "bs58";
 import { CLUSTER_GENESIS } from "../solana/rpc";
-import { competitionInstructions, COMPETITION_TEST_MINT, COMPETITION_DEVNET_MINT, readCompetitionEntry, readCompetitionRoom } from "./escrow";
+import { assertRelayedCompetitionTransaction, competitionInstructions, COMPETITION_TEST_MINT, COMPETITION_DEVNET_MINT, readCompetitionEntry, readCompetitionRoom, type RelayBinding } from "./escrow";
 import { missingTesterTokenAccount, TESTER_SOL_AIRDROP, TESTER_SOL_FAUCET, TESTER_TOKEN_GRANT, type TesterPlan } from "./testerFunds";
 import type { FundedConfig, VerifiedChainRoom } from "./types";
 import type { createCompetitionStore } from "./store";
@@ -11,7 +12,10 @@ export type CompetitionEnvironment = {
   SUDOKU_COMPETITION_RPC?: string; SUDOKU_COMPETITION_LOCALNET?: string;
   SUDOKU_COMPETITION_PLAY_MS?: string; SUDOKU_COMPETITION_GRACE_MS?: string;
   SUDOKU_COMPETITION_MINT?: string; SUDOKU_COMPETITION_FAUCET_KEY?: string;
+  SUDOKU_COMPETITION_PAUSED?: string;
 };
+export type SettlementObservation = "confirmed" | "pending" | "unknown" | "failed" | "expired";
+export type PreparedSettlement = { serialized: string; signature: string; blockhash: string; lastValidBlockHeight: number; winner: string };
 type Context = ReturnType<ReturnType<typeof createCompetitionStore>["fundingContext"]>;
 export type PreparedCompetitionTransaction = { transaction: string; action: string; wallet: string; cluster: "devnet" | "localnet";
   room: string; mint: string; stakeUnits: string; startsAt: number; endsAt: number; refundAt: number; expiresAtBlockHeight: number };
@@ -22,7 +26,10 @@ export type CompetitionChain = {
   read(context: Context): Promise<VerifiedChainRoom | null>;
   transaction(context: Context, action: string, extraMs?: unknown): Promise<PreparedCompetitionTransaction>;
   settle(context: Context): Promise<string | null>;
-  submit(raw: unknown, wallet: string): Promise<string>;
+  prepareSettlement?(context: Context): Promise<PreparedSettlement | null>;
+  broadcastSettlement?(serialized: string): Promise<string>;
+  observeSettlement?(signature: string, lastValidBlockHeight: number): Promise<SettlementObservation>;
+  submit(raw: unknown, wallet: string, binding?: RelayBinding): Promise<string>;
   faucetConfigured: boolean;
   testerBalances(wallet: string): Promise<{ solLamports: number; testUnits: bigint }>;
   fundTester(wallet: string, plan: TesterPlan): Promise<{ solSignature: string | null; testSignature: string | null; note: string | null }>;
@@ -58,6 +65,7 @@ export function competitionChain(env: CompetitionEnvironment): CompetitionChain 
   }
   const config: FundedConfig = { program: program.toBase58(), authority: authority.publicKey.toBase58(), mint: supportedMint.toBase58(), decimals: 6,
     playMs: milliseconds(env.SUDOKU_COMPETITION_PLAY_MS, 1800000, 15000), graceMs: milliseconds(env.SUDOKU_COMPETITION_GRACE_MS, 3600000, 60000) };
+  const paused = env.SUDOKU_COMPETITION_PAUSED === "1";
   const connection = new Connection(endpoint, { commitment: "finalized", fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(12000) }) });
   // No process-global environment mutation. Each request's bindings own their connection/key.
   let verified: Promise<void> | undefined;
@@ -124,6 +132,7 @@ export function competitionChain(env: CompetitionEnvironment): CompetitionChain 
   }
   async function transaction(context: Context, action: string, extraMs?: unknown): Promise<PreparedCompetitionTransaction> {
     await verify();
+    if (paused && action === "deposit") throw new Error("New deposits are paused. Claims, refunds, and settlement still work.");
     const ix = bound(context); const wallet = new PublicKey(context.wallet); const terms = context.terms;
     const chain = await read(context); const now = Date.now();
     const instructions: TransactionInstruction[] = [];
@@ -161,7 +170,7 @@ export function competitionChain(env: CompetitionEnvironment): CompetitionChain 
       room: ix.room.toBase58(), mint: config.mint, stakeUnits: terms.stakeUnits, startsAt: chain?.startsAt ?? terms.startsAt,
       endsAt: chain?.endsAt ?? context.endsAt, refundAt: chain?.refundAt ?? terms.refundAt, expiresAtBlockHeight: latest.lastValidBlockHeight };
   }
-  async function settle(context: Context): Promise<string | null> {
+  async function prepareSettlement(context: Context): Promise<PreparedSettlement | null> {
     await verify(); const ix = bound(context); const chain = await read(context);
     if (!chain) throw new Error("Competition escrow has not been funded.");
     if (chain.status !== "open") return null;
@@ -171,16 +180,38 @@ export function competitionChain(env: CompetitionEnvironment): CompetitionChain 
     const latest = await connection.getLatestBlockhash("finalized");
     const tx = new Transaction({ feePayer: authority.publicKey, recentBlockhash: latest.blockhash }).add(ix.settle(authority.publicKey, winner));
     tx.sign(authority);
-    return connection.sendRawTransaction(tx.serialize(), { preflightCommitment: "finalized", maxRetries: 3 });
+    const signatureBytes = tx.signature;
+    if (!signatureBytes) throw new Error("Settlement transaction was not signed.");
+    return { serialized: Buffer.from(tx.serialize()).toString("base64"), signature: bs58.encode(signatureBytes), blockhash: latest.blockhash,
+      lastValidBlockHeight: latest.lastValidBlockHeight, winner: winner?.toBase58() ?? "" };
   }
-  async function submit(raw: unknown, wallet: string): Promise<string> {
+  async function broadcastSettlement(serialized: string): Promise<string> {
+    const bytes = Buffer.from(serialized, "base64");
+    return connection.sendRawTransaction(bytes, { preflightCommitment: "finalized", maxRetries: 3 });
+  }
+  async function observeSettlement(signature: string, lastValidBlockHeight: number): Promise<SettlementObservation> {
+    const status = await connection.getSignatureStatuses([signature], { searchTransactionHistory: true });
+    const value = status.value[0];
+    if (value?.err) return "failed";
+    if (value?.confirmationStatus === "finalized") return "confirmed";
+    if (value) return "pending";
+    const height = await connection.getBlockHeight("finalized");
+    if (height > lastValidBlockHeight) return "expired";
+    return "unknown";
+  }
+  async function settle(context: Context): Promise<string | null> {
+    const prepared = await prepareSettlement(context);
+    if (!prepared) return null;
+    return broadcastSettlement(prepared.serialized);
+  }
+  async function submit(raw: unknown, wallet: string, binding?: RelayBinding): Promise<string> {
     await verify();
+    if (!binding) throw new Error("Competition transaction is not bound to this room.");
     if (typeof raw !== "string" || raw.length > 2400) throw new Error("Invalid signed competition transaction.");
     const bytes = Buffer.from(raw, "base64"); const tx = Transaction.from(bytes);
     if (!tx.feePayer?.equals(new PublicKey(wallet)) || !tx.verifySignatures()) throw new Error("Competition transaction signatures do not match this wallet.");
-    // Relay only the exact purpose-built competition instructions, plus idempotent ATA recreation.
-    if (tx.instructions.some(instruction => !instruction.programId.equals(program)
-      && !instruction.programId.equals(new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")))) throw new Error("Unrelated instructions cannot be relayed by the competition API.");
+    assertRelayedCompetitionTransaction(tx, binding);
+    if (paused && binding.action === "deposit") throw new Error("New deposits are paused. Claims, refunds, and settlement still work.");
     return connection.sendRawTransaction(bytes, { preflightCommitment: "finalized", maxRetries: 3 });
   }
   async function testerBalances(wallet: string) {
@@ -221,5 +252,5 @@ export function competitionChain(env: CompetitionEnvironment): CompetitionChain 
     }
     return { solSignature, testSignature, note };
   }
-  return { config, cluster, verify, read, transaction, settle, submit, faucetConfigured: faucet !== null, testerBalances, fundTester };
+  return { config, cluster, verify, read, transaction, settle, prepareSettlement, broadcastSettlement, observeSettlement, submit, faucetConfigured: faucet !== null, testerBalances, fundTester };
 }

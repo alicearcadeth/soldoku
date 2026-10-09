@@ -3,6 +3,7 @@ export const TESTER_SOL_AIRDROP = 1_000_000_000;
 export const TESTER_TOKEN_FLOOR = 5_000_000n;
 export const TESTER_TOKEN_GRANT = 20_000_000n;
 export const TESTER_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+export const TESTER_GLOBAL_CAP = 50;
 export const TESTER_SOL_FAUCET = "https://faucet.solana.com";
 
 export type TesterPlan = { sol: boolean; test: boolean; note: string | null };
@@ -21,6 +22,7 @@ export function planTesterGrant(input: {
   lastGrantAt: number | null;
   now: number;
   faucetConfigured: boolean;
+  recentGrants?: number;
 }): TesterPlan {
   if (!Number.isSafeInteger(input.solLamports) || input.solLamports < 0) throw new Error("Invalid SOL balance.");
   if (input.testUnits < 0n) throw new Error("Invalid TEST balance.");
@@ -35,6 +37,9 @@ export function planTesterGrant(input: {
       throw new Error(`Test funds were already sent to this wallet. Try again in ${Math.ceil((TESTER_COOLDOWN_MS - elapsed) / 60000)} minutes.`);
     }
   }
+  const recent = input.recentGrants ?? 0;
+  if (!Number.isSafeInteger(recent) || recent < 0) throw new Error("Invalid faucet grant.");
+  if (recent >= TESTER_GLOBAL_CAP) throw new Error("The shared Devnet test-fund limit of 50 grants per 24 hours was reached. Try again later.");
   if (needsTest && !input.faucetConfigured && !needsSol) {
     throw new Error("TEST minting is not enabled on this server yet.");
   }

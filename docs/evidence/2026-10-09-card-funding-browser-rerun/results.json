@@ -1,0 +1,33 @@
+{
+  "browser": "Google Chrome (Playwright channel=chrome)",
+  "startedAt": "2026-10-09T05:19:46.381Z",
+  "scenarios": [
+    {
+      "name": "production-unavailable",
+      "origin": "http://127.0.0.1:4179/",
+      "unavailableCopy": true,
+      "previewAbsent": true,
+      "simulateAbsent": true,
+      "providerHits": []
+    },
+    {
+      "name": "dev-preview-lanes",
+      "origin": "http://127.0.0.1:5188/?fiatSandbox=1",
+      "previewPresent": true,
+      "providerHits": [],
+      "reloadRecovered": true,
+      "chromePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+    }
+  ],
+  "network": {
+    "paymentProviderHosts": [],
+    "blockedOrAbsent": true
+  },
+  "passed": true,
+  "runnerNotes": [
+    "Original 2026-10-09 run wrote passed:true then hung ~90s after success; outer kill reported exit 4294967295 (-1).",
+    "Cause: shell:true npx/vite children survived child.kill(); Tee-Object alone does not flip LASTEXITCODE (verified).",
+    "This runner uses cmd.exe /c without shell:true, taskkill /T /F, browser finally-close, and process.exit(0|1)."
+  ],
+  "finishedAt": "2026-10-09T05:20:01.428Z"
+}

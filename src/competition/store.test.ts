@@ -141,6 +141,22 @@ describe("leaderboard competition", () => {
     const persisted = JSON.parse(f.store.snapshot()).rooms[0];
     expect(() => f.call("/move", { code: room.code, actor: a.actor, sequence: 1, values: persisted.puzzle.solution, completedMs: 1 })).toThrow(/one cell/);
   });
+  it("rejects a move 119 ms after the previous one and accepts a move at 120 ms", () => {
+    const f = fixture(); const a = f.auth(); const room = f.create(a.actor);
+    const start = f.call("/start", { code: room.code, actor: a.actor });
+    const persisted = JSON.parse(f.store.snapshot()).rooms[0];
+    const first = [...start.you.board];
+    const empty = first.flatMap((value: number, index: number) => value === 0 ? [index] : []);
+    first[empty[0]] = persisted.puzzle.solution[empty[0]];
+    f.advance(200);
+    expect(f.call("/move", { code: room.code, actor: a.actor, sequence: 1, values: first }).you.sequence).toBe(1);
+    const second = [...first];
+    second[empty[1]] = persisted.puzzle.solution[empty[1]];
+    f.advance(119);
+    expect(() => f.call("/move", { code: room.code, actor: a.actor, sequence: 2, values: second })).toThrow(/one move at a time/);
+    f.advance(1);
+    expect(f.call("/move", { code: room.code, actor: a.actor, sequence: 2, values: second }).you.sequence).toBe(2);
+  });
   it("refuses token entry on the server instead of creating an unfunded paid room", () => {
     const f = fixture(); const a = f.auth();
     expect(() => f.call("/create", { actor: a.actor, mode: "tokens", token: { symbol: "SOL" }, stake: 5 })).toThrow(/unavailable/);
