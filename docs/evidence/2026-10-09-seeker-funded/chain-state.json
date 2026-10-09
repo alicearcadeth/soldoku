@@ -1,0 +1,104 @@
+{
+  "release": "0b3055bebe3d700c7c77fc869214261ab05d8817",
+  "observedAt": "2026-10-09T13:47:41.671Z",
+  "paused": true,
+  "before": [
+    {
+      "wallet": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+      "test": "20000000"
+    },
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "test": "34000000"
+    }
+  ],
+  "balances": [
+    {
+      "wallet": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+      "test": "20000000"
+    },
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "test": "34000000"
+    }
+  ],
+  "rooms": [
+    {
+      "code": "6D7076B2",
+      "name": "Seeker funded winner",
+      "participants": 1,
+      "endsAt": 1791555377000,
+      "funded": {
+        "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+        "authority": "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N",
+        "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+        "decimals": 6,
+        "playMs": 1800000,
+        "graceMs": 3600000,
+        "id": "9606513986927527561",
+        "stakeUnits": "1000000",
+        "startsAt": 1791553577000,
+        "refundAt": 1791558977000,
+        "chainStatus": "refunding",
+        "confirmedParticipants": 1,
+        "chainTime": 1791553577000,
+        "winner": null
+      },
+      "leaderboard": [],
+      "ownerDeposit": "63fnz1Mg8JEnWcbKjy4Bgazu7jz9SwFUc4HVT7DF2ujy1CRXmb7Fkm7efy8BYKqcHm9bTwBGKQ2iHLhvKAoe9YYH",
+      "ownerRefund": "5LSPDmu3rknC8wvthcPe2Jm3ghUXg9SDj8QTFRfoTE6Hv5Qjxie7R7e8jCByqYpAJdzHPWrMY1ZDa1SCH6B29Dsm",
+      "escrow": "6WSbYY3qpxfFsdC9NwELXjfjtF7vdVsSXSYH9zv5Wp2p",
+      "vault": "9tEWitEiPVURJcitvpkut79Ux2GtdpKwPXStrMni5KGJ",
+      "vaultAmount": "0",
+      "duplicateRejected": true,
+      "ownerRefundChainStatus": {
+        "confirmationStatus": "finalized",
+        "confirmations": null,
+        "err": null,
+        "slot": 509198399,
+        "status": {
+          "Ok": null
+        }
+      }
+    },
+    {
+      "code": "DA19BD20",
+      "name": "Seeker funded refund",
+      "participants": 1,
+      "endsAt": 1791555384000,
+      "funded": {
+        "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+        "authority": "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N",
+        "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+        "decimals": 6,
+        "playMs": 1800000,
+        "graceMs": 3600000,
+        "id": "8501083124330203599",
+        "stakeUnits": "1000000",
+        "startsAt": 1791553584000,
+        "refundAt": 1791558984000,
+        "chainStatus": "refunding",
+        "confirmedParticipants": 1,
+        "chainTime": 1791553584000,
+        "winner": null
+      },
+      "leaderboard": [],
+      "ownerDeposit": "SsaC7HiQ3oG6vhLUAEpuyN4QPMuVwx243tRcxVVyJKLCCSudRHTHvqK1eXqJVjL1fg95o193jUUvmu5dLyLpPHG",
+      "ownerRefund": "5dajxHXKsdLFGWfM48czpXpwJ4a7xtim5v37YtdZTtPc8QimpUBXw3vmu5PjTfpG8Ej7PGhEGQY8pMzjtJ1mNvu3",
+      "escrow": "3XHz8wzrG4jhMAGsBQ7vDsHk4q74bDqyHnCE5xFMRXgE",
+      "vault": "39DMDgD8a2wxFQBhbRCtgne6sjepyMVbVJkQP4QmFBHn",
+      "vaultAmount": "0",
+      "duplicateRejected": true,
+      "ownerRefundChainStatus": {
+        "confirmationStatus": "finalized",
+        "confirmations": null,
+        "err": null,
+        "slot": 509198425,
+        "status": {
+          "Ok": null
+        }
+      }
+    }
+  ],
+  "duplicateDelta": "0"
+}

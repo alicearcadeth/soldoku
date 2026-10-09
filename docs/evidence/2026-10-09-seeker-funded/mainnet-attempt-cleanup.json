@@ -1,0 +1,83 @@
+{
+  "release": "0b3055bebe3d700c7c77fc869214261ab05d8817",
+  "observedAt": "2026-10-09T13:40:18.962Z",
+  "paused": true,
+  "before": [
+    {
+      "wallet": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+      "test": "20000000"
+    },
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "test": "34000000"
+    }
+  ],
+  "balances": [
+    {
+      "wallet": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+      "test": "20000000"
+    },
+    {
+      "wallet": "JCVsKd4TMg1fvEs7rjf5YgLYbJfNC8Dwb4x1PchFkGM7",
+      "test": "34000000"
+    }
+  ],
+  "rooms": [
+    {
+      "code": "8BF91AC5",
+      "name": "Seeker funded winner",
+      "participants": 1,
+      "endsAt": 1791554971000,
+      "funded": {
+        "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+        "authority": "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N",
+        "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+        "decimals": 6,
+        "playMs": 1800000,
+        "graceMs": 3600000,
+        "id": "11718261369397635021",
+        "stakeUnits": "1000000",
+        "startsAt": 1791553171000,
+        "refundAt": 1791558571000,
+        "chainStatus": "refunding",
+        "confirmedParticipants": 1,
+        "chainTime": 1791553171000,
+        "winner": null
+      },
+      "leaderboard": [],
+      "ownerDeposit": "4VKqS7bymTThBSJ6Mj1mekiF3gsSsmAaVQ75oXnZqpaMZSgccS1jCdD7WH1bh3B3rowu6WSF1XCV6pYADXPzhN9p",
+      "ownerRefund": "437u84mxxv5K62uwzsroNqxigyd2yE4oe5pNk7wR7Yd9dkt28ehQbrZ7aY8Qer5h9492SUHCUNzYejdYRHwZf319",
+      "escrow": "BDajiUVpn48vt8AxoNXS5SyehQpvMbY5mSM6L8kGFSmm",
+      "vault": "6kVm432Azj563h16u7rd8SQLjebvop9uR819xK4TPUWi",
+      "vaultAmount": "0"
+    },
+    {
+      "code": "A7056F8B",
+      "name": "Seeker funded refund",
+      "participants": 1,
+      "endsAt": 1791554978000,
+      "funded": {
+        "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+        "authority": "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N",
+        "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+        "decimals": 6,
+        "playMs": 1800000,
+        "graceMs": 3600000,
+        "id": "15519549047201696731",
+        "stakeUnits": "1000000",
+        "startsAt": 1791553178000,
+        "refundAt": 1791558578000,
+        "chainStatus": "refunding",
+        "confirmedParticipants": 1,
+        "chainTime": 1791553178000,
+        "winner": null
+      },
+      "leaderboard": [],
+      "ownerDeposit": "xKJZ5uttwzhU3XimmWT9qZYdMdRLXGKLacmxumpEmgxKkR85VEefWvTw3naDDvrPvAGXaAExATwvYm9iT5vs5NP",
+      "ownerRefund": "2p6nvsV1xzAmtpKRpRZ7DD2EkNj6axEifFZwU5x7xPu3QizJA2xcZmSEfdn52VP2Ym6JhQvLTRBg5fW439wfQ1L1",
+      "escrow": "7Mg4pawPide8qANYta8a6fr9axa7pLv1TZQHuCtM319F",
+      "vault": "G9pqoPrspVbrBvfNAmBEiBhaMbBG2hG4Djy9sqjH2uQi",
+      "vaultAmount": "0"
+    }
+  ]
+}

@@ -91,7 +91,7 @@ export function assertRelayedCompetitionTransaction(tx: Transaction, binding: Re
       if (!ata?.equals(expectedAta) || !owner?.equals(wallet) || !tokenMint?.equals(mint)) throw new Error("The claim destination or token account is a different entrant.");
       continue;
     }
-    if (!instruction.programId.equals(program)) throw new Error("Unrelated instructions cannot be relayed by the competition API.");
+    if (!instruction.programId.equals(program)) throw new Error(`Unrelated instructions cannot be relayed by the competition API (program ${instruction.programId.toBase58()}).`);
     const tag = instruction.data[0];
     if (!instruction.keys[0]?.pubkey.equals(built.room)) throw new Error("This transaction is for a different competition room.");
     if (binding.action === "deposit" && tag !== 0 && tag !== 1) throw new Error("This transaction does not match the requested action.");

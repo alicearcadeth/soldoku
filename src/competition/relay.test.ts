@@ -39,6 +39,7 @@ describe("relayed competition transactions", () => {
       SystemProgram.transfer({ fromPubkey: player.publicKey, toPubkey: authority.publicKey, lamports: 1 }),
     ], [player]);
     expect(() => assertRelayedCompetitionTransaction(extra, binding)).toThrow(/Unrelated/);
+    expect(() => assertRelayedCompetitionTransaction(extra, binding)).toThrow(`program ${SystemProgram.programId.toBase58()}`);
   });
   it("rejects a claim whose destination is a different wallet and a claim submitted as a deposit", () => {
     const other = Keypair.generate();
