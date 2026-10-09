@@ -29,14 +29,14 @@ Living snapshot. Historical evidence folders keep their original wording; this f
 | Free room browse / LB read | Seeker + `d9a182a` | Passed (`61702E42`) |
 | Wallet connect cancel / MWA BACK | Seeker + `d9a182a` | Passed |
 | Existing-session join → Start, count +1, no hang | Seeker + `d9a182a` | Passed (`CA64EA8C`) |
-| Fresh Seed Vault message authorize on live tip | Seeker + `d9a182a` | Unverified — see `FRESH-MESSAGE-AUTH.md` |
+| Fresh Seed Vault message authorize on live tip | Seeker + `d9a182a` | **Passed** (`BTzc…fY9r` → `D878A8E1`) — `FRESH-MESSAGE-PASSED.md` |
 | Full Join → play → LB | Seeker + prior `f4619a4` | Passed historically — `7:50.6 · rank 2` |
 | Funded deposit / claim / refund on device | — | **Untested** this phase |
 | External-player pilot | — | **Not started** |
 
 ## Gaps
 
-1. Fresh message on `d9a182a`: session **still valid** as of 2026-10-09 18:18 ICT (`EXPIRY-CONFIRMATION.md`). Wait until after **2026-10-10 14:05 ICT** (or use another owner wallet), re-probe, then `seeker-fresh-message.mjs`. Do not clear storage.
+1. Fresh message on `d9a182a` closed via alt wallet (`FRESH-MESSAGE-PASSED.md`). Optional: redeploy `a907d1a` wallet-sheet fix so Get-wallet links stay hidden.
 2. Owner may authorize invites using `docs/pilot/FREE-COMPETITION-PILOT.md` — no invites under this phase alone.
 3. Bounded funded Devnet physical plan still needs separate pause-lift auth. Do not clear Soldoku/wallet app data.
 

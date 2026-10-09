@@ -118,15 +118,32 @@
       "verifyHang": false,
       "connectMwaObserved": true,
       "joinSeedVaultMessageObserved": false,
-      "note": "Existing-session join passed; fresh Seed Vault message on d9a182a unverified. AUTHORIZE-RETURN.md + FRESH-MESSAGE-AUTH.md",
+      "note": "Existing-session join passed; see later fresh-message-alt-wallet for Seed Vault message on d9a182a.",
       "at": "2026-10-09T10:56:24.613Z"
+    },
+    {
+      "name": "fresh-message-alt-wallet",
+      "status": "passed",
+      "kind": "physical-seeker",
+      "release": "d9a182a-hosted",
+      "wallet": "BTzc…fY9r",
+      "primaryWallet": "E3DQ…DpJn",
+      "roomCode": "D878A8E1",
+      "stake": 0,
+      "sawNativeMwa": true,
+      "sawSeedVault": true,
+      "cachedSessionSuspected": false,
+      "startChallenge": true,
+      "persistence": true,
+      "note": "Mode B: alt wallet Connect→MESSAGE→create free room. FRESH-MESSAGE-PASSED.md",
+      "at": "2026-10-09T12:04:14.554Z"
     }
   ],
-  "finishedAt": "2026-10-09T10:56:54.559Z",
+  "finishedAt": "2026-10-09T12:04:14.554Z",
   "corrections": [
     "Interrupted pm-clear+verify run remains inconclusive; later passes do not rewrite it.",
     "join-cancel-return is in-app Connect Close, not Seed Vault message authorization cancel.",
     "Pre-deploy 61702E42 full play evidence is f4619a4-hosted, not d9a182a approve-return proof.",
-    "Physical joining with an existing session passed; fresh physical message authorization on this release remains unverified."
+    "CA64EA8C was existing-session join; fresh message proven later via BTzc…fY9r / D878A8E1."
   ]
 }

@@ -65,7 +65,7 @@ Assumption rejected: a script named `postdeploy` does not prove deploy. Deploy i
 | Connect → MWA → BACK → usable Soldoku | **Passed** | `lifecycle-preserve.json` `wallet-cancel-return` path `native-mwa`; also postdeploy wallet-pause |
 | Join → in-app Connect Close → room (no hang) | **Passed** | `seeker-postdeploy.json` join-cancel-return |
 | Existing-session join → Start without Verify hang | **Passed** (`CA64EA8C`, 3→4) | See `AUTHORIZE-RETURN.md`. Connect used MWA; join reused competition session. |
-| Fresh Seed Vault message-sign on Join (`d9a182a`) | **Unverified** | No safe invalidation without storage clear; see `FRESH-MESSAGE-AUTH.md` |
+| Fresh Seed Vault message-sign on `d9a182a` | **Passed** (alt wallet) | `BTzc…fY9r` create `D878A8E1`; see `FRESH-MESSAGE-PASSED.md` |
 | Duplicate join after success | **Passed** | Join not offered; Start challenge only |
 
 ## 5. State-preserving lifecycle (`d9a182a`)
@@ -116,12 +116,12 @@ Existing funded rooms still listed via `/api/competitions` (e.g. `BFF6D992` refu
 | Surface | Verdict |
 |---------|---------|
 | Classic / Practice | **Ready** on deployed shell+`d9a182a` (pause/bg/Continue observed; Practice not re-exercised this close-out — prior Seeker evidence) |
-| Free competition | **Limited ready** — existing-session join on `CA64EA8C` passed; fresh message on `d9a182a` unverified; pilot pack in `docs/pilot/FREE-COMPETITION-PILOT.md` |
+| Free competition | **Limited ready** — existing-session + fresh message on `d9a182a` passed; pilot pack in `docs/pilot/FREE-COMPETITION-PILOT.md` |
 | Funded Devnet | **Paused / hold** — create/deposit paused; historical rooms readable; no new physical funded tx |
 | Card funding | **Deployed-disabled** — not unreleased; execution blocked |
 
 ## Owner actions still needed
 
-1. Fresh message on `d9a182a`: after natural expiry (~2026-10-10 14:01 ICT estimate) or with another owner wallet, Join a new free room → Seed Vault **message** → return. Disconnect alone is insufficient. Do not clear storage.
-2. Authorize invites separately using `docs/pilot/FREE-COMPETITION-PILOT.md`.
+1. Authorize invites separately using `docs/pilot/FREE-COMPETITION-PILOT.md`.
+2. Optional: deploy wallet Get-wallet UI fix (`a907d1a`) so Connect sheet stays clear on Seeker.
 3. Do **not** clear app/wallet data; do not lift pause / enable card / Mainnet.

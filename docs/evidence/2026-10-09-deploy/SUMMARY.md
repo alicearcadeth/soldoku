@@ -33,6 +33,6 @@ Command attempted: `pm clear --cache-only com.sudoku.game` (Soldoku only). Hung 
 | funded-pause-ui | passed | **Browser-only** |
 | Classic pause / bg / Continue | passed | Physical `d9a182a` |
 | existing-session join → Start (`CA64EA8C`) | passed | 3→4; no Verify hang; AUTHORIZE-RETURN.md |
-| fresh Seed Vault message on `d9a182a` | unverified | FRESH-MESSAGE-AUTH.md; natural expiry or other wallet |
+| fresh Seed Vault message on `d9a182a` | **passed** | alt wallet `BTzc…fY9r` → room `D878A8E1`; FRESH-MESSAGE-PASSED.md |
 
 Pre-deploy full Join→play→LB on `61702E42` remains under `docs/evidence/2026-10-09-seeker/` against hosted **`f4619a4`**.

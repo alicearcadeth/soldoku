@@ -1,6 +1,6 @@
 {
   "name": "alt-wallet-fresh-message-d9a182a",
-  "startedAt": "2026-10-09T11:40:13.102Z",
+  "startedAt": "2026-10-09T12:02:32.613Z",
   "hostedRelease": "d9a182a90f00487c5a08506f0db3a5987207b9fe",
   "releaseDirty": false,
   "phases": [
@@ -24,33 +24,155 @@
         "How to play",
         "About this beta"
       ],
-      "at": "2026-10-09T11:40:18.455Z"
+      "at": "2026-10-09T12:02:40.414Z"
     },
     {
       "name": "OWNER_ACTION_REQUIRED",
       "status": "waiting",
       "kind": "switch-wallet",
-      "instruction": "On the Seeker NOW:\n1) Open Seed Vault / Solana Mobile Wallet and SWITCH to a DIFFERENT owner account (not E3DQ…).\n2) Return to Soldoku.\n3) Tap Connect wallet → Mobile Wallet Adapter → approve CONNECT (PIN/biometrics).\nDo NOT clear Soldoku storage. Tell the chat when the new wallet chip shows on Home (or just approve — script is watching).",
+      "instruction": "On the Seeker NOW:\n1) In Seed Vault / Solana Mobile Wallet, SWITCH to a DIFFERENT account (not E3DQ…DpJn).\n2) Return to Soldoku.\n3) Tap ONLY «Mobile Wallet Adapter · Detected · connect» — do NOT tap Phantom/Solflare Get wallet.\n4) In the system MWA sheet pick that other account (or Phantom if that is the other wallet) → approve CONNECT.\nHome chip must NOT be E3DQ… Script is watching.",
       "top": "topResumedActivity=ActivityRecord{245217289 u0 com.sudoku.game/.MainActivity t65}",
-      "at": "2026-10-09T11:40:18.511Z"
+      "at": "2026-10-09T12:02:40.483Z"
     },
     {
       "name": "alt-connect",
-      "status": "needs-owner",
+      "status": "passed",
       "primaryChip": "E3DQ…DpJn",
-      "altChip": null,
+      "altChip": "BTzc…fY9r",
       "sameAsPrimary": false,
       "sawNativeMwa": true,
       "sawSeedVault": false,
       "texts": [
-        "connect.phantom.app"
+        "PAPER GRID",
+        "Settings",
+        "BTzc…fY9r",
+        "Soldoku",
+        "Play a solo game, race a friend, or climb the competition leaderboard.",
+        "DEVNET · TEST TOKENS · NO CASH VALUE",
+        "Continue game",
+        "New game",
+        "SOLO Play classic A quiet game. Pause whenever you want.",
+        "FREE Practice No wallet required. Same grid, two players.",
+        "LEADERBOARD Compete Free rooms: join with a wallet message, then Start. Fastest correct finish ranks.",
+        "How to play",
+        "About this beta"
       ],
-      "at": "2026-10-09T11:47:27.423Z"
+      "at": "2026-10-09T12:02:53.042Z"
+    },
+    {
+      "name": "create-tap",
+      "status": "passed",
+      "at": "2026-10-09T12:03:13.042Z"
+    },
+    {
+      "name": "OWNER_ACTION_REQUIRED",
+      "status": "waiting",
+      "kind": "message",
+      "instruction": "On the Seeker NOW: approve the Soldoku MESSAGE signature in Seed Vault / MWA (identity only — NOT a deposit). PIN/biometrics OK. Wait until the Quick-check slider appears.",
+      "top": "topResumedActivity=ActivityRecord{245217289 u0 com.sudoku.game/.MainActivity t65}",
+      "at": "2026-10-09T12:03:13.114Z"
+    },
+    {
+      "name": "fresh-message-handoff",
+      "status": "passed",
+      "sawNativeMwa": true,
+      "sawSeedVault": true,
+      "gateVisible": true,
+      "cachedSessionSuspected": false,
+      "texts": [
+        "Quick check before creating",
+        "Slide the solid dot onto the outlined dot, then verify.",
+        "Verify position",
+        "Cancel"
+      ],
+      "top": "topResumedActivity=ActivityRecord{245217289 u0 com.sudoku.game/.MainActivity t65}",
+      "at": "2026-10-09T12:03:31.113Z"
+    },
+    {
+      "name": "OWNER_ACTION_REQUIRED",
+      "status": "waiting",
+      "kind": "slider",
+      "instruction": "On the Seeker NOW: on Quick check, slide the solid dot onto the outlined target, tap Verify position, then Confirm create room.",
+      "top": "topResumedActivity=ActivityRecord{245217289 u0 com.sudoku.game/.MainActivity t65}",
+      "at": "2026-10-09T12:03:31.181Z"
+    },
+    {
+      "name": "create-room",
+      "status": "passed",
+      "roomCode": "D878A8E1",
+      "startVisible": true,
+      "texts": [
+        "Home",
+        "Settings",
+        "ONE GRID. YOUR FASTEST FINISH.",
+        "Room D878A8E1",
+        "Room code: ",
+        "D878A8E1",
+        "← Back to Rooms",
+        "Game mode",
+        "Sudoku · medium",
+        "Token",
+        "None · free entry",
+        "Stake per player",
+        "0",
+        "Approx. USD",
+        "$0.00",
+        "Competition period",
+        "1 day",
+        "Participants",
+        "1 · open entry",
+        "Status",
+        "Active",
+        "Best completion",
+        "No finishes yet",
+        "Ends 10/10/2026, 7:03:48 PM. No fixed player limit.",
+        "One attempt only. Your timer starts when you press Start challenge.",
+        "Start challenge",
+        "Extend room duration",
+        "Leaderboard"
+      ],
+      "at": "2026-10-09T12:03:53.848Z"
+    },
+    {
+      "name": "persistence",
+      "status": "passed",
+      "roomCode": "D878A8E1",
+      "start": true,
+      "join": false,
+      "texts": [
+        "Home",
+        "Settings",
+        "ONE GRID. YOUR FASTEST FINISH.",
+        "Room D878A8E1",
+        "Room code: ",
+        "D878A8E1",
+        "← Back to Rooms",
+        "Game mode",
+        "Sudoku · medium",
+        "Token",
+        "None · free entry",
+        "Stake per player",
+        "0",
+        "Approx. USD",
+        "$0.00",
+        "Competition period",
+        "1 day",
+        "Participants",
+        "1 · open entry",
+        "Status",
+        "Active",
+        "Best completion"
+      ],
+      "at": "2026-10-09T12:04:14.554Z"
     }
   ],
-  "finishedAt": "2026-10-09T11:47:27.423Z",
+  "finishedAt": "2026-10-09T12:04:14.554Z",
   "verdict": {
-    "freshMessagePassed": false,
-    "reason": "Alternate wallet connect not completed"
+    "freshMessagePassed": true,
+    "altWallet": "BTzc…fY9r",
+    "primaryWallet": null,
+    "roomCode": "D878A8E1",
+    "seedVaultOrMwaObserved": true,
+    "note": "Alternate wallet required Seed Vault/MWA message before create gate"
   }
 }

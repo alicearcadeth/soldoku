@@ -2,9 +2,8 @@
 
 ## Corrected result (authoritative)
 
-**Physical joining with an existing session passed; fresh physical message authorization on this release remains unverified.**
-
-Do not treat the `CA64EA8C` join as proof that a Seed Vault **message** signature occurred on live `d9a182a`. No wallet message sheet was observed during Join.
+**Physical joining with an existing session passed** (`CA64EA8C` / `E3DQ…`).  
+**Fresh physical message authorization on live `d9a182a` passed** via alternate wallet `BTzc…fY9r` (create free room `D878A8E1`) — see `FRESH-MESSAGE-PASSED.md`.
 
 ## Identities (reconfirmed)
 
@@ -39,7 +38,7 @@ Do not treat the `CA64EA8C` join as proof that a Seed Vault **message** signatur
 | Force-stop relaunch persistence | **passed** | Start challenge; Join not offered; count 4 |
 | Duplicate join | **passed** | Join not offered |
 | Background return | **passed** | Usable room UI |
-| Fresh Seed Vault **message** on Join (this release) | **unverified** | Join completed without `seedvault` / MWA as top activity |
+| Fresh Seed Vault **message** on this release | **passed** (alt wallet) | `BTzc…fY9r` → create `D878A8E1`; MWA + Seed Vault observed (`FRESH-MESSAGE-PASSED.md`) |
 
 ## Why Join skipped Seed Vault
 
@@ -50,5 +49,5 @@ Do not treat the `CA64EA8C` join as proof that a Seed Vault **message** signatur
 | Question | Answer |
 |----------|--------|
 | Existing-session physical join + return on `d9a182a`? | **Passed** |
-| Fresh physical message approval + return on `d9a182a`? | **Unverified** |
-| Small free-competition pilot technically ready? | **Limited yes** — join/persistence proven with session cache; fresh-message path still open; no invites under this prompt |
+| Fresh physical message approval + return on `d9a182a`? | **Passed** (alt wallet `BTzc…fY9r`) |
+| Small free-competition pilot technically ready? | **Yes, limited** — free path verified; funded/card paused; no invites until owner go-ahead |

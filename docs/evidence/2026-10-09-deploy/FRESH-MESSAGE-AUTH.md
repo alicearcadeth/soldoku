@@ -52,7 +52,6 @@ See `EXPIRY-CONFIRMATION.md` + `session-probe.json`.
 
 See `ALT-WALLET-ATTEMPT.md`. Primary disconnected; reconnects returned `E3DQ…` or stalled on `connect.phantom.app`. Fresh message still **unverified**.
 
-## This phase outcome
+## Outcome (updated)
 
-Fresh physical message authorization on `d9a182a`: **unverified**.  
-Scripts: `seeker-session-probe.mjs`, `seeker-alt-wallet-fresh.mjs`, `seeker-fresh-message.mjs`.
+Fresh physical message authorization on `d9a182a`: **passed** — Mode B alt wallet `BTzc…fY9r`, room `D878A8E1`. See `FRESH-MESSAGE-PASSED.md`.

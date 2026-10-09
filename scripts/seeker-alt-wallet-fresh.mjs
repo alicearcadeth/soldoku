@@ -163,10 +163,11 @@ if (walletConnected(t)) {
 prompt(
   "switch-wallet",
   "On the Seeker NOW:\n" +
-    "1) Open Seed Vault / Solana Mobile Wallet and SWITCH to a DIFFERENT owner account (not E3DQ…).\n" +
+    "1) In Seed Vault / Solana Mobile Wallet, SWITCH to a DIFFERENT account (not E3DQ…DpJn).\n" +
     "2) Return to Soldoku.\n" +
-    "3) Tap Connect wallet → Mobile Wallet Adapter → approve CONNECT (PIN/biometrics).\n" +
-    "Do NOT clear Soldoku storage. Tell the chat when the new wallet chip shows on Home (or just approve — script is watching).",
+    "3) Tap ONLY «Mobile Wallet Adapter · Detected · connect» — do NOT tap Phantom/Solflare Get wallet.\n" +
+    "4) In the system MWA sheet pick that other account (or Phantom if that is the other wallet) → approve CONNECT.\n" +
+    "Home chip must NOT be E3DQ… Script is watching.",
 );
 
 // Wait for Connect wallet then owner connects — or they may already be connecting
