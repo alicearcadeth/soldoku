@@ -5,20 +5,27 @@ export function walletCall<T>(pending: Promise<T>, graceMs = 8000, capMs = 25000
     let settled = false;
     let sawHidden = false;
     let sheetUp = false;
+    /** After pageshow/visible, Seeker may still report hasFocus()===false; do not treat that as the sheet covering. */
+    let pageForeground = false;
     let returnedAt = 0;
     let mark = Date.now();
     const started = mark;
     const onBlur = () => {
       sheetUp = true;
+      pageForeground = false;
       returnedAt = 0;
     };
     /** Focus alone is unreliable on Seeker after Seed Vault; clear the sheet flag when the page is shown again. */
     const onReturned = () => {
       sheetUp = false;
+      pageForeground = true;
       check();
     };
     const onVisibility = () => {
-      if (document.visibilityState === "visible") sheetUp = false;
+      if (document.visibilityState === "visible") {
+        sheetUp = false;
+        pageForeground = true;
+      }
       check();
     };
     const stop = () => {
@@ -37,7 +44,8 @@ export function walletCall<T>(pending: Promise<T>, graceMs = 8000, capMs = 25000
     const check = () => {
       if (settled) return;
       const now = Date.now();
-      const covered = sheetUp || document.visibilityState === "hidden" || document.hasFocus() === false;
+      const unfocused = document.hasFocus() === false && !pageForeground;
+      const covered = sheetUp || document.visibilityState === "hidden" || unfocused;
       if (now - mark > 1500 || covered) sawHidden = true;
       mark = now;
       if (covered) {

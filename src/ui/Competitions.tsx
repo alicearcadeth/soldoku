@@ -182,7 +182,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
     } catch (error) {
       const text = error instanceof Error ? error.message : "";
       if (/session timeout/i.test(text)) {
-        throw new Error("Wallet signing timed out. Approve the message in Seed Vault, or try Join again.");
+        throw new Error("Wallet signing timed out. Approve or cancel in Seed Vault, then try Join again.");
       }
       throw error;
     }
@@ -408,7 +408,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
         <div className="pad">{Array.from({ length: 9 }, (_, index) => <button key={index} disabled={Boolean(busy) || Boolean(givens[selected])} onClick={() => void move(index + 1)}>{index + 1}</button>)}</div><button className="secondary" disabled={Boolean(busy) || Boolean(givens[selected])} onClick={() => void move(0)}>Erase</button>
       </> : <>
         <RoomFacts room={{ ...room, status: active ? "active" : "ended" }} /><p className="choice-note">Ends {new Date(room.endsAt).toLocaleString()}. No fixed player limit.</p>
-        {room.you?.completedMs != null && <p className="banner">Finished in {elapsedLabel(room.you.completedMs)} · rank {room.you.rank}{active ? " so far. Rankings can change until the room closes." : ". Competition ended."}</p>}
+        {room.you?.completedMs != null && <><p className="banner">Finished in {elapsedLabel(room.you.completedMs)} · rank {room.you.rank}{active ? " so far. Rankings can change until the room closes." : ". Competition ended."}</p><p className="choice-note">Share this room’s code to invite others, or use Back to Rooms for another competition.</p></>}
         {!active && <p className="banner">Competition ended. {room.bestMs === null ? "No player completed the grid in time." : room.funded ? "The unique fastest verified completion wins. Exact fastest ties refund all entrants." : "The fastest verified completion is the winning time. Equal times share first place."}</p>}
         {room.funded && <section className="stack" aria-label="Escrow competition status"><p className="choice-note">{fundingConfig?.cluster === "localnet" ? "Local validator" : "Devnet"} · TEST entry</p>{fundingConfig && <details><summary>Need test funds?</summary><TesterFunds busy={Boolean(busy)} note={fundNote} faucet={Boolean(fundingConfig.testerFaucet)} onRequest={() => void requestTesterFunds()} /></details>}<p role="status">{escrowNotice(room, now)}</p><p className="choice-note">Fastest unique finish wins the pool. Ties or no finishes refund everyone.</p>
           {room.you && <p className="banner">{room.you.claimed ? "Your claim is complete." : "Your stake is confirmed in escrow."}</p>}
@@ -418,7 +418,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
           {canClaim && <button className="primary" disabled={Boolean(busy)} onClick={() => void claim()}>{room.funded.chainStatus === "awarded" ? "Claim winner payout" : "Claim stake refund"}</button>}
           {receipt?.code === room.code && <p className="choice-note">{receipt.cluster === "devnet" ? <a href={`https://explorer.solana.com/tx/${encodeURIComponent(receipt.signature)}?cluster=devnet`} target="_blank" rel="noreferrer">View transaction</a> : "Local validator transaction submitted."}</p>}
         </section>}
-        {canJoin && !room.you && <button className="primary" disabled={Boolean(busy)} onClick={() => void join(room.code)}>{room.funded ? `Deposit ${room.stake} TEST to join` : "Join room"}</button>}
+        {canJoin && !room.you && <><p className="choice-note">Join verifies your wallet with a message signature (no deposit for free rooms). Your timer starts only when you press Start challenge.</p><button className="primary" disabled={Boolean(busy)} onClick={() => void join(room.code)}>{room.funded ? `Deposit ${room.stake} TEST to join` : "Join room"}</button></>}
         {room.funded && !room.you && <button className="secondary" disabled={Boolean(busy)} onClick={() => void action("Checking your escrow entry", async () => {
           const auth = await identity(); if (!auth) return;
           const recovered = await api<CompetitionView>("/api/competitions/sync", { code: room.code, actor: auth.actor });
