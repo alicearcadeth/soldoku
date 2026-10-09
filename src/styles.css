@@ -553,7 +553,7 @@ button:disabled { cursor: not-allowed; }
 .token-picker { display: flex; flex-direction: column; gap: 4px; }
 .token-picker span { color: var(--muted); font-size: 0.85rem; }
 .token-picker strong { font-size: 1.1rem; }
-.stake-presets button { display: flex; flex-direction: column; gap: 4px; min-height: 68px; }
+.stake-presets button { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 4px; min-height: 68px; }
 .stake-presets span { font-size: 0.75rem; }
 .quote-total { margin: 0; padding: 14px; background: var(--match); border-radius: 12px; font-weight: 650; font-variant-numeric: tabular-nums; }
 .token-result small { overflow-wrap: anywhere; font-size: 0.7rem; }

@@ -8,6 +8,8 @@ export function TokenStake({ onChange, supportedMint }: { onChange: (token: Mark
   const [token, setToken] = useState<MarketToken | null>(null);
   const [mint, setMint] = useState(supportedMint ?? SOL_MINT);
   const isTest = Boolean(supportedMint && mint === supportedMint);
+  // Product label only: keep the configured mint and TEST symbol unchanged.
+  const displaySymbol = isTest ? "Soldoku" : token?.symbol ?? "tokens";
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<MarketToken[]>([]);
@@ -81,12 +83,13 @@ export function TokenStake({ onChange, supportedMint }: { onChange: (token: Mark
   return <section className="stack stake-section" aria-label="Token entry">
     <button className="secondary token-picker" onClick={() => setOpen(true)}><span>Choose token</span><strong>{isTest ? "Soldoku Token" : token?.symbol ?? "Choose token"} ▾</strong></button>
     {token && <div className="quote-line"><strong>{token.name} · {token.symbol}</strong><span>{price > 0 ? `${usdLabel(price)} per token` : isTest ? "No cash value" : "Price unavailable"}</span></div>}
-    <div className="tools stake-presets" role="group" aria-label="Entry amount">{[1, 2, 5].map(value => <button key={value} aria-pressed={kind === "tokens" && Number(input) === value} className={kind === "tokens" && Number(input) === value ? "on" : ""} onClick={() => { setKind("tokens"); setInput(String(value)); }}><strong>{value} {token?.symbol ?? "tokens"}</strong><span>{price > 0 ? `≈ ${usdLabel(value * price)}` : isTest ? "No cash value" : "USD unavailable"}</span></button>)}</div>
+    <div className="tools stake-presets" role="group" aria-label="Entry amount">{[1, 2, 5].map(value => <button key={value} aria-pressed={kind === "tokens" && Number(input) === value} className={kind === "tokens" && Number(input) === value ? "on" : ""} onClick={() => { setKind("tokens"); setInput(String(value)); }}><strong>{value} {displaySymbol}</strong><span>{price > 0 ? `≈ ${usdLabel(value * price)}` : isTest ? "No cash value" : "USD unavailable"}</span></button>)}</div>
+    <p className="choice-note">Choose a preset or enter your own amount, such as 3 or 10.</p>
     <div className="amount-fields">
-      <label>Token amount<input type="number" inputMode="decimal" step="any" min="0" aria-label="Token amount" value={kind === "tokens" ? input : amount > 0 ? amountText : ""} onChange={event => { setKind("tokens"); setInput(event.target.value); }} /></label>
+      <label>Custom token amount<input type="number" inputMode="decimal" step="any" min="0" aria-label="Token amount" value={kind === "tokens" ? input : amount > 0 ? amountText : ""} onChange={event => { setKind("tokens"); setInput(event.target.value); }} /></label>
       <label>USD value<input type="number" inputMode="decimal" step="any" min="0" aria-label="USD value" disabled={price <= 0} value={kind === "usd" ? input : usd > 0 ? usdText : ""} onChange={event => { setKind("usd"); setInput(event.target.value); }} /></label>
     </div>
-    <p className="quote-total" aria-live="polite">{price > 0 && amountText ? `${amountText} ${token?.symbol} ≈ ${usdLabel(usd)}` : amountText && token ? `${amountText} ${token.symbol}` : "Enter a positive amount."}</p>
+    <p className="quote-total" aria-live="polite">{price > 0 && amountText ? `${amountText} ${displaySymbol} ≈ ${usdLabel(usd)}` : amountText && token ? `${amountText} ${displaySymbol}` : "Enter a positive amount."}</p>
     {!isTest && <p className="choice-note">{loading ? "Updating price…" : "Approximate market value; prices may change."}</p>}
     {error && <p className="alert" role="alert">{error}</p>}
     {open && <DialogFrame id="token-title" onClose={() => setOpen(false)}>
