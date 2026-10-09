@@ -64,8 +64,9 @@ Assumption rejected: a script named `postdeploy` does not prove deploy. Deploy i
 |----------|--------------|----------|
 | Connect → MWA → BACK → usable Soldoku | **Passed** | `lifecycle-preserve.json` `wallet-cancel-return` path `native-mwa`; also postdeploy wallet-pause |
 | Join → in-app Connect Close → room (no hang) | **Passed** | `seeker-postdeploy.json` join-cancel-return |
-| Competition message authorize → return without Verify hang | **Needs owner** | Seed Vault PIN/biometric; not completed on `d9a182a`. Fix is **in deployed JS** (source + asset). Prior approve success was on `f4619a4` after force-stop workaround |
-| Duplicate participant from repeated cancel | **Not observed** | Room stayed 4 participants; Join still offered while disconnected |
+| Competition join → Start challenge without Verify hang | **Passed** (`CA64EA8C`, 3→4) | See `AUTHORIZE-RETURN.md`. Connect used MWA; join reused day-long competition session (no fresh Seed Vault message sheet observed). |
+| Fresh Seed Vault message-sign on Join | **Not re-observed** | Would need session clear/expiry (not authorized this phase) |
+| Duplicate join after success | **Passed** | Join not offered; Start challenge only |
 
 ## 5. State-preserving lifecycle (`d9a182a`)
 
@@ -103,21 +104,22 @@ Existing funded rooms still listed via `/api/competitions` (e.g. `BFF6D992` refu
 - Evidence corrections + assessment docs/scripts under `docs/evidence/2026-10-09-deploy/`
 - Seeker helper scripts (no product runtime change required; no defect fix beyond documentation honesty)
 - Status docs updated to merged/deployed identity
-- Tests run: `pendingTx`, `settlement`, `walletCall` — 38 passed
-- Pushed commit: `3e8504f` on private `github/main` (docs/evidence only; live Worker remains `d9a182a`)
-- Backup: `C:\Soldoku-reconstruct\backups\soldoku-main-2026-10-09-3e8504f` (+ `soldoku-3e8504f.bundle` verified)
+- Authorize-return physical pass on free room `CA64EA8C` (`AUTHORIZE-RETURN.md`, `authorize-return.json`, `40-*` / `30-*` screenshots)
+- Tests run: `pendingTx`, `settlement`, `walletCall` — 38 passed (earlier close-out)
+- Prior evidence pushes: `3e8504f`, `e79f6ee` on private `github/main` (docs only; live Worker remains `d9a182a`)
+- This evidence push + backup follow commit (see git tip after push)
 
 ## 9. Verdicts
 
 | Surface | Verdict |
 |---------|---------|
 | Classic / Practice | **Ready** on deployed shell+`d9a182a` (pause/bg/Continue observed; Practice not re-exercised this close-out — prior Seeker evidence) |
-| Free competition | **Limited ready** — browse/room/LB OK; cancel-return OK; **owner approve** of message sign on `d9a182a` still outstanding |
+| Free competition | **Limited ready** — join registration + Start state on `d9a182a` for `CA64EA8C` passed; fresh Seed Vault message path optional retest (session reuse) |
 | Funded Devnet | **Paused / hold** — create/deposit paused; historical rooms readable; no new physical funded tx |
 | Card funding | **Deployed-disabled** — not unreleased; execution blocked |
 
 ## Owner actions still needed
 
-1. On Seeker: approve one free-room **message** sign (or confirm already-joined wallet) to close the `d9a182a` authorize-return gap.
-2. Optional: create a **new free** room if a second full play→LB on `d9a182a` is desired (same wallet already finished `61702E42`).
-3. Do **not** clear app/wallet data; do not lift pause / enable card / invite externals until separately authorized.
+1. Optional: after competition session expiry (or a future authorized single-key clear of `sudoku.competitionSession` only), re-run Join → Seed Vault **message** to close the last instrumentation gap.
+2. Authorize any external free pilot separately — do not invite under this phase.
+3. Do **not** clear app/wallet data; do not lift pause / enable card / Mainnet.

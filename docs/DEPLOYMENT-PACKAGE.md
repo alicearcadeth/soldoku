@@ -19,7 +19,7 @@
 
 ## Remaining (not authorized by deploy prompt)
 
-- Owner Seed Vault message-approve return check on Seeker
+- Optional: fresh Seed Vault message-sign retest after session expiry (join→Start already passed on `CA64EA8C`)
 - External invites
 - Pause lift / funded physical / card enable / Mainnet
 

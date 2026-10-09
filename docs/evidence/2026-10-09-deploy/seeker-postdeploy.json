@@ -43,9 +43,9 @@
     },
     {
       "name": "free-join-handoff",
-      "status": "needs-owner",
+      "status": "superseded",
       "kind": "physical-seeker",
-      "note": "Message approve requires owner Seed Vault on d9a182a. Separate cancel paths: wallet-cancel-return (MWA/Close) and join-cancel-return (in-app Connect Close only — not Seed Vault message cancel).",
+      "note": "Superseded by message-authorize-return on CA64EA8C. Historical note: cancel paths are wallet-cancel-return (MWA/Close) and join-cancel-return (in-app Connect Close only — not Seed Vault message cancel).",
       "at": "2026-10-09T09:24:44.160Z"
     },
     {
@@ -104,12 +104,29 @@
       "via": "seeker-classic-preserve.mjs + seeker-classic-continue-check.mjs",
       "note": "Pause/bg passed; Continue game true on home after session",
       "at": "2026-10-09T10:35:41.020Z"
+    },
+    {
+      "name": "message-authorize-return",
+      "status": "passed",
+      "kind": "physical-seeker",
+      "release": "d9a182a-hosted",
+      "roomCode": "CA64EA8C",
+      "participantsBefore": 3,
+      "participantsAfter": 4,
+      "wallet": "E3DQ…DpJn",
+      "startChallenge": true,
+      "verifyHang": false,
+      "connectMwaObserved": true,
+      "joinSeedVaultMessageObserved": false,
+      "note": "Join registered + Start challenge. Fresh Seed Vault message sheet not seen (likely day-long competitionSession reuse). Detail: AUTHORIZE-RETURN.md",
+      "at": "2026-10-09T10:56:24.613Z"
     }
   ],
-  "finishedAt": "2026-10-09T10:35:41.020Z",
+  "finishedAt": "2026-10-09T10:56:54.559Z",
   "corrections": [
     "Interrupted pm-clear+verify run remains inconclusive; later passes do not rewrite it.",
     "join-cancel-return is in-app Connect Close, not Seed Vault message authorization cancel.",
-    "Pre-deploy 61702E42 full play evidence is f4619a4-hosted, not d9a182a approve-return proof."
+    "Pre-deploy 61702E42 full play evidence is f4619a4-hosted, not d9a182a approve-return proof.",
+    "CA64EA8C join pass does not by itself prove a fresh Seed Vault message-sign cycle."
   ]
 }

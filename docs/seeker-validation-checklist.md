@@ -2,12 +2,12 @@
 
 Physical Seeker / Seed Vault testing status. Do not treat mock wallets or browser adapters as Seeker evidence. Serials redacted in committed artifacts.
 
-Evidence: `docs/evidence/2026-10-09-seeker/` (deployed web `f4619a4` via APK). APK identity: `APK-IDENTITY.md`.
+Evidence: `docs/evidence/2026-10-09-seeker/` (`f4619a4` full play) and `docs/evidence/2026-10-09-deploy/` (`d9a182a` post-deploy). APK identity: `APK-IDENTITY.md`.
 
 ## Identity and launch
 
 - [x] Verified — APK `com.sudoku.game` `0.1.0` / `1`, SHA-256 `bf427627…` matches recovery `soldoku-clockin.apk`
-- [x] Verified — Shell URL `https://soldoku.com/`; hosted release `f4619a4`
+- [x] Verified — Shell URL `https://soldoku.com/`; hosted release `d9a182a` `dirty:false` (post-deploy)
 - [x] Verified — App launches; Home / Compete load (cold restore may open Continue game)
 - [ ] Unverified — Post–lock-screen session (device currently PIN-locked mid continuation)
 
@@ -15,8 +15,9 @@ Evidence: `docs/evidence/2026-10-09-seeker/` (deployed web `f4619a4` via APK). A
 
 - [x] Verified — MWA discovery “Detected · connect”
 - [x] Verified — MWA handoff to Solana Mobile Wallet bottom sheet; return showed truncated wallet
-- [ ] Unverified — Message proof for competition session authorize (**owner signing**)
-- [ ] Unverified — User cancels connect/sign; app recovers without stuck busy
+- [x] Verified — Free-room join → Start challenge on `CA64EA8C` (`d9a182a`); see AUTHORIZE-RETURN.md
+- [ ] Unverified — Fresh Seed Vault **message** sheet on Join (session reuse likely; optional after expiry)
+- [x] Verified — User cancels connect; app recovers without stuck busy (post-deploy wallet-cancel)
 - [ ] Unverified — Account switch
 - [x] Verified — Background / foreground and process kill → Classic pause/continue recovery
 - [ ] Unverified — Pending deposit recovery after interrupt (no funded deposit this pass)

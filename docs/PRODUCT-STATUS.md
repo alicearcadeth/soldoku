@@ -16,7 +16,7 @@ Living snapshot. Historical evidence folders keep their original wording; this f
 | Surface | State |
 |---------|-------|
 | Classic / Practice | Available on live |
-| Free competitions | Available; cancel-return verified on `d9a182a`; message **approve** return still needs owner on this tip |
+| Free competitions | Available; cancel-return + join→Start on `CA64EA8C` verified on `d9a182a` (see AUTHORIZE-RETURN.md; session-reuse caveat) |
 | Funded Devnet entry | **Paused**. Claims/refunds/settlement + room reads remain |
 | Card funding | Foundations **deployed-but-disabled** (not unreleased) |
 | Mainnet / real payments | Off |
@@ -28,14 +28,14 @@ Living snapshot. Historical evidence folders keep their original wording; this f
 | Classic pause / bg / Continue | Seeker + `d9a182a` | Passed (`docs/evidence/2026-10-09-deploy/`) |
 | Free room browse / LB read | Seeker + `d9a182a` | Passed (`61702E42`) |
 | Wallet connect cancel / MWA BACK | Seeker + `d9a182a` | Passed |
-| Join message approve → no Verify hang | Seeker + `d9a182a` | **Needs owner** (fix is in live JS) |
+| Join → Start challenge, count +1, no hang | Seeker + `d9a182a` | Passed (`CA64EA8C`); fresh Seed Vault message sheet not re-observed (session cache) |
 | Full Join → play → LB | Seeker + prior `f4619a4` | Passed historically — `7:50.6 · rank 2` |
 | Funded deposit / claim / refund on device | — | **Untested** this phase |
 | External-player pilot | — | **Not started** |
 
 ## Gaps
 
-1. Owner Seed Vault approve on `d9a182a` to close authorize-return gap.
+1. Optional: retest fresh message Seed Vault after session expiry.
 2. Bounded funded Devnet physical plan still needs separate pause-lift auth.
 3. Do not clear Soldoku/wallet app data during testing (`pm clear --cache-only` was attempted once; outcome unknown — see deploy ASSESSMENT).
 
