@@ -48,7 +48,11 @@ See `EXPIRY-CONFIRMATION.md` + `session-probe.json`.
 - Behavioural probe: Create room → gate dialog **without** Seed Vault → **session still valid**.
 - Estimated expiry remains **2026-10-10 14:01:39 ICT**; ~19.7h remaining at probe time.
 
+## Alt-wallet attempt (2026-10-09 evening)
+
+See `ALT-WALLET-ATTEMPT.md`. Primary disconnected; reconnects returned `E3DQ…` or stalled on `connect.phantom.app`. Fresh message still **unverified**.
+
 ## This phase outcome
 
-Fresh physical message authorization on `d9a182a`: **unverified** — session not yet expired; no alternate wallet used.  
-Ready script after unblock: `scripts/seeker-fresh-message.mjs` (requires `SEEKER_ROOM`).
+Fresh physical message authorization on `d9a182a`: **unverified**.  
+Scripts: `seeker-session-probe.mjs`, `seeker-alt-wallet-fresh.mjs`, `seeker-fresh-message.mjs`.

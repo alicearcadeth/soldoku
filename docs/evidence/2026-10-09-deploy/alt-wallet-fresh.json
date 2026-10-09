@@ -1,0 +1,56 @@
+{
+  "name": "alt-wallet-fresh-message-d9a182a",
+  "startedAt": "2026-10-09T11:40:13.102Z",
+  "hostedRelease": "d9a182a90f00487c5a08506f0db3a5987207b9fe",
+  "releaseDirty": false,
+  "phases": [
+    {
+      "name": "home-before",
+      "status": "passed",
+      "chip": null,
+      "connected": false,
+      "texts": [
+        "PAPER GRID",
+        "Settings",
+        "Connect wallet",
+        "Soldoku",
+        "Play a solo game, race a friend, or climb the competition leaderboard.",
+        "DEVNET · TEST TOKENS · NO CASH VALUE",
+        "Continue game",
+        "New game",
+        "SOLO Play classic A quiet game. Pause whenever you want.",
+        "FREE Practice No wallet required. Same grid, two players.",
+        "LEADERBOARD Compete Free rooms: join with a wallet message, then Start. Fastest correct finish ranks.",
+        "How to play",
+        "About this beta"
+      ],
+      "at": "2026-10-09T11:40:18.455Z"
+    },
+    {
+      "name": "OWNER_ACTION_REQUIRED",
+      "status": "waiting",
+      "kind": "switch-wallet",
+      "instruction": "On the Seeker NOW:\n1) Open Seed Vault / Solana Mobile Wallet and SWITCH to a DIFFERENT owner account (not E3DQ…).\n2) Return to Soldoku.\n3) Tap Connect wallet → Mobile Wallet Adapter → approve CONNECT (PIN/biometrics).\nDo NOT clear Soldoku storage. Tell the chat when the new wallet chip shows on Home (or just approve — script is watching).",
+      "top": "topResumedActivity=ActivityRecord{245217289 u0 com.sudoku.game/.MainActivity t65}",
+      "at": "2026-10-09T11:40:18.511Z"
+    },
+    {
+      "name": "alt-connect",
+      "status": "needs-owner",
+      "primaryChip": "E3DQ…DpJn",
+      "altChip": null,
+      "sameAsPrimary": false,
+      "sawNativeMwa": true,
+      "sawSeedVault": false,
+      "texts": [
+        "connect.phantom.app"
+      ],
+      "at": "2026-10-09T11:47:27.423Z"
+    }
+  ],
+  "finishedAt": "2026-10-09T11:47:27.423Z",
+  "verdict": {
+    "freshMessagePassed": false,
+    "reason": "Alternate wallet connect not completed"
+  }
+}
