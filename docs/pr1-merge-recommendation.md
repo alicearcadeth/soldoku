@@ -2,9 +2,9 @@
 
 **Verdict: ready with stated limitations — recommend merge; do not auto-deploy.**
 
+Reviewed PR head: `1f4fe5668664f2ccc15ec97509a8d7d42f043d1a`  
+Parent foundation commit: `3d4a12a1b47d9a9788776eaef22c4c4de4d0353c`  
 Base: `main` @ `ee6e0d0`. CI: no status checks configured (`statusCheckRollup: []`). Wrangler deploy is manual (`npx wrangler deploy`); merge does **not** deploy.
-
-Record the **current PR head** after the review follow-up commit lands (see git / GitHub). Parent foundation commit: `3d4a12a1b47d9a9788776eaef22c4c4de4d0353c`.
 
 ## Why acceptable
 
