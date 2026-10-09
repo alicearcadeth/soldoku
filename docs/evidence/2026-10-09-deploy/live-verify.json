@@ -1,0 +1,69 @@
+{
+  "checkedAt": "2026-10-09T10:35:00.000Z",
+  "origin": "https://soldoku.com",
+  "wwwOrigin": "https://www.soldoku.com",
+  "release": {
+    "commit": "d9a182a90f00487c5a08506f0db3a5987207b9fe",
+    "dirty": false,
+    "assetCount": 14,
+    "wwwMatches": true
+  },
+  "apk": {
+    "package": "com.sudoku.game",
+    "versionName": "0.1.0",
+    "versionCode": 1,
+    "sha256": "bf4276273dc43f1609c464171180676dbf0f933c3da79f767eede8fb352a200c",
+    "loadsHosted": "https://soldoku.com/"
+  },
+  "worker": {
+    "deploymentVersion": "ecaf2e9f-0996-4a82-b04f-45fefbcad0be",
+    "secretChangeAfterDeploy": "b7bda8cd-da56-43b8-b373-1c849226e3a3",
+    "note": "Deploy at 09:10:05Z; SUDOKU_COMPETITION_PAUSED=1 secret put immediately after"
+  },
+  "safety": {
+    "competitionsConfig": {
+      "enabled": true,
+      "paused": true,
+      "cluster": "devnet",
+      "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs"
+    },
+    "competitionsList": {
+      "http": 200,
+      "includesActiveFreeRoom": "61702E42",
+      "includesFundedEndedReadable": true
+    },
+    "chain": {
+      "cluster": "devnet",
+      "localnet": false,
+      "staging": false
+    },
+    "cardGet": {
+      "http": 200,
+      "available": false,
+      "externalExecution": false,
+      "publicWagering": false,
+      "admitsEntrant": false,
+      "classification": "deployed-but-disabled"
+    },
+    "cardPost": {
+      "http": 403,
+      "error": "Card funding unavailable. External checkout execution is disabled."
+    },
+    "mainnet": "off"
+  },
+  "headers": {
+    "content-security-policy": "script-src 'self'; frame-ancestors 'none'",
+    "cache-control": "no-cache",
+    "server": "cloudflare"
+  },
+  "pmClearAttempt": {
+    "command": "pm clear --cache-only com.sudoku.game",
+    "succeeded": "unknown",
+    "walletCleared": false
+  },
+  "backup": {
+    "path": "C:\\Soldoku-reconstruct\\backups\\soldoku-main-2026-10-09-d9a182a",
+    "merged_main": "d9a182a90f00487c5a08506f0db3a5987207b9fe",
+    "pr": 2
+  }
+}

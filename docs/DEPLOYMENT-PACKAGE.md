@@ -1,56 +1,28 @@
-# Reviewable merge & deployment package (phase 2026-10-09)
+# Reviewable merge & deployment package (phase 2026-10-09) — closed
 
-## Essential before external free-room pilot
+## Completed
 
-| Item | Why |
-|------|-----|
-| Merge PR #2 | Pause UX + Seeker walletCall hang fix + Join/Start copy |
-| Deploy web release from merged tip | Phone APK loads live site; without deploy, hang fix stays unreleased |
-| Pilot guide + feedback template | Consistent invites |
+| Item | Result |
+|------|--------|
+| Merge PR #2 | Done → `d9a182a` |
+| Deploy web to soldoku.com / www | Done — `/api/release` `d9a182a` `dirty:false` |
+| Keep funded pause on | Done — `paused:true` + secret revision |
+| Card stays disabled | Done — deployed-but-disabled |
 
-## Can wait
+## Exact artifacts
 
-| Item | Why |
-|------|-----|
-| Funded physical deposit/claim | Pause held; plan only |
-| Card provider onboarding | Foundations disabled by design |
-| Account-switch deep suite | Nice-to-have after free pilot |
+- **Merged tip:** `d9a182a90f00487c5a08506f0db3a5987207b9fe`
+- **PR:** https://github.com/alicearcadeth/soldoku/pull/2 (MERGED)
+- **Worker deploy:** `ecaf2e9f-0996-4a82-b04f-45fefbcad0be`
+- **Assessment:** `docs/evidence/2026-10-09-deploy/ASSESSMENT.md`
+- **Backup:** `C:\Soldoku-reconstruct\backups\soldoku-main-2026-10-09-d9a182a`
 
-## Exact artifacts (update tip after final push)
+## Remaining (not authorized by deploy prompt)
 
-- **Branch:** `seeker-product-2026-10-09`  
-- **PR:** https://github.com/alicearcadeth/soldoku/pull/2  
-- **Reviewed tip:** `3f8426e4ca88c0b4e33014b2be3e6c5983a9a3c5` (product fix `6accfca` + doc pins)  
-- **Live today:** `f4619a4` (unchanged until authorized deploy)  
-- **Backup:** `C:\Soldoku-reconstruct\backups\soldoku-2026-10-09-1551-39f7eea` (plus later backups if created)
-
-## Deploy target (when authorized)
-
-- Existing Cloudflare Worker + static assets for `soldoku.com` (same pipeline as prior releases).  
-- Config: funded pause remains **on** unless a separate owner auth lifts it.  
-- Card adapter remains disabled-production.
-
-## Expected post-deploy identity
-
-- New `/api/release` `commit` = deployed git SHA  
-- Asset hashes in that JSON update  
-
-## Compatibility
-
-- Existing free rooms and leaderboard rows remain.  
-- Do **not** restore old DBs or swap escrow program IDs as part of this release.
-
-## Post-deploy checks
-
-1. `/api/release` matches intended SHA  
-2. Compete → For tokens shows pause; free create still works  
-3. Seeker Join free room: after Seed Vault return, no multi-minute “Verify your wallet identity…” trap  
-4. No Simulate / fiatSandbox controls on production UI  
+- Owner Seed Vault message-approve return check on Seeker
+- External invites
+- Pause lift / funded physical / card enable / Mainnet
 
 ## Rollback
 
-Redeploy previous known-good Worker/assets (`f4619a4` or last good SHA). Do not “fix” finance by restoring incompatible schema dumps.
-
-## Single owner request (when ready)
-
-**Please authorize: (1) merge PR #2, (2) deploy the merged tip to soldoku.com, (3) keep funded pause on.** Reply with yes/no per item.
+Redeploy previous known-good Worker/assets if needed (`f4619a4` or last good SHA). Do not “fix” finance by restoring incompatible schema dumps.

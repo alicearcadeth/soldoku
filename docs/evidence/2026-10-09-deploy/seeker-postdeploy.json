@@ -1,0 +1,115 @@
+{
+  "release": {
+    "hostedCommit": "d9a182a90f00487c5a08506f0db3a5987207b9fe",
+    "dirty": false,
+    "workerDeploy": "ecaf2e9f-0996-4a82-b04f-45fefbcad0be",
+    "note": "Hosted identity confirmed via /api/release independently of these scripts."
+  },
+  "interruptedRun": {
+    "status": "inconclusive",
+    "command": "adb -s SM02E4072803429 shell pm clear --cache-only com.sudoku.game; node scripts/seeker-postdeploy-verify.mjs",
+    "terminal": "778856",
+    "startedAt": "2026-10-09T09:11:12.280Z",
+    "endedAt": "2026-10-09T09:16:25.750Z",
+    "exitCode": 4294967295,
+    "stdout": "(empty)",
+    "packageTargeted": "com.sudoku.game",
+    "clearSucceeded": "unknown",
+    "walletPackagesCleared": false,
+    "policyDeviation": "Earlier instructions prohibited clearing application/wallet data. --cache-only was attempted against Soldoku only; outcome unverified."
+  },
+  "startedAt": "2026-10-09T09:16:38.639Z",
+  "phases": [
+    {
+      "name": "free-compete-browse",
+      "status": "passed",
+      "kind": "physical-seeker",
+      "release": "d9a182a-hosted",
+      "texts": [
+        "Weekend Sprint",
+        "61702E42",
+        "Join verifies your wallet with a message signature (no deposit for free rooms). Your timer starts only when you press Start challenge."
+      ],
+      "at": "2026-10-09T09:16:58.520Z"
+    },
+    {
+      "name": "free-room-detail",
+      "status": "passed",
+      "kind": "physical-seeker",
+      "release": "d9a182a-hosted",
+      "joinStartCopy": true,
+      "texts": ["Join room", "E3DQ…DpJn", "7:50.6", "FTwf…xAVt", "0:25.7"],
+      "at": "2026-10-09T09:17:08.568Z"
+    },
+    {
+      "name": "free-join-handoff",
+      "status": "needs-owner",
+      "kind": "physical-seeker",
+      "note": "Message approve requires owner Seed Vault on d9a182a. Separate cancel paths: wallet-cancel-return (MWA/Close) and join-cancel-return (in-app Connect Close only — not Seed Vault message cancel).",
+      "at": "2026-10-09T09:24:44.160Z"
+    },
+    {
+      "name": "cold-home",
+      "status": "passed",
+      "kind": "physical-seeker",
+      "release": "d9a182a-hosted",
+      "via": "seeker-postdeploy-wallet-pause.mjs",
+      "texts": ["Soldoku", "DEVNET · TEST TOKENS · NO CASH VALUE", "LEADERBOARD Compete Free rooms: join with a wallet message, then Start."],
+      "at": "2026-10-09T09:17:58.458Z"
+    },
+    {
+      "name": "wallet-cancel-return",
+      "status": "passed",
+      "kind": "physical-seeker",
+      "release": "d9a182a-hosted",
+      "sawMwaOrClose": true,
+      "note": "Usable MainActivity after cancel; not a Seed Vault approve-return proof.",
+      "at": "2026-10-09T09:18:13.495Z"
+    },
+    {
+      "name": "funded-pause-ui",
+      "status": "passed",
+      "kind": "browser-only",
+      "release": "d9a182a-hosted",
+      "via": "browser",
+      "note": "Funded rooms paused (disabled) + claims/refunds status + card unavailable on soldoku.com For tokens",
+      "at": "2026-10-09T09:23:04.904Z"
+    },
+    {
+      "name": "join-cancel-return",
+      "status": "passed",
+      "kind": "physical-seeker",
+      "release": "d9a182a-hosted",
+      "path": "in-app-connect",
+      "cancelled": true,
+      "stuckVerify": false,
+      "note": "Join while disconnected opened Connect sheet; Close returned to room. Not message-sign Seed Vault cancel.",
+      "at": "2026-10-09T09:24:44.160Z"
+    },
+    {
+      "name": "wallet-cancel-native-mwa-d9a182a",
+      "status": "passed",
+      "kind": "physical-seeker",
+      "release": "d9a182a-hosted",
+      "path": "native-mwa",
+      "via": "seeker-lifecycle-preserve.mjs",
+      "stuckVerify": false,
+      "at": "2026-10-09T10:32:48.712Z"
+    },
+    {
+      "name": "classic-pause-bg-continue-d9a182a",
+      "status": "passed",
+      "kind": "physical-seeker",
+      "release": "d9a182a-hosted",
+      "via": "seeker-classic-preserve.mjs + seeker-classic-continue-check.mjs",
+      "note": "Pause/bg passed; Continue game true on home after session",
+      "at": "2026-10-09T10:35:41.020Z"
+    }
+  ],
+  "finishedAt": "2026-10-09T10:35:41.020Z",
+  "corrections": [
+    "Interrupted pm-clear+verify run remains inconclusive; later passes do not rewrite it.",
+    "join-cancel-return is in-app Connect Close, not Seed Vault message authorization cancel.",
+    "Pre-deploy 61702E42 full play evidence is f4619a4-hosted, not d9a182a approve-return proof."
+  ]
+}

@@ -6,41 +6,41 @@ Living snapshot. Historical evidence folders keep their original wording; this f
 
 | Line | Identity | Notes |
 |------|----------|-------|
-| **Deployed (live)** | `f4619a4` via `https://soldoku.com/api/release` | Dirty: false |
-| **main (GitHub)** | `5ead4e6` Merge PR #1 | Settlement recovery + disabled card foundations |
-| **PR #2 head** | `3f8426e` on `seeker-product-2026-10-09` | Pause UX, walletCall hang fix (+ hasFocus), Join/Start copy, pilot docs — **not merged, not deployed** |
-| **APK tested** | `com.sudoku.game` 0.1.0 / SHA-256 `bf427627…` (`docs/evidence/2026-10-09-seeker/APK-IDENTITY.md`) | Loads **live** web (`f4619a4`), not PR #2 assets |
+| **Deployed (live)** | `d9a182a` via soldoku.com + www `/api/release` | Dirty: false; Worker `ecaf2e9f-…` + pause secret `b7bda8cd-…` |
+| **main (GitHub)** | `d9a182a` Merge PR #2 | Pause UX, walletCall hang fix, Join/Start copy, pilot docs |
+| **PR #2** | **MERGED** | https://github.com/alicearcadeth/soldoku/pull/2 |
+| **APK tested** | `com.sudoku.game` 0.1.0 / SHA-256 `bf427627…` | Shell loads **live** web (`d9a182a`) |
 
 ## Availability
 
 | Surface | State |
 |---------|-------|
 | Classic / Practice | Available on live |
-| Free competitions | Available on live; physical Join → play → leaderboard verified on Seeker |
-| Funded Devnet entry | **Paused** (API + PR #2 UI notice). Claims/refunds/settlement intended to remain |
-| Card funding | Foundations merged; production adapter **disabled**; `/api/funding/card` → unknown/disabled path |
+| Free competitions | Available; cancel-return verified on `d9a182a`; message **approve** return still needs owner on this tip |
+| Funded Devnet entry | **Paused**. Claims/refunds/settlement + room reads remain |
+| Card funding | Foundations **deployed-but-disabled** (not unreleased) |
 | Mainnet / real payments | Off |
 
 ## Validated journeys (internal agent + owner HITL)
 
 | Journey | Environment | Verdict |
 |---------|-------------|---------|
-| Classic / Practice nav, pause, notes, undo | Seeker + `f4619a4` | Passed (earlier evidence) |
-| Free room detail, Join message proof | Seeker + owner Seed Vault | Passed (`61702E42`) |
-| Start → moves → bg/fg → complete → LB | Seeker scripted + physical | Passed — **7:50.6 · rank 2** |
-| Wallet connect reject / MWA cancel return | Seeker | Passed |
-| Funded deposit / claim / refund on device | — | **Untested** |
-| Card payment | — | **Unavailable** (by design) |
+| Classic pause / bg / Continue | Seeker + `d9a182a` | Passed (`docs/evidence/2026-10-09-deploy/`) |
+| Free room browse / LB read | Seeker + `d9a182a` | Passed (`61702E42`) |
+| Wallet connect cancel / MWA BACK | Seeker + `d9a182a` | Passed |
+| Join message approve → no Verify hang | Seeker + `d9a182a` | **Needs owner** (fix is in live JS) |
+| Full Join → play → LB | Seeker + prior `f4619a4` | Passed historically — `7:50.6 · rank 2` |
+| Funded deposit / claim / refund on device | — | **Untested** this phase |
 | External-player pilot | — | **Not started** |
 
-## Gaps before external pilot
+## Gaps
 
-1. Merge + deploy PR #2 (owner authorize) so pause copy + hang fix ship.
-2. Bounded funded Devnet physical plan ready; execution needs pause lift auth.
-3. Reconnect after disconnect left phone on Connect wallet — expected after reject tests.
-4. Solver/collusion residual risk remains for competitions (timing rules do not eliminate it).
+1. Owner Seed Vault approve on `d9a182a` to close authorize-return gap.
+2. Bounded funded Devnet physical plan still needs separate pause-lift auth.
+3. Do not clear Soldoku/wallet app data during testing (`pm clear --cache-only` was attempted once; outcome unknown — see deploy ASSESSMENT).
 
 ## Evidence index
 
-- Physical Seeker: `docs/evidence/2026-10-09-seeker/` (+ `PROVENANCE.md`, `SUMMARY.md`)
-- Backup tip (includes `.git`): `C:\Soldoku-reconstruct\backups\soldoku-2026-10-09-1551-39f7eea`
+- Post-deploy assessment: `docs/evidence/2026-10-09-deploy/ASSESSMENT.md`
+- Pre-deploy Seeker (f4619a4): `docs/evidence/2026-10-09-seeker/`
+- Merge-tip backup: `C:\Soldoku-reconstruct\backups\soldoku-main-2026-10-09-d9a182a`

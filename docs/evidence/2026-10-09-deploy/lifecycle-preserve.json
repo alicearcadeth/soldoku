@@ -1,0 +1,117 @@
+{
+  "name": "lifecycle-preserve-d9a182a",
+  "releaseHint": "APK WebView → soldoku.com (verify /api/release separately)",
+  "startedAt": "2026-10-09T10:31:56.506Z",
+  "phases": [
+    {
+      "name": "relaunch-home",
+      "status": "partial",
+      "texts": [
+        "Friday, Oct 9",
+        "89°F",
+        "Gemini",
+        "Google",
+        "Wallet",
+        "Play Store",
+        "Meet",
+        "dApp Store",
+        "Phone",
+        "Messages",
+        "Chrome",
+        "Camera"
+      ],
+      "top": "topResumedActivity=ActivityRecord{241750224 u0 com.android.launcher3/com.android.searchlauncher.SearchLauncher t29}",
+      "at": "2026-10-09T10:32:10.397Z"
+    },
+    {
+      "name": "classic-enter",
+      "status": "blocked",
+      "texts": [
+        "Friday, Oct 9",
+        "89°F",
+        "Gemini",
+        "Google",
+        "Wallet",
+        "Play Store",
+        "Meet",
+        "dApp Store",
+        "Phone",
+        "Messages",
+        "Chrome",
+        "Camera"
+      ],
+      "at": "2026-10-09T10:32:10.398Z"
+    },
+    {
+      "name": "classic-bg-reopen",
+      "status": "partial",
+      "texts": [],
+      "top": "topResumedActivity=ActivityRecord{24970013 u0 com.sudoku.game/.MainActivity t56}",
+      "at": "2026-10-09T10:32:17.804Z"
+    },
+    {
+      "name": "classic-force-stop-relaunch",
+      "status": "partial",
+      "texts": [],
+      "top": "topResumedActivity=ActivityRecord{183575335 u0 com.sudoku.game/.MainActivity t57}",
+      "at": "2026-10-09T10:32:25.161Z"
+    },
+    {
+      "name": "free-room-identity",
+      "status": "passed",
+      "lbHasPrior": true,
+      "joinPresent": true,
+      "startPresent": false,
+      "texts": [
+        "Home",
+        "Settings",
+        "ONE GRID. YOUR FASTEST FINISH.",
+        "Weekend Sprint",
+        "Room code: ",
+        "61702E42",
+        "← Back to Rooms",
+        "Game mode",
+        "Sudoku · easy",
+        "Token",
+        "None · free entry",
+        "Stake per player",
+        "0",
+        "Approx. USD",
+        "$0.00",
+        "Competition period",
+        "8 days",
+        "Participants",
+        "4 · open entry",
+        "Status",
+        "Active",
+        "Best completion",
+        "0:25.7",
+        "Ends 10/11/2026, 8:29:14 AM. No fixed player limit.",
+        "Join verifies your wallet with a message signature (no deposit for free rooms). Your timer starts only when you press Start challenge.",
+        "Join room",
+        "Leaderboard",
+        "#"
+      ],
+      "at": "2026-10-09T10:32:30.529Z"
+    },
+    {
+      "name": "wallet-cancel-return",
+      "status": "passed",
+      "path": "native-mwa",
+      "stuck": false,
+      "texts": [
+        "Connect wallet",
+        "Choose your Solana wallet. You approve the connection in your wallet.",
+        "Mobile Wallet Adapter Waiting for approval…",
+        "Phantom",
+        "Get wallet ↗",
+        "Solflare",
+        "Backpack",
+        "Close"
+      ],
+      "top": "topResumedActivity=ActivityRecord{183575335 u0 com.sudoku.game/.MainActivity t57}",
+      "at": "2026-10-09T10:32:48.712Z"
+    }
+  ],
+  "finishedAt": "2026-10-09T10:32:48.713Z"
+}
