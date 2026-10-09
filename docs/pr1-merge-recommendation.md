@@ -2,11 +2,11 @@
 
 **Verdict: ready with explicitly accepted limitations — recommend merge; do not deploy.**
 
-Reviewed PR head (this document’s commit will update the tip): see git `HEAD` on `reconstruct-2026-10-08`.  
+Reviewed PR head: `7ad88ae8bbd1f63e0115d0472f2a98519a35e4c1`  
 Design/behavior review baseline: `1f4fe5668664f2ccc15ec97509a8d7d42f043d1a`  
 Card foundations parent: `3d4a12a1b47d9a9788776eaef22c4c4de4d0353c`  
 Deployed release (unchanged): `f4619a4d194ca03eef84df04080df38c7d6bad25`  
-Base: `main` @ `ee6e0d0`.  
+Base: `main` @ `ee6e0d0`.
 
 CI: no status checks (`statusCheckRollup: []`). No `.github` workflows that deploy. Wrangler deploy is manual (`npx wrangler deploy --config wrangler.soldoku.jsonc`). **Merge does not deploy and does not activate payments.**
 
