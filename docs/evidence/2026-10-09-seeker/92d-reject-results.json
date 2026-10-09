@@ -1,0 +1,66 @@
+{
+  "startedAt": "2026-10-09T07:19:24.075Z",
+  "steps": [
+    {
+      "s": "auth-open",
+      "top": "topResumedActivity=ActivityRecord{99127980 u0 com.sudoku.game/.MainActivity t44}",
+      "texts": [
+        "Connect wallet",
+        "Choose your Solana wallet. You approve the connection in your wallet.",
+        "Mobile Wallet Adapter Detected · connect",
+        "Phantom",
+        "Get wallet ↗",
+        "Solflare",
+        "Backpack",
+        "Close"
+      ],
+      "at": "2026-10-09T07:19:37.438Z"
+    },
+    {
+      "s": "tapped-reject-ui",
+      "at": "2026-10-09T07:19:37.522Z"
+    },
+    {
+      "s": "returned-after-connect-reject",
+      "texts": [
+        "PAPER GRID",
+        "Settings",
+        "Connect wallet",
+        "Soldoku",
+        "Play a solo game, race a friend, or climb the competition leaderboard.",
+        "DEVNET · TEST TOKENS · NO CASH VALUE",
+        "Continue game",
+        "New game",
+        "SOLO Play classic A quiet game. Pause whenever you want.",
+        "FREE Practice No wallet required. Same grid, two players.",
+        "LEADERBOARD Compete One attempt. Open entry. Fastest correct completion wins.",
+        "How to play",
+        "About this beta"
+      ],
+      "at": "2026-10-09T07:19:42.304Z"
+    }
+  ],
+  "status": "passed",
+  "returnTexts": [
+    "PAPER GRID",
+    "Settings",
+    "Connect wallet",
+    "Soldoku",
+    "Play a solo game, race a friend, or climb the competition leaderboard.",
+    "DEVNET · TEST TOKENS · NO CASH VALUE",
+    "Continue game",
+    "New game",
+    "SOLO Play classic A quiet game. Pause whenever you want.",
+    "FREE Practice No wallet required. Same grid, two players.",
+    "LEADERBOARD Compete One attempt. Open entry. Fastest correct completion wins.",
+    "How to play",
+    "About this beta"
+  ],
+  "errors": [
+    "Connect wallet",
+    "FREE Practice No wallet required. Same grid, two players."
+  ],
+  "top": "topResumedActivity=ActivityRecord{99127980 u0 com.sudoku.game/.MainActivity t44}",
+  "finishedAt": "2026-10-09T07:19:52.697Z",
+  "rejected": true
+}

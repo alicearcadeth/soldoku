@@ -13,9 +13,13 @@ const PAUSED = "New funded rooms are paused. Claims, refunds, and settlement sti
 export async function prepareCompetitionRequest(store: Store, chain: CompetitionChain | undefined, method: string, url: URL,
   body: Record<string, unknown>, options?: { paused?: boolean; persist?: SettlementPersist }): Promise<CompetitionRequest> {
   if (method === "GET" && url.pathname === "/api/competitions/config") {
-    if (!chain) return { result: { enabled: false, reason: "Multi-player Devnet escrow is not configured." } };
-    try { await chain.verify(); return { result: { enabled: true, cluster: chain.cluster, testerFaucet: chain.faucetConfigured, ...chain.config } }; }
-    catch (error) { return { result: { enabled: false, reason: error instanceof Error ? error.message : "Competition escrow is unavailable." } }; }
+    const paused = options?.paused === true;
+    if (!chain) return { result: { enabled: false, paused, reason: "Multi-player Devnet escrow is not configured." } };
+    try {
+      await chain.verify();
+      return { result: { enabled: true, paused, cluster: chain.cluster, testerFaucet: chain.faucetConfigured, ...chain.config } };
+    }
+    catch (error) { return { result: { enabled: false, paused, reason: error instanceof Error ? error.message : "Competition escrow is unavailable." } }; }
   }
   if (method === "POST" && url.pathname === "/api/competitions/faucet") {
     if (!chain) throw new Error("Tester funding is unavailable until the Devnet competition escrow is configured.");

@@ -1,0 +1,114 @@
+{
+  "startedAt": "2026-10-09T06:44:26.728Z",
+  "scenarios": [
+    {
+      "name": "home",
+      "status": "passed",
+      "texts": [
+        "PAPER GRID",
+        "Settings",
+        "E3DQ…DpJn",
+        "Soldoku",
+        "Play a solo game, race a friend, or climb the competition leaderboard.",
+        "DEVNET · TEST TOKENS · NO CASH VALUE",
+        "Continue game",
+        "New game",
+        "SOLO Play classic A quiet game. Pause whenever you want.",
+        "FREE Practice No wallet required. Same grid, two players.",
+        "LEADERBOARD Compete One attempt. Open entry. Fastest correct completion wins.",
+        "How to play",
+        "About this beta"
+      ],
+      "at": "2026-10-09T06:44:31.560Z"
+    },
+    {
+      "name": "compete-browse",
+      "status": "passed",
+      "texts": [
+        "Browse rooms",
+        "Competition rooms",
+        "Have a room code?",
+        "Find room",
+        "Weekend Sprint",
+        "Room code: 61702E42",
+        "View room",
+        "Join room",
+        "Room code: CA64EA8C",
+        "Room code: 9793822F",
+        "Room code: AF61BD84"
+      ],
+      "at": "2026-10-09T06:44:41.699Z"
+    },
+    {
+      "name": "free-room-detail",
+      "status": "passed",
+      "note": "Left browse list into room surface",
+      "texts": [
+        "Home",
+        "Settings",
+        "ONE GRID. YOUR FASTEST FINISH.",
+        "Weekend Sprint",
+        "Room code: ",
+        "61702E42",
+        "← Back to Rooms",
+        "Game mode",
+        "Sudoku · easy",
+        "Token",
+        "None · free entry",
+        "Stake per player",
+        "0",
+        "Approx. USD",
+        "$0.00",
+        "Competition period",
+        "8 days",
+        "Participants",
+        "3 · open entry",
+        "Status",
+        "Active",
+        "Best completion",
+        "0:25.7",
+        "Ends 10/11/2026, 8:29:14 AM. No fixed player limit.",
+        "Join room",
+        "Leaderboard",
+        "#",
+        "1",
+        " · ",
+        "FTwf…xAVt",
+        "Share this room code: ",
+        ". Finish times are checked by the server. The same grid allows one attempt per wallet.",
+        "Shareable room link",
+        "Copy room link",
+        "Previous two-player races &amp; refunds"
+      ],
+      "at": "2026-10-09T06:44:47.371Z"
+    },
+    {
+      "name": "competition-message-proof",
+      "status": "needs-owner",
+      "instruction": "Approve the Soldoku competition session MESSAGE in Seed Vault / Solana Mobile Wallet (Devnet, authorize only — not a deposit). Return to Soldoku afterward.",
+      "texts": [],
+      "walletFocus": true,
+      "at": "2026-10-09T06:44:54.597Z"
+    },
+    {
+      "name": "wallet-sheet-cancel-close",
+      "status": "blocked",
+      "texts": [
+        "Home",
+        "Settings",
+        "ONE GRID. YOUR FASTEST FINISH.",
+        "Weekend Sprint",
+        "Room code: ",
+        "61702E42",
+        "← Back to Rooms",
+        "Game mode",
+        "Sudoku · easy",
+        "Token",
+        "None · free entry",
+        "Stake per player"
+      ],
+      "at": "2026-10-09T06:45:00.819Z"
+    }
+  ],
+  "finishedAt": "2026-10-09T06:45:00.819Z"
+}

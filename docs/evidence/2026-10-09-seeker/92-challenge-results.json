@@ -1,0 +1,133 @@
+{
+  "startedAt": "2026-10-09T07:11:41.921Z",
+  "phases": [
+    {
+      "name": "parse-board",
+      "status": "passed",
+      "givens": 36,
+      "pad": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "gridPreview": "603010002028006004941002670000054000059000460000160000035900826800200750200080103",
+      "at": "2026-10-09T07:11:45.052Z"
+    },
+    {
+      "name": "solve",
+      "status": "passed",
+      "at": "2026-10-09T07:11:45.053Z"
+    },
+    {
+      "name": "enter-moves",
+      "status": "passed",
+      "placed": 3,
+      "probe": [
+        1,
+        3,
+        5
+      ],
+      "seen": [
+        7,
+        4,
+        8
+      ],
+      "at": "2026-10-09T07:12:01.853Z"
+    },
+    {
+      "name": "bg-reopen-recovery",
+      "status": "passed",
+      "onBoard": true,
+      "recoveredProbe": [
+        7,
+        4,
+        8
+      ],
+      "at": "2026-10-09T07:12:17.589Z"
+    },
+    {
+      "name": "complete-puzzle",
+      "status": "passed",
+      "filled": 42,
+      "texts": [
+        "Finished in 7:50.6 · rank 2 so far. Rankings can change until the room closes.",
+        "Leaderboard"
+      ],
+      "at": "2026-10-09T07:17:51.018Z"
+    },
+    {
+      "name": "leaderboard-result",
+      "status": "passed",
+      "texts": [
+        "Home",
+        "Settings",
+        "ONE GRID. YOUR FASTEST FINISH.",
+        "Weekend Sprint",
+        "Room code: ",
+        "61702E42",
+        "← Back to Rooms",
+        "Game mode",
+        "Sudoku · easy",
+        "Token",
+        "None · free entry",
+        "Stake per player",
+        "0",
+        "Approx. USD",
+        "$0.00",
+        "Competition period",
+        "8 days",
+        "Participants",
+        "4 · open entry",
+        "Status",
+        "Active",
+        "Best completion",
+        "0:25.7",
+        "Ends 10/11/2026, 8:29:14 AM. No fixed player limit.",
+        "Finished in 7:50.6 · rank 2 so far. Rankings can change until the room closes.",
+        "Leaderboard",
+        "#",
+        "1",
+        " · ",
+        "FTwf…xAVt",
+        "2",
+        "E3DQ…DpJn",
+        " · You",
+        "7:50.6",
+        "Share this room code: ",
+        ". Finish times are checked by the server. The same grid allows one attempt per wallet.",
+        "Shareable room link",
+        "Copy room link"
+      ],
+      "at": "2026-10-09T07:17:53.768Z"
+    },
+    {
+      "name": "reject-signature",
+      "status": "passed",
+      "rejectedAt": "mwa-sheet",
+      "note": "MWA cancel/back",
+      "at": "2026-10-09T07:21:40.064Z"
+    },
+    {
+      "name": "reject-return",
+      "status": "passed",
+      "texts": [
+        "Connect wallet",
+        "Choose your Solana wallet. You approve the connection in your wallet.",
+        "Mobile Wallet Adapter Waiting for approval…",
+        "Phantom",
+        "Get wallet ↗",
+        "Solflare",
+        "Backpack",
+        "Close"
+      ],
+      "at": "2026-10-09T07:21:40.064Z"
+    }
+  ],
+  "finishedAt": "2026-10-09T07:21:40.064Z"
+}

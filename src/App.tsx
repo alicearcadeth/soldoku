@@ -207,7 +207,7 @@ function AppContent() {
           <button className="mode" type="button" onClick={() => open({ name: "competitions" })}>
             <span className="eyebrow">Leaderboard</span>
             <strong>Compete</strong>
-            <span className="choice-note">One attempt. Open entry. Fastest correct completion wins.</span>
+            <span className="choice-note">Free rooms: join with a wallet message, then Start. Fastest correct finish ranks.</span>
           </button>
           <button className="text" type="button" onClick={() => { history.pushState({ sudoku: "home", sheet: "help" }, ""); setHelp(true); }}>How to play</button>
           <button className="text" type="button" onClick={() => { history.pushState({ sudoku: "home", sheet: "about" }, ""); setAbout(true); }}>About this beta</button>
@@ -262,7 +262,7 @@ function HowToPlay({ onClose }: { onClose: () => void }) {
       <p>Fill the grid so each row, column, and 3×3 box contains the digits 1–9 once.</p>
       <p>Notes pencils in a candidate. It does not fill the cell.</p>
       <p>A wrong digit counts as a mistake. The game stays playable.</p>
-      <p>Practice is a free two-player race. Compete is a leaderboard: everyone plays the same grid once per wallet, and the fastest correct completion wins when the room closes. Your timer starts when you begin the challenge.</p>
+      <p>Practice is a free two-player race (no wallet). Compete is a shared leaderboard: Join proves your wallet with a message, Start begins your one timed attempt, and the fastest correct finish ranks when the room closes.</p>
       <p>{HELP_FUNDED_ROOMS}</p>
       <button className="primary" type="button" onClick={onClose}>Close</button>
     </DialogFrame>

@@ -40,6 +40,80 @@ describe("wallet call", () => {
     await expect(settled).resolves.toBe("session timeout");
   });
 
+  it("clears a stuck Seeker sheet flag on pageshow so grace timeout can run", async () => {
+    vi.useFakeTimers();
+    const windowListeners = new Map<string, Set<() => void>>();
+    vi.stubGlobal("document", {
+      visibilityState: "visible",
+      hasFocus: () => true,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+    });
+    vi.stubGlobal("window", {
+      setTimeout,
+      clearTimeout,
+      setInterval,
+      clearInterval,
+      addEventListener: (name: string, listener: () => void) => {
+        const set = windowListeners.get(name) ?? new Set();
+        set.add(listener);
+        windowListeners.set(name, set);
+      },
+      removeEventListener: (name: string, listener: () => void) => {
+        windowListeners.get(name)?.delete(listener);
+      },
+    });
+    const pending = walletCall(new Promise(() => undefined), 8000, 90_000, 600_000);
+    const settled = pending.then(
+      () => "resolved",
+      (error: Error) => error.message,
+    );
+    windowListeners.get("blur")?.forEach((listener) => listener());
+    await vi.advanceTimersByTimeAsync(30_000);
+    let status = "pending";
+    void settled.then((value) => { status = value; });
+    await vi.advanceTimersByTimeAsync(0);
+    expect(status).toBe("pending");
+    windowListeners.get("pageshow")?.forEach((listener) => listener());
+    await vi.advanceTimersByTimeAsync(8000);
+    await expect(settled).resolves.toBe("session timeout");
+  });
+
+  it("starts grace on pageshow even when hasFocus stays false after Seed Vault", async () => {
+    vi.useFakeTimers();
+    const windowListeners = new Map<string, Set<() => void>>();
+    vi.stubGlobal("document", {
+      visibilityState: "visible",
+      hasFocus: () => false,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+    });
+    vi.stubGlobal("window", {
+      setTimeout,
+      clearTimeout,
+      setInterval,
+      clearInterval,
+      addEventListener: (name: string, listener: () => void) => {
+        const set = windowListeners.get(name) ?? new Set();
+        set.add(listener);
+        windowListeners.set(name, set);
+      },
+      removeEventListener: (name: string, listener: () => void) => {
+        windowListeners.get(name)?.delete(listener);
+      },
+    });
+    const pending = walletCall(new Promise(() => undefined), 8000, 90_000, 600_000);
+    const settled = pending.then(
+      () => "resolved",
+      (error: Error) => error.message,
+    );
+    windowListeners.get("blur")?.forEach((listener) => listener());
+    await vi.advanceTimersByTimeAsync(5_000);
+    windowListeners.get("pageshow")?.forEach((listener) => listener());
+    await vi.advanceTimersByTimeAsync(8000);
+    await expect(settled).resolves.toBe("session timeout");
+  });
+
   it("rejects after the wallet sheet releases focus and never replies", async () => {
     vi.useFakeTimers();
     let focused = true;

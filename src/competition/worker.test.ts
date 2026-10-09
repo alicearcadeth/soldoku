@@ -237,6 +237,9 @@ describe("Worker leaderboard persistence", () => {
     vi.mocked(competitionChain).mockReturnValue(chain);
     const env = { DB: db, ASSETS: { fetch: async () => new Response("asset") }, SUDOKU_COMPETITION_PAUSED: "1" };
     try {
+      const configPaused = await worker.fetch(new Request("https://soldoku.test/api/competitions/config"), env);
+      expect(configPaused.status).toBe(200);
+      expect(await configPaused.json()).toMatchObject({ enabled: true, paused: true, mint: "mint" });
       const key = nacl.sign.keyPair(); const wallet = bs58.encode(key.publicKey);
       const proof = await (await worker.fetch(new Request("https://soldoku.test/api/competitions/proof", { method: "POST", body: JSON.stringify({ wallet }) }), env)).json() as { id: string; message: string };
       const auth = await (await worker.fetch(new Request("https://soldoku.test/api/competitions/authorize", { method: "POST", body: JSON.stringify({ id: proof.id, signature: bs58.encode(nacl.sign.detached(new TextEncoder().encode(proof.message), key.secretKey)) }) }), env)).json() as { actor: string };

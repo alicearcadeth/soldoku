@@ -1,0 +1,293 @@
+{
+  "texts": [
+    "PAPER GRID",
+    "Settings",
+    "E3DQ…DpJn",
+    "Soldoku",
+    "Play a solo game, race a friend, or climb the competition leaderboard.",
+    "DEVNET · TEST TOKENS · NO CASH VALUE",
+    "Continue game",
+    "New game",
+    "SOLO Play classic A quiet game. Pause whenever you want.",
+    "FREE Practice No wallet required. Same grid, two players.",
+    "LEADERBOARD Compete One attempt. Open entry. Fastest correct completion wins.",
+    "How to play",
+    "About this beta"
+  ],
+  "descs": [
+    "Soldoku"
+  ],
+  "sampleNodes": [
+    {
+      "text": "",
+      "desc": "",
+      "bounds": [
+        0,
+        0,
+        1200,
+        2670
+      ]
+    },
+    {
+      "text": "",
+      "desc": "",
+      "bounds": [
+        0,
+        0,
+        1200,
+        2670
+      ]
+    },
+    {
+      "text": "",
+      "desc": "",
+      "bounds": [
+        0,
+        0,
+        1200,
+        2670
+      ]
+    },
+    {
+      "text": "",
+      "desc": "",
+      "bounds": [
+        0,
+        0,
+        1200,
+        2670
+      ]
+    },
+    {
+      "text": "",
+      "desc": "",
+      "bounds": [
+        0,
+        0,
+        1200,
+        2670
+      ]
+    },
+    {
+      "text": "",
+      "desc": "",
+      "bounds": [
+        0,
+        110,
+        1200,
+        2598
+      ]
+    },
+    {
+      "text": "",
+      "desc": "",
+      "bounds": [
+        0,
+        110,
+        1200,
+        2598
+      ]
+    },
+    {
+      "text": "",
+      "desc": "",
+      "bounds": [
+        0,
+        110,
+        1200,
+        2598
+      ]
+    },
+    {
+      "text": "",
+      "desc": "",
+      "bounds": [
+        0,
+        110,
+        1200,
+        2598
+      ]
+    },
+    {
+      "text": "",
+      "desc": "",
+      "bounds": [
+        0,
+        110,
+        1200,
+        2598
+      ]
+    },
+    {
+      "text": "",
+      "desc": "",
+      "bounds": [
+        0,
+        110,
+        1200,
+        2598
+      ]
+    },
+    {
+      "text": "",
+      "desc": "",
+      "bounds": [
+        0,
+        110,
+        1200,
+        2598
+      ]
+    },
+    {
+      "text": "PAPER GRID",
+      "desc": "",
+      "bounds": [
+        42,
+        209,
+        282,
+        251
+      ]
+    },
+    {
+      "text": "Settings",
+      "desc": "",
+      "bounds": [
+        621,
+        158,
+        834,
+        302
+      ]
+    },
+    {
+      "text": "E3DQ…DpJn",
+      "desc": "",
+      "bounds": [
+        855,
+        164,
+        1158,
+        296
+      ]
+    },
+    {
+      "text": "",
+      "desc": "Soldoku",
+      "bounds": [
+        120,
+        398,
+        1080,
+        719
+      ]
+    },
+    {
+      "text": "Soldoku",
+      "desc": "",
+      "bounds": [
+        39,
+        155,
+        42,
+        158
+      ]
+    },
+    {
+      "text": "",
+      "desc": "",
+      "bounds": [
+        42,
+        830,
+        1158,
+        2598
+      ]
+    },
+    {
+      "text": "Play a solo game, race a friend, or climb the competition leaderboard.",
+      "desc": "",
+      "bounds": [
+        42,
+        830,
+        1158,
+        974
+      ]
+    },
+    {
+      "text": "DEVNET · TEST TOKENS · NO CASH VALUE",
+      "desc": "",
+      "bounds": [
+        75,
+        1022,
+        834,
+        1067
+      ]
+    },
+    {
+      "text": "Continue game",
+      "desc": "",
+      "bounds": [
+        42,
+        1118,
+        1158,
+        1289
+      ]
+    },
+    {
+      "text": "New game",
+      "desc": "",
+      "bounds": [
+        42,
+        1316,
+        1158,
+        1487
+      ]
+    },
+    {
+      "text": "SOLO Play classic A quiet game. Pause whenever you want.",
+      "desc": "",
+      "bounds": [
+        42,
+        1514,
+        1158,
+        1760
+      ]
+    },
+    {
+      "text": "FREE Practice No wallet required. Same grid, two players.",
+      "desc": "",
+      "bounds": [
+        42,
+        1787,
+        1158,
+        2036
+      ]
+    },
+    {
+      "text": "LEADERBOARD Compete One attempt. Open entry. Fastest correct completion wins.",
+      "desc": "",
+      "bounds": [
+        42,
+        2063,
+        1158,
+        2363
+      ]
+    },
+    {
+      "text": "How to play",
+      "desc": "",
+      "bounds": [
+        42,
+        2390,
+        1158,
+        2537
+      ]
+    },
+    {
+      "text": "About this beta",
+      "desc": "",
+      "bounds": [
+        42,
+        2564,
+        1158,
+        2598
+      ]
+    }
+  ],
+  "len": 9804
+}

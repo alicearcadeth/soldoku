@@ -1,0 +1,68 @@
+{
+  "status": "passed",
+  "rejectedAt": "mwa-sheet",
+  "returnTexts": [
+    "Connect wallet",
+    "Choose your Solana wallet. You approve the connection in your wallet.",
+    "Mobile Wallet Adapter Waiting for approval…",
+    "Phantom",
+    "Get wallet ↗",
+    "Solflare",
+    "Backpack",
+    "Close"
+  ],
+  "log": [
+    {
+      "step": "mwa-tapped"
+    },
+    {
+      "i": 0,
+      "top": "topResumedActivity=ActivityRecord{69984983 u0 com.solanamobile.wallet/.MWABottomSheetActivity t46}",
+      "sample": []
+    },
+    {
+      "i": 1,
+      "top": "topResumedActivity=ActivityRecord{69984983 u0 com.solanamobile.wallet/.MWABottomSheetActivity t46}",
+      "sample": []
+    },
+    {
+      "i": 2,
+      "top": "topResumedActivity=ActivityRecord{69984983 u0 com.solanamobile.wallet/.MWABottomSheetActivity t46}",
+      "sample": []
+    },
+    {
+      "i": 3,
+      "top": "topResumedActivity=ActivityRecord{69984983 u0 com.solanamobile.wallet/.MWABottomSheetActivity t46}",
+      "sample": []
+    },
+    {
+      "i": 4,
+      "top": "topResumedActivity=ActivityRecord{69984983 u0 com.solanamobile.wallet/.MWABottomSheetActivity t46}",
+      "sample": []
+    },
+    {
+      "i": 5,
+      "top": "topResumedActivity=ActivityRecord{69984983 u0 com.solanamobile.wallet/.MWABottomSheetActivity t46}",
+      "sample": []
+    },
+    {
+      "i": 6,
+      "top": "topResumedActivity=ActivityRecord{69984983 u0 com.solanamobile.wallet/.MWABottomSheetActivity t46}",
+      "sample": []
+    },
+    {
+      "i": 7,
+      "top": "topResumedActivity=ActivityRecord{69984983 u0 com.solanamobile.wallet/.MWABottomSheetActivity t46}",
+      "sample": []
+    },
+    {
+      "i": 8,
+      "top": "topResumedActivity=ActivityRecord{69984983 u0 com.solanamobile.wallet/.MWABottomSheetActivity t46}",
+      "sample": []
+    },
+    {
+      "step": "mwa-back"
+    }
+  ],
+  "at": "2026-10-09T07:21:40.064Z"
+}
