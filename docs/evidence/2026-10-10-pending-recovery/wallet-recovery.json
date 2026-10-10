@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "declinedStoredNothing": true,
+  "signsBeforeSwitch": 2,
+  "signsAfterSwitch": 2,
+  "refreshSignedAgain": false,
+  "sameBytesResubmitted": true,
+  "expiryHeightPreserved": true,
+  "legacyClosedRoomRecovery": [
+    "expired",
+    "failed",
+    "confirmed"
+  ],
+  "rpcFailureKeptPending": true,
+  "checkRequestedNoSignature": true,
+  "explicitFreshApprovalAfterExpiry": true
+}

@@ -6,7 +6,7 @@ import { LEVELS, type Level } from "../engine/types";
 import { DAY_MS, elapsedLabel, usdLabel, type CompetitionSummary, type CompetitionView, type MarketToken, type FundedConfig } from "../competition/types";
 import { connectedAddress, signPlayMessage, signPlayTransaction, setPlayChain } from "../solana/browserWallet";
 import { roomCodeFromUrl, roomUrl, stakeBaseUnits, tokenUnitsLabel } from "../competition/roomLink";
-import type { PreparedCompetitionTransaction } from "../competition/chain";
+import type { PreparedCompetitionTransaction, SettlementObservation } from "../competition/chain";
 import { blockSecondApproval, readPending, recoveryMessage, rememberPending, signedTransactionIdentity, storageFailureMessage, writePending, type PendingEscrow } from "../competition/pendingTx";
 import { cellLabel } from "./boardInput";
 import { DialogFrame } from "./dialogFocus";
@@ -248,6 +248,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
   async function submitSaved(target: CompetitionView, auth: Session, item: PendingEscrow) {
     try {
       const sent = await api<{ signature: string }>("/api/competitions/submit", { code: target.code, actor: auth.actor, action: item.action, transaction: item.serialized });
+      if (sent.signature !== item.signature) throw new Error("Submit response does not match the stored transaction.");
       const next = rememberPending(readPending(localStorage), { ...item, signature: sent.signature || item.signature, status: "broadcast" });
       savePending(next);
       return sent.signature || item.signature;
@@ -261,20 +262,29 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
   async function escrowAction(target: CompetitionView, auth: Session, kind: "deposit" | "extend" | "claim") {
     const existing = blockSecondApproval(readPending(localStorage), target.code, auth.wallet);
     if (existing.blocked) throw new Error(existing.message);
+    if (existing.resume) {
+      const observed = await checkPending(target, auth, existing.resume);
+      if (observed === "confirmed") return;
+      if (observed === "failed" || observed === "expired") throw new Error(recoveryMessage(existing.resume, observed));
+      if (existing.resume.action !== kind) throw new Error(recoveryMessage(existing.resume, observed));
+    }
     let serialized = existing.resume?.serialized;
     let signature = existing.resume?.signature;
     let cluster = existing.resume?.cluster ?? "devnet";
+    let expiresAtBlockHeight = existing.resume?.expiresAtBlockHeight ?? 0;
     if (!existing.resume) {
       const prepared = await api<PreparedCompetitionTransaction>("/api/competitions/transaction", { code: target.code, actor: auth.actor, action: kind, ...(kind === "extend" ? { durationMs: extra } : {}) });
       if (!target.funded || prepared.wallet !== auth.wallet || prepared.mint !== target.funded.mint || prepared.stakeUnits !== target.funded.stakeUnits
         || prepared.action !== kind || !["devnet", "localnet"].includes(prepared.cluster)) throw new Error("Transaction preview does not match this competition.");
       setPlayChain(prepared.cluster);
       cluster = prepared.cluster;
+      expiresAtBlockHeight = prepared.expiresAtBlockHeight;
       setBusy(kind === "deposit" ? `Approve ${target.stake} TEST deposit in your wallet` : `Approve ${kind} in your wallet`);
       let signed: Uint8Array | null;
       try { signed = await signPlayTransaction(Uint8Array.from(atob(prepared.transaction), character => character.charCodeAt(0))); }
       catch (error) {
         if (error instanceof Error && /declined/i.test(error.message)) throw new Error("Wallet approval was cancelled. Nothing was submitted.");
+        if (error instanceof Error && /session timeout/i.test(error.message)) throw new Error("Wallet signing timed out or was cancelled. Nothing new was submitted by Soldoku. Retry when ready.");
         throw error;
       }
       if (!signed) throw new Error("Choose a wallet that supports transaction signing.");
@@ -286,7 +296,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
     }
     if (!serialized || !signature) throw new Error(recoveryMessage({ action: kind, signature: signature ?? "unknown" }, "unknown"));
     setBusy("Resubmitting the signed transaction. A timeout is not a failure.");
-    const sentSignature = await submitSaved(target, auth, { code: target.code, wallet: auth.wallet, action: kind, signature, serialized, cluster, expiresAtBlockHeight: existing.resume?.expiresAtBlockHeight ?? 0, status: "broadcast" });
+    const sentSignature = await submitSaved(target, auth, { code: target.code, wallet: auth.wallet, action: kind, signature, serialized, cluster, expiresAtBlockHeight, status: "broadcast" });
     const nextReceipt = { code: target.code, signature: sentSignature, cluster };
     setReceipt(nextReceipt); localStorage.setItem("sudoku.competitionReceipt", JSON.stringify(nextReceipt));
     setBusy("Transaction submitted · waiting for finalized escrow confirmation");
@@ -301,12 +311,21 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
       }
       setRoom(latest);
       if (kind === "deposit" && latest.you || kind === "extend" && latest.funded!.startsAt > target.funded!.startsAt || kind === "claim" && latest.you?.claimed) {
-        savePending(rememberPending(readPending(localStorage), { code: target.code, wallet: auth.wallet, action: kind, signature: sentSignature, serialized, cluster, expiresAtBlockHeight: existing.resume?.expiresAtBlockHeight ?? 0, status: "confirmed" }));
+        savePending(rememberPending(readPending(localStorage), { code: target.code, wallet: auth.wallet, action: kind, signature: sentSignature, serialized, cluster, expiresAtBlockHeight, status: "confirmed" }));
         return;
       }
     }
-    savePending(rememberPending(readPending(localStorage), { code: target.code, wallet: auth.wallet, action: kind, signature: sentSignature, serialized, cluster, expiresAtBlockHeight: existing.resume?.expiresAtBlockHeight ?? 0, status: "unknown" }));
+    savePending(rememberPending(readPending(localStorage), { code: target.code, wallet: auth.wallet, action: kind, signature: sentSignature, serialized, cluster, expiresAtBlockHeight, status: "unknown" }));
     throw new Error(recoveryMessage({ action: kind, signature: sentSignature }, "unknown"));
+  }
+  async function checkPending(target: CompetitionView, auth: Session, item: PendingEscrow): Promise<SettlementObservation> {
+    if (item.wallet !== auth.wallet || item.code !== target.code || item.cluster !== fundingConfig?.cluster) throw new Error("Reconnect the original wallet and network to check this receipt.");
+    const result = await api<{ signature: string; observation: SettlementObservation }>("/api/competitions/recover", { code: target.code, actor: auth.actor, action: item.action, transaction: item.serialized });
+    if (result.signature !== item.signature || !["confirmed", "failed", "expired", "pending", "unknown"].includes(result.observation)) throw new Error("Recovery response does not match the stored transaction.");
+    const status = result.observation === "pending" ? "broadcast" : result.observation;
+    savePending(rememberPending(readPending(localStorage), { ...item, status, note: recoveryMessage(item, result.observation) }));
+    if (result.observation === "confirmed") setRoom(await api<CompetitionView>("/api/competitions/sync", { code: target.code, actor: auth.actor }));
+    return result.observation;
   }
   async function claim() {
     if (!room) return;
@@ -335,6 +354,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
   const values = room?.you?.board;
   const givens = room?.you?.givens;
   const active = room && now < room.endsAt;
+  const pendingReceipt = room && readPending(localStorage).find(item => item.code === room.code && item.wallet === wallet.address && ["prepared", "broadcast", "unknown"].includes(item.status));
   const canJoin = active && (!room?.funded || now < room.funded.startsAt && ["pending", "open"].includes(room.funded.chainStatus));
   const canStart = active && (!room?.funded || now >= room.funded.startsAt && room.funded.chainTime >= room.funded.startsAt && room.funded.chainStatus === "open" && room.participants >= 2 && !room.you?.claimed);
   const canClaim = room?.funded && room.you && !room.you.claimed && (room.funded.chainStatus === "refunding"
@@ -418,6 +438,11 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
           {canClaim && <button className="primary" disabled={Boolean(busy)} onClick={() => void claim()}>{room.funded.chainStatus === "awarded" ? "Claim winner payout" : "Claim stake refund"}</button>}
           {receipt?.code === room.code && <p className="choice-note">{receipt.cluster === "devnet" ? <a href={`https://explorer.solana.com/tx/${encodeURIComponent(receipt.signature)}?cluster=devnet`} target="_blank" rel="noreferrer">View transaction</a> : "Local validator transaction submitted."}</p>}
         </section>}
+        {pendingReceipt && <button className="secondary" disabled={Boolean(busy)} onClick={() => void action("Checking the saved transaction", async () => {
+          const auth = await identity(); if (!auth) return;
+          const observed = await checkPending(room, auth, pendingReceipt);
+          throw new Error(observed === "expired" || observed === "failed" ? "The earlier transaction did not land. Its receipt is kept. You can retry if registration is still open; otherwise use a new room." : recoveryMessage(pendingReceipt, observed));
+        })}>Check pending transaction</button>}
         {canJoin && !room.you && <><p className="choice-note">Join verifies your wallet with a message signature (no deposit for free rooms). Your timer starts only when you press Start challenge.</p><button className="primary" disabled={Boolean(busy)} onClick={() => void join(room.code)}>{room.funded ? `Deposit ${room.stake} TEST to join` : "Join room"}</button></>}
         {room.funded && !room.you && <button className="secondary" disabled={Boolean(busy)} onClick={() => void action("Checking your escrow entry", async () => {
           const auth = await identity(); if (!auth) return;

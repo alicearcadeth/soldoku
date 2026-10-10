@@ -3,6 +3,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { once } from "node:events";
 import { Keypair, Transaction, SystemProgram } from "@solana/web3.js";
 import { chromium } from "playwright";
+import bs58 from "bs58";
 
 const port = 5174;
 const base = `http://127.0.0.1:${port}`;
@@ -28,7 +29,7 @@ const otherAddress = other.publicKey.toBase58();
 const mint = "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4";
 const unsigned = new Transaction({ feePayer: signer.publicKey, recentBlockhash: Keypair.generate().publicKey.toBase58() });
 unsigned.add(SystemProgram.transfer({ fromPubkey: signer.publicKey, toPubkey: other.publicKey, lamports: 1 }));
-const transaction = Buffer.from(unsigned.serialize({ requireAllSignatures: false, verifySignatures: false })).toString("base64");
+let transaction = Buffer.from(unsigned.serialize({ requireAllSignatures: false, verifySignatures: false })).toString("base64");
 const room = {
   code: "A1B2C3D4", name: "Recovery check", level: "easy", createdAt: 1, endsAt: Date.now() + 3_600_000, durationMs: 3_600_000,
   participants: 1, status: "active", token: { mint, symbol: "TEST", name: "Soldoku Token (Devnet)", priceUsd: 0, updatedAt: 0 },
@@ -41,6 +42,8 @@ const browser = await chromium.launch({ channel: "chrome", headless: true });
 const page = await browser.newPage();
 const submits = [];
 let proofWallet = address;
+let observation = "unknown";
+let recoveryUnavailable = false;
 await page.route("**/api/competitions/**", async route => {
   const url = new URL(route.request().url());
   let body = {};
@@ -49,10 +52,15 @@ await page.route("**/api/competitions/**", async route => {
   if (url.pathname.endsWith("/proof")) { proofWallet = body.wallet || address; return route.fulfill({ json: { id: "proof-1", message: "Sign in to Soldoku Devnet" } }); }
   if (url.pathname.endsWith("/authorize")) return route.fulfill({ json: { actor: "actor-1", wallet: proofWallet, expires: Date.now() + 600000 } });
   if (url.pathname.endsWith("/transaction")) return route.fulfill({ json: { transaction, action: "claim", wallet: address, cluster: "devnet", room: "room", mint, stakeUnits: "1000000", startsAt: room.funded.startsAt, endsAt: room.endsAt, refundAt: room.funded.refundAt, expiresAtBlockHeight: 9 } });
+  if (url.pathname.endsWith("/recover")) {
+    if (recoveryUnavailable) return route.abort();
+    const signature = bs58.encode(Transaction.from(Buffer.from(body.transaction, "base64")).signature);
+    return route.fulfill({ json: { signature, observation } });
+  }
   if (url.pathname.endsWith("/submit")) {
     submits.push(body.transaction);
     if (submits.length === 1) return route.abort();
-    return route.fulfill({ json: { signature: "submitted-signature" } });
+    return route.fulfill({ json: { signature: bs58.encode(Transaction.from(Buffer.from(body.transaction, "base64")).signature) } });
   }
   if (url.pathname.endsWith("/sync")) return route.fulfill({ json: { ...room, you: { ...room.you, claimed: true } } });
   return route.fulfill({ json: url.pathname.endsWith("/competitions") ? { rooms: [] } : room });
@@ -102,6 +110,8 @@ try {
     throw new Error(JSON.stringify({ alerts, signs, submits: submits.length, cause: error.message }));
   }
   const signsAfterLoss = await page.evaluate(() => window.__escrowSigns());
+  const pendingAfterLoss = await page.evaluate(() => JSON.parse(localStorage.getItem("sudoku.pendingEscrow") ?? "[]"));
+  if (pendingAfterLoss[0]?.expiresAtBlockHeight !== 9) throw new Error("Lost-response recovery erased the prepared transaction expiry height.");
   if (signsAfterLoss !== 2) throw new Error(`Expected the declined attempt and one signature, saw ${signsAfterLoss}.`);
   await page.evaluate(() => window.__switchEscrowAccount());
   await page.getByRole("button", { name: "Claim stake refund" }).click();
@@ -116,9 +126,48 @@ try {
   const signsAfterRefresh = await page.evaluate(() => window.__escrowSigns());
   if (signsAfterRefresh !== 0) throw new Error("Refresh asked for a new signature instead of resubmitting the stored one.");
   if (submits.length !== 2 || submits[0] !== submits[1]) throw new Error("Refresh did not resubmit the same signed bytes.");
-  const evidence = { passed: true, declinedStoredNothing: true, signsBeforeSwitch: signsAfterLoss, signsAfterSwitch, refreshSignedAgain: signsAfterRefresh !== 0, sameBytesResubmitted: submits[0] === submits[1] };
-  mkdirSync("docs/evidence/2026-10-08-browser", { recursive: true });
-  writeFileSync("docs/evidence/2026-10-08-browser/wallet-recovery.json", JSON.stringify(evidence, null, 2));
+  // Exercise the actual closed-room UI seam with legacy receipts, not just helper functions.
+  room.endsAt = Date.now() - 60000;
+  async function seedLegacy() {
+    await page.evaluate((receipt) => {
+      const old = { ...receipt, status: "unknown", expiresAtBlockHeight: 0 };
+      localStorage.setItem("sudoku.pendingEscrow", JSON.stringify([old]));
+    }, pendingAfterLoss[0]);
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await page.getByRole("button", { name: "Check pending transaction" }).waitFor();
+  }
+  await seedLegacy(); recoveryUnavailable = true;
+  await page.getByRole("button", { name: "Check pending transaction" }).click();
+  await page.getByRole("alert").filter({ hasText: /Cannot reach/ }).waitFor();
+  let saved = await page.evaluate(() => JSON.parse(localStorage.getItem("sudoku.pendingEscrow")));
+  if (saved[0].status !== "unknown") throw new Error("RPC failure cleared a pending receipt.");
+  recoveryUnavailable = false; observation = "pending";
+  await page.getByRole("button", { name: "Check pending transaction" }).click();
+  await page.getByRole("alert").filter({ hasText: /still unconfirmed/ }).waitFor();
+  saved = await page.evaluate(() => JSON.parse(localStorage.getItem("sudoku.pendingEscrow")));
+  if (saved[0].status !== "broadcast") throw new Error("Pending observation unblocked a new approval.");
+  for (const terminal of ["expired", "failed", "confirmed"]) {
+    const countBeforeCheck = submits.length;
+    await seedLegacy(); observation = terminal;
+    await page.getByRole("button", { name: "Check pending transaction" }).click();
+    await page.getByRole("alert").filter({ hasText: terminal === "confirmed" ? /earlier transaction is confirmed/ : /earlier transaction did not land/ }).waitFor();
+    saved = await page.evaluate(() => JSON.parse(localStorage.getItem("sudoku.pendingEscrow")));
+    if (saved[0].status !== terminal || saved[0].serialized !== submits[0]) throw new Error("Recovery lost the receipt or terminal state.");
+    if (await page.evaluate(() => window.__escrowSigns()) !== 0) throw new Error("Checking an old transaction requested a signature.");
+    if (submits.length !== countBeforeCheck) throw new Error("Read-only recovery submitted a transaction.");
+    if (terminal === "expired") {
+      unsigned.recentBlockhash = Keypair.generate().publicKey.toBase58();
+      transaction = Buffer.from(unsigned.serialize({ requireAllSignatures: false, verifySignatures: false })).toString("base64");
+      await page.evaluate(() => window.__escrowSet({ mode: "sign" }));
+      await page.getByRole("button", { name: "Claim stake refund" }).click();
+      await page.getByText("Your claim is complete.").waitFor();
+      if (await page.evaluate(() => window.__escrowSigns()) !== 1 || submits.length !== countBeforeCheck + 1 || submits.at(-1) === submits[0]) throw new Error("Explicit retry after expiry did not sign exactly one fresh transaction.");
+    }
+  }
+  const evidence = { passed: true, declinedStoredNothing: true, signsBeforeSwitch: signsAfterLoss, signsAfterSwitch, refreshSignedAgain: signsAfterRefresh !== 0, sameBytesResubmitted: submits[0] === submits[1], expiryHeightPreserved: true, legacyClosedRoomRecovery: ["expired", "failed", "confirmed"], rpcFailureKeptPending: true, checkRequestedNoSignature: true, explicitFreshApprovalAfterExpiry: true };
+  const evidenceDir = process.env.SEEKER_RECOVERY_EVIDENCE ?? "docs/evidence/2026-10-10-pending-recovery";
+  mkdirSync(evidenceDir, { recursive: true });
+  writeFileSync(`${evidenceDir}/wallet-recovery.json`, JSON.stringify(evidence, null, 2));
   console.log(JSON.stringify(evidence));
 } finally {
   await browser.close();

@@ -33,6 +33,23 @@ function fixture() {
   return { store, call, auth, owner, b, c, created, chain, adapter, prepare, setTime: (at: number) => { time = at; }, sends: () => sends };
 }
 describe("funded leaderboard admission and integrity", () => {
+  it("checks saved transactions while paused without broadcasting or changing financial state", async () => {
+    const f = fixture(); const before = f.store.snapshot();
+    let observedWallet = "";
+    f.adapter.observeTransaction = async (context, action, raw) => {
+      observedWallet = context.wallet;
+      expect(action).toBe("deposit"); expect(raw).toBe("signed-bytes");
+      return { signature: "stored-signature", observation: "expired" };
+    };
+    const result = await prepareCompetitionRequest(f.store, f.adapter, "POST", new URL("https://soldoku.com/api/competitions/recover"), {
+      code: f.created.code, actor: f.owner.actor, action: "deposit", transaction: "signed-bytes",
+    }, { paused: true });
+    expect(result.result).toEqual({ signature: "stored-signature", observation: "expired" });
+    expect(observedWallet).toBe(f.owner.wallet); expect(result.afterCommit).toBeUndefined();
+    expect(f.sends()).toBe(0); expect(f.store.snapshot()).toBe(before);
+    await expect(f.prepare("/recover", { code: f.created.code, actor: "invalid", action: "deposit", transaction: "signed-bytes" })).rejects.toThrow();
+    await expect(f.prepare("/recover", { code: f.created.code, actor: f.owner.actor, action: "settle", transaction: "signed-bytes" })).rejects.toThrow(/action/);
+  });
   it("keeps intents unfunded and blocks free-join bypass until actual verified entries are supplied", () => {
     const f = fixture(); expect(f.created.participants).toBe(0); expect(f.created.you).toBeNull();
     expect(f.created.funded.chainStatus).toBe("pending");

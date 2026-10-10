@@ -6,6 +6,7 @@ import { assertRelayedCompetitionTransaction, competitionInstructions, COMPETITI
 import { missingTesterTokenAccount, TESTER_SOL_AIRDROP, TESTER_SOL_FAUCET, TESTER_TOKEN_GRANT, type TesterPlan } from "./testerFunds";
 import type { FundedConfig, VerifiedChainRoom } from "./types";
 import type { createCompetitionStore } from "./store";
+import { observeSignedEscrow } from "./transactionObservation";
 
 export type CompetitionEnvironment = {
   SUDOKU_COMPETITION_PROGRAM_ID?: string; SUDOKU_COMPETITION_AUTHORITY_KEY?: string;
@@ -29,6 +30,7 @@ export type CompetitionChain = {
   prepareSettlement?(context: Context): Promise<PreparedSettlement | null>;
   broadcastSettlement?(serialized: string): Promise<string>;
   observeSettlement?(signature: string, lastValidBlockHeight: number): Promise<SettlementObservation>;
+  observeTransaction?(context: Context, action: string, raw: unknown): Promise<{ signature: string; observation: SettlementObservation }>;
   submit(raw: unknown, wallet: string, binding?: RelayBinding): Promise<string>;
   faucetConfigured: boolean;
   testerBalances(wallet: string): Promise<{ solLamports: number; testUnits: bigint }>;
@@ -252,5 +254,10 @@ export function competitionChain(env: CompetitionEnvironment): CompetitionChain 
     }
     return { solSignature, testSignature, note };
   }
-  return { config, cluster, verify, read, transaction, settle, prepareSettlement, broadcastSettlement, observeSettlement, submit, faucetConfigured: faucet !== null, testerBalances, fundTester };
+  async function observeTransaction(context: Context, action: string, raw: unknown) {
+    await verify();
+    const ix = bound(context);
+    return observeSignedEscrow(connection, raw, context.wallet, config.program, ix.room.toBase58(), action);
+  }
+  return { config, cluster, verify, read, transaction, settle, prepareSettlement, broadcastSettlement, observeSettlement, observeTransaction, submit, faucetConfigured: faucet !== null, testerBalances, fundTester };
 }

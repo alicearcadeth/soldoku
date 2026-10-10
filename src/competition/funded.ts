@@ -32,7 +32,7 @@ export async function prepareCompetitionRequest(store: Store, chain: Competition
       catch (error) { store.releaseFaucet(context.wallet, context.now); throw error; }
     } };
   }
-  const special = ["/transaction", "/submit", "/sync", "/settle"].some(path => url.pathname === `/api/competitions${path}`);
+  const special = ["/transaction", "/submit", "/sync", "/settle", "/recover"].some(path => url.pathname === `/api/competitions${path}`);
   if (special) {
     if (method !== "POST") throw new Error("Use POST for escrow actions.");
     if (!chain) throw new Error("The multi-player competition escrow is not configured.");
@@ -40,6 +40,12 @@ export async function prepareCompetitionRequest(store: Store, chain: Competition
       throw new Error("New deposits are paused. Claims, refunds, and settlement still work.");
     }
     const context = store.fundingContext(body.code, body.actor);
+    if (url.pathname.endsWith("/recover")) {
+      if (!chain.observeTransaction) throw new Error("Transaction recovery is unavailable. Keep the existing receipt and try later.");
+      const action = String(body.action);
+      if (!["deposit", "extend", "claim"].includes(action)) throw new Error("Unknown competition transaction action.");
+      return { result: await chain.observeTransaction(context, action, body.transaction) };
+    }
     if (url.pathname.endsWith("/submit")) {
       const action = body.action;
       if (action !== "deposit" && action !== "extend" && action !== "claim") throw new Error("Unknown competition transaction action.");
