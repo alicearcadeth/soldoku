@@ -35,7 +35,7 @@ Existing broader limits remain: skipped integrations, dependency advisories, no 
 
 ## Evidence
 
-Pending-receipt recovery correction is prepared locally on 10 October: authenticated read-only chain reconciliation, legacy height-zero receipts, terminal-state retention, explicit fresh retry, and checking closed rooms while funding is paused. Browser regression passed and the full suite has 316 passes/6 skips. Deployment and verification of the actual Seeker receipt in 110FBE65 remain required. See `docs/evidence/2026-10-10-pending-recovery/REPORT.md`.
+Pending-receipt recovery correction is live as 795e6d1 on both domains as of 10 October: authenticated read-only chain reconciliation, legacy height-zero receipts, terminal-state retention, explicit fresh retry, and checking closed rooms while funding is paused. Browser regression passed and the full suite has 316 passes/6 skips. The actual old Seeker receipt in 110FBE65 was reconciled without signing or clearing storage, survived app recreation with the original wallet connected, and left its balance at 20 TEST. See `docs/evidence/2026-10-10-pending-recovery-deploy/REPORT.md`. This supersedes the earlier unreconciled-receipt limitation above.
 
 DAABEC94 refund follow-up is scheduled once for 10 October at 23:05 ICT. Its stake is not yet refunded; the owner must approve the wallet request after unlock.
 

@@ -1,0 +1,27 @@
+{
+  "observedAt": "2026-10-10T03:10:37.053Z",
+  "results": [
+    {
+      "host": "soldoku.com",
+      "commit": "795e6d190cad968d04919fcc61cbdcd6244f6d23",
+      "dirty": false,
+      "paused": true,
+      "cluster": "devnet",
+      "jsHash": "c13b1a68bb43e0687527151ad8f56a00ac33f89cbfd496948de08b76b35f83bd",
+      "csp": "script-src 'self' 'sha256-0O7guzLcvq90WTIFoiK+MIxo2eYv1PMO5mZfGr8llGg='; frame-ancestors 'none'",
+      "nosniff": "nosniff",
+      "referrer": "no-referrer"
+    },
+    {
+      "host": "www.soldoku.com",
+      "commit": "795e6d190cad968d04919fcc61cbdcd6244f6d23",
+      "dirty": false,
+      "paused": true,
+      "cluster": "devnet",
+      "jsHash": "c13b1a68bb43e0687527151ad8f56a00ac33f89cbfd496948de08b76b35f83bd",
+      "csp": "script-src 'self' 'sha256-0O7guzLcvq90WTIFoiK+MIxo2eYv1PMO5mZfGr8llGg='; frame-ancestors 'none'",
+      "nosniff": "nosniff",
+      "referrer": "no-referrer"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "observedAt": "2026-10-10T03:12:49.390Z",
+  "balance": "20000000",
+  "paused": true,
+  "cluster": "devnet",
+  "states": [
+    {
+      "code": "110FBE65",
+      "participants": 0,
+      "chainStatus": "pending",
+      "startsAt": 1791562315000
+    },
+    {
+      "code": "E0FD563E",
+      "participants": 1,
+      "chainStatus": "refunding",
+      "startsAt": 1791600855000
+    },
+    {
+      "code": "DAABEC94",
+      "participants": 1,
+      "chainStatus": "open",
+      "startsAt": 1791648246000
+    },
+    {
+      "code": "FE65DD6D",
+      "participants": 2,
+      "chainStatus": "paid",
+      "startsAt": 1791555031000
+    }
+  ],
+  "oldSignatureStatus": null,
+  "cardStatus": 403
+}
