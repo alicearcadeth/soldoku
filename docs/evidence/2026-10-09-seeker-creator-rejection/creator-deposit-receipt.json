@@ -1,0 +1,57 @@
+{
+  "signature": "36K1yM7AzAm1UbzXDZrJwgNqFEYehjgCFoRJAtbigNykevDm7KNJ8Vj1aAYVmQGevaBepKK6dNEw9KEKPLAFjCxu",
+  "slot": 509231734,
+  "blockTime": 1791561555,
+  "meta": {
+    "err": null,
+    "fee": 10000,
+    "preTokenBalances": [
+      {
+        "accountIndex": 2,
+        "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+        "owner": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+        "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "uiTokenAmount": {
+          "amount": "21000000",
+          "decimals": 6,
+          "uiAmount": 21,
+          "uiAmountString": "21"
+        }
+      }
+    ],
+    "postTokenBalances": [
+      {
+        "accountIndex": 2,
+        "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+        "owner": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+        "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "uiTokenAmount": {
+          "amount": "20000000",
+          "decimals": 6,
+          "uiAmount": 20,
+          "uiAmountString": "20"
+        }
+      },
+      {
+        "accountIndex": 3,
+        "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+        "owner": "osSqJs6YAucUHq4qMxbF5wUjki132bdotmwqmTb1PnC",
+        "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "uiTokenAmount": {
+          "amount": "1000000",
+          "decimals": 6,
+          "uiAmount": 1,
+          "uiAmountString": "1"
+        }
+      }
+    ]
+  },
+  "signers": [
+    "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+    "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N"
+  ],
+  "programs": [
+    "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+    "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs"
+  ]
+}

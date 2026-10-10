@@ -25,11 +25,19 @@ Classic, Practice and free competitions remain available. New funded rooms and d
 
 ## Remaining limits
 
-The bounded physical funded join/play/payout/refund flow passed; phone creation/opening of a funded room remains untested. Physical connect-wait recovery passed on 88a40f8 after a confirmed return and page interaction. The early claim-cancellation probe remains inconclusive. Phone is left disconnected after that test. Existing broader limits remain: skipped integrations, dependency advisories, no live D1 restore rehearsal, solver/collusion resistance, and no real-money/provider approval. This Devnet test does not establish unattended or Mainnet production readiness. External invites have not been sent.
+The bounded physical funded join/play/payout/refund flow passed. Physical creator/opening, solo refund, and finalized refund-byte replay also passed on 88a40f8 in room E0FD563E on 10 October: wallet 20 → 19 → 20 TEST, vault empty, replay +0. Phone remains connected.
+
+Physical cancellation without signing in 110FBE65 moved no funds; returning and touching the page cleared the wait after about eight seconds with generic `session timeout` copy. The subsequent approved retry did not land and its pending receipt was not cleared or altered. A successful new room does not establish recovery from that older unresolved local receipt. The early claim-cancellation probe remains inconclusive.
+
+One outstanding test stake remains in DAABEC94 after an approved one-day extension: 1 TEST, solo refund available 10 October 2026 at 23:04:06 ICT. No program or database changes were made to bypass its deadline.
+
+Existing broader limits remain: skipped integrations, dependency advisories, no live D1 restore rehearsal, solver/collusion resistance, and no real-money/provider approval. This Devnet test does not establish unattended or Mainnet production readiness. External invites have not been sent.
 
 ## Evidence
 
 - `docs/evidence/2026-10-09-seeker-relay-fix/`: rejection, red/green regression and diagnostic refund.
 - `docs/evidence/2026-10-09-seeker-relay-fixed-physical/`: phone deposit and winner journey.
 - `docs/evidence/2026-10-09-seeker-relay-fixed-refund/`: phone deposit and no-finish refund journey.
+- `docs/evidence/2026-10-09-seeker-creator-rejection/`: physical creator, approved extension, cancellation and unconfirmed retry evidence.
+- `docs/evidence/2026-10-10-seeker-creator-retry/`: physical creator deposit, solo refund and finalized-byte replay.
 

@@ -8,7 +8,7 @@ assert.equal(await c.getGenesisHash(),'EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkr
 const phone=new PublicKey('E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn');
 const mint=new PublicKey('BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4');
 const program='6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs';
-const rooms=[{code:'FE65DD6D',escrow:'9CnVK49t9ezyDAs4ZZ2of7iakjvdPzbkB8MagkFqnUwq',tag:4},{code:'E571262D',escrow:'H2TJmpAgAcBFp2gAUKeK1S7ue4CehAxB7BPj62Ec46G9',tag:5}];
+const rooms=process.env.SEEKER_REPLAY_ROOMS?JSON.parse(process.env.SEEKER_REPLAY_ROOMS):[{code:'FE65DD6D',escrow:'9CnVK49t9ezyDAs4ZZ2of7iakjvdPzbkB8MagkFqnUwq',tag:4},{code:'E571262D',escrow:'H2TJmpAgAcBFp2gAUKeK1S7ue4CehAxB7BPj62Ec46G9',tag:5}];
 const receipts=[];
 for(const room of rooms){
  const rows=await c.getSignaturesForAddress(new PublicKey(room.escrow),{limit:12});
@@ -32,6 +32,6 @@ for(const room of rooms){
  assert.equal(vault,0n,`${room.code} still has outstanding TEST`);
  receipts.push({code:room.code,signature:found.row.signature,confirmationStatus:'finalized',err:found.row.err,slot:found.row.slot,fee:found.tx.meta.fee,preTokenBalances:found.tx.meta.preTokenBalances,postTokenBalances:found.tx.meta.postTokenBalances,replay,before:before.toString(),after:after.toString(),replayDelta:(after-before).toString(),vaultAmount:vault.toString()});
 }
-writeFileSync('docs/evidence/2026-10-09-seeker-relay-fixed-physical/physical-claim-replay.json',JSON.stringify({observedAt:new Date().toISOString(),receipts},null,2));
+writeFileSync(process.env.SEEKER_REPLAY_OUT??'docs/evidence/2026-10-09-seeker-relay-fixed-physical/physical-claim-replay.json',JSON.stringify({observedAt:new Date().toISOString(),receipts},null,2));
 console.log(JSON.stringify(receipts.map(({code,signature,confirmationStatus,replayDelta,vaultAmount})=>({code,signature,confirmationStatus,replayDelta,vaultAmount}))));
 

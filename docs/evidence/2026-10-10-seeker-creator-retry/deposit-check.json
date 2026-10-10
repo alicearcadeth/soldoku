@@ -1,0 +1,35 @@
+{
+  "observedAt": "2026-10-10T02:51:52.785Z",
+  "code": "E0FD563E",
+  "participants": 1,
+  "funded": {
+    "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+    "authority": "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N",
+    "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+    "decimals": 6,
+    "playMs": 1800000,
+    "graceMs": 3600000,
+    "id": "169439261356598419",
+    "stakeUnits": "1000000",
+    "startsAt": 1791600855000,
+    "refundAt": 1791606255000,
+    "chainStatus": "open",
+    "confirmedParticipants": 1,
+    "chainTime": 0,
+    "winner": null
+  },
+  "escrow": "CrY37amj7V6TwdsRqbBFE8MeuUgzZEFn14xgxm5BDmce",
+  "vault": "1000000",
+  "balance": "19000000",
+  "signatures": [
+    {
+      "blockTime": 1791600689,
+      "confirmationStatus": "finalized",
+      "err": null,
+      "memo": null,
+      "signature": "2nVLDty6vdBUa7KwmAC376CVBmTvc4js6iJgJiRsvF5ne9KvG27qa3xwf7RMVqRWeeQYC8HSwXC6QBDUvfXwzPT8",
+      "slot": 509395759,
+      "transactionIndex": 8
+    }
+  ]
+}

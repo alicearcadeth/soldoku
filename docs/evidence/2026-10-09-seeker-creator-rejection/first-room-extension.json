@@ -1,0 +1,34 @@
+{
+  "signature": "5mvXw6Uv8C23Cc7QkQvXFJyiV6jyA94qkkcj4dfMksW4WAy9gKKF2FSFXqHB44ncQ8DENBHsTEZDbkXST8AJRoe3",
+  "slot": 509232623,
+  "blockTime": 1791561767,
+  "err": null,
+  "fee": 25000,
+  "signers": [
+    "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn"
+  ],
+  "instructions": [
+    {
+      "accounts": [
+        "osSqJs6YAucUHq4qMxbF5wUjki132bdotmwqmTb1PnC",
+        "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn"
+      ],
+      "data": "3BrFoxUx19Sf",
+      "programId": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+      "stackHeight": 1
+    },
+    {
+      "accounts": [],
+      "data": "Fj2Eoy",
+      "programId": "ComputeBudget111111111111111111111111111111",
+      "stackHeight": 1
+    },
+    {
+      "accounts": [],
+      "data": "3gJqkocMWaMm",
+      "programId": "ComputeBudget111111111111111111111111111111",
+      "stackHeight": 1
+    }
+  ],
+  "ownerClarification": "Owner reported creating/approving rather than rejecting the initial transaction. A separately signed extension added one day."
+}

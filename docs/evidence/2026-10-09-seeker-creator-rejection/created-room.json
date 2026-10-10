@@ -1,0 +1,37 @@
+{
+  "code": "DAABEC94",
+  "name": "Seeker_creator_rejection",
+  "level": "easy",
+  "createdAt": 1791561515560,
+  "endsAt": 1791563646000,
+  "durationMs": 330440,
+  "participants": 0,
+  "status": "active",
+  "token": {
+    "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+    "symbol": "TEST",
+    "name": "Soldoku Token (Devnet)",
+    "priceUsd": 0,
+    "updatedAt": 0
+  },
+  "stake": 1,
+  "bestMs": null,
+  "funded": {
+    "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+    "authority": "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N",
+    "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+    "decimals": 6,
+    "playMs": 1800000,
+    "graceMs": 3600000,
+    "id": "10282088355203224939",
+    "stakeUnits": "1000000",
+    "startsAt": 1791561846000,
+    "refundAt": 1791567246000,
+    "chainStatus": "pending",
+    "confirmedParticipants": 0,
+    "chainTime": 0,
+    "winner": null
+  },
+  "leaderboard": [],
+  "you": null
+}

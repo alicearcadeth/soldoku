@@ -1,0 +1,37 @@
+{
+  "code": "E0FD563E",
+  "name": "Seeker_retry_Oct10",
+  "level": "easy",
+  "createdAt": 1791600524289,
+  "endsAt": 1791602655000,
+  "durationMs": 330711,
+  "participants": 0,
+  "status": "active",
+  "token": {
+    "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+    "symbol": "TEST",
+    "name": "Soldoku Token (Devnet)",
+    "priceUsd": 0,
+    "updatedAt": 0
+  },
+  "stake": 1,
+  "bestMs": null,
+  "funded": {
+    "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+    "authority": "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N",
+    "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+    "decimals": 6,
+    "playMs": 1800000,
+    "graceMs": 3600000,
+    "id": "169439261356598419",
+    "stakeUnits": "1000000",
+    "startsAt": 1791600855000,
+    "refundAt": 1791606255000,
+    "chainStatus": "pending",
+    "confirmedParticipants": 0,
+    "chainTime": 0,
+    "winner": null
+  },
+  "leaderboard": [],
+  "you": null
+}

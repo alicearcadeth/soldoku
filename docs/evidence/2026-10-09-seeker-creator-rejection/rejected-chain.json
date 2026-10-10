@@ -1,0 +1,12 @@
+{
+  "observedAt": "2026-10-09T16:01:14.085Z",
+  "code": "DAABEC94",
+  "participants": 1,
+  "chainStatus": "open",
+  "escrow": "osSqJs6YAucUHq4qMxbF5wUjki132bdotmwqmTb1PnC",
+  "escrowExists": true,
+  "wallet": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+  "balance": "20000000",
+  "paused": true,
+  "rejectionReportedByOwner": true
+}
