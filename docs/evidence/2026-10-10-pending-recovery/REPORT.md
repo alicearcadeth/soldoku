@@ -1,6 +1,10 @@
 # Pending transaction recovery correction
 
-Live remains `88a40f8`. New funded rooms/deposits remain paused. The correction is local until its exact release is authorized and deployed.
+Live remains `88a40f8`. New funded rooms/deposits remain paused. Candidate runtime `795e6d190cad968d04919fcc61cbdcd6244f6d23` is pushed to the private repository and backed up with a verified restore. It is not deployed.
+
+Clean detached checkout `C:\Soldoku-reconstruct\release-pending-recovery-20261010`: `npm ci`, `npm test` (316 passed/6 skipped), and `npm run build` passed. Manifest `dirty: false`; JS `/assets/index-D3sUv44N.js`, SHA-256 `c13b1a68bb43e0687527151ad8f56a00ac33f89cbfd496948de08b76b35f83bd`. `release-candidate.json` records complete asset hashes. Dependency audit remains 0 critical, 14 high, 6 moderate; no dependency upgrade in this fix.
+
+Deploy only the reviewed runtime candidate if authorized, retaining the funding-pause secret. Verify release metadata and both domains, then recover the actual Seeker receipt in 110FBE65 using Check pending transaction without clearing storage. Recheck finalized history and balance; it is a closed room, so do not reopen its registration or expect a new deposit there. No program upgrade or financial database restore.
 
 ## Reproduction
 

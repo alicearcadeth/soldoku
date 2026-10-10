@@ -1,0 +1,20 @@
+{
+  "commit": "795e6d190cad968d04919fcc61cbdcd6244f6d23",
+  "dirty": false,
+  "assets": {
+    "/apple-touch-icon.png": "35af2d20bc390ec49d75b8c93796a4a4d19dad3c2696966cab1833af3065d4a2",
+    "/assets/index-D3sUv44N.js": "c13b1a68bb43e0687527151ad8f56a00ac33f89cbfd496948de08b76b35f83bd",
+    "/assets/index-kysR4Rwb.css": "41382a06bfe4e1500b15dd916f60258fb5590936e6b4702e9dfaa02bee96f9cc",
+    "/brand/soldoku-logo.png": "e09b5df4d3cd2614a3ba4f5815dc17c9573b3d1913c6525a49c4e7f075f81eed",
+    "/favicon.ico": "372c0912d7c1b73ddada23317b83b2d652bcb079d9ceafb4ab8b028d269bb6b5",
+    "/fonts/OFL-Atkinson.txt": "b5b7a8bc1e0e92be9b64abd8abd92659488733aa5be8d982bc872c36dac73f08",
+    "/fonts/OFL-Inter.txt": "b3195af0fb14368d1b3b10fb9d3fe503b7163ea083859d2ee553bc74da07c320",
+    "/fonts/atkinson-latin-400.woff2": "5cb240a4d99ab7e6fc3a4d4e6d11d89789fdffe9c86a8384000d662c53283f6f",
+    "/fonts/atkinson-latin-700.woff2": "0dbe07ed7679407db9d90f747d5ca3bd1b2bb7ccbcbe41c8246cfc6d2c7bc3bc",
+    "/fonts/inter-latin-400.woff2": "8909904ab6c872eb994093482a88a28eca2cd95912d7b6fecd72103b0dc07edc",
+    "/fonts/inter-latin-600.woff2": "f9a06e79cd3a2a20951c0f0e28f66dd0e6d3fda73911d640a2125c8fcb78f21a",
+    "/icon-32.png": "a004d3591bec5db5d33e8347f758d882321d6a33d7af245edf08190230ba9e3f",
+    "/index.html": "e908d7a06ee9bedb874de0b6f81ad5732bfd57d042782acae6c3d805f55195fd",
+    "/sw.js": "1b12635c713923d37a6461c64f163d5848c475301aa2b69685e324c62bdf8c94"
+  }
+}
