@@ -82,7 +82,7 @@ export function TokenStake({ onChange, supportedMint }: { onChange: (token: Mark
   function select(next: MarketToken) { setToken(next); setMint(next.mint); setOpen(false); setError(null); }
   return <section className="stack stake-section" aria-label="Token entry">
     <button className="secondary token-picker" onClick={() => setOpen(true)}><span>Choose token</span><strong>{isTest ? "Soldoku Token" : token?.symbol ?? "Choose token"} ▾</strong></button>
-    {token && <div className="quote-line"><strong>{token.name} · {token.symbol}</strong><span>{price > 0 ? `${usdLabel(price)} per token` : isTest ? "No cash value" : "Price unavailable"}</span></div>}
+    {token && <div className="quote-line"><strong>{token.name} · {displaySymbol}</strong><span>{price > 0 ? `${usdLabel(price)} per token` : isTest ? "No cash value" : "Price unavailable"}</span></div>}
     <div className="tools stake-presets" role="group" aria-label="Entry amount">{[1, 2, 5].map(value => <button key={value} aria-pressed={kind === "tokens" && Number(input) === value} className={kind === "tokens" && Number(input) === value ? "on" : ""} onClick={() => { setKind("tokens"); setInput(String(value)); }}><strong>{value} {displaySymbol}</strong><span>{price > 0 ? `≈ ${usdLabel(value * price)}` : isTest ? "No cash value" : "USD unavailable"}</span></button>)}</div>
     <p className="choice-note">Choose a preset or enter your own amount, such as 3 or 10.</p>
     <div className="amount-fields">

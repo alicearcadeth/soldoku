@@ -437,7 +437,7 @@ export function Compete({ onExit, initialMode = "practice" }: Props) {
 
   async function fund() {
     if (!takeAction()) return;
-    setBusy("Requesting test tokens");
+    setBusy("Requesting Soldoku tokens");
     setError(null);
     try {
       const key = playerKey();
@@ -708,7 +708,7 @@ export function Compete({ onExit, initialMode = "practice" }: Props) {
         </header>
         <p className="status">
           <span className="chip">{roomState(room)}</span>
-          {room.staked && <span className="chip">{room.stake ?? "1 test token"} each · pool {poolLabel(room.stake)}</span>}
+          {room.staked && <span className="chip">{room.stake ?? "1 Soldoku token"} each · pool {poolLabel(room.stake)}</span>}
         </p>
         {!room.startedAt && (
           <p className="lede">
@@ -717,7 +717,7 @@ export function Compete({ onExit, initialMode = "practice" }: Props) {
               : room.staked
               ? room.you.deposited
                 ? `Share code ${room.code}. Waiting for the other deposit.`
-                : `Share code ${room.code}. Deposit ${room.stake ?? "1 test token"} to lock the stake.`
+                : `Share code ${room.code}. Deposit ${room.stake ?? "1 Soldoku token"} to lock the stake.`
               : room.listed
                 ? `Share code ${room.code}, or wait here. Quick match can seat the next player.`
                 : `Share code ${room.code}. The clock starts when a second player joins.`}
@@ -739,7 +739,7 @@ export function Compete({ onExit, initialMode = "practice" }: Props) {
         )}
         {room.staked && room.you.deposited && (room.chain === "refunded" || refundOpen(funds?.status ?? null, funds?.joinDeadline ?? null, funds?.settleDeadline ?? null, Math.floor(now / 1000))) && (
           <button className="secondary" type="button" aria-busy={busy !== null} disabled={busy !== null} onClick={() => void refund()}>
-            {busy ?? (readPending("sudoku.pendingRefund", seat) ? "Check refund" : room.chain === "refunded" ? "Submit refund again" : "Refund stake · return my test tokens")}
+            {busy ?? (readPending("sudoku.pendingRefund", seat) ? "Check refund" : room.chain === "refunded" ? "Submit refund again" : "Refund stake · return my Soldoku tokens")}
           </button>
         )}
         {room.staked && room.canClose && (localnet || room.programId === STAGING_ESCROW_PROGRAM_ID) && (room.chain === "settled" || room.chain === "refunded" || funds?.status === 2 || funds?.status === 3) && (
@@ -817,22 +817,22 @@ export function Compete({ onExit, initialMode = "practice" }: Props) {
         <p className="lede">
           {mode === "practice"
             ? "Practice races are free. No wallet required. The clock starts when a second player joins, and no tokens move."
-            : "Same grid for both players. First correct finish wins. At 0:00, more correct cells wins. A tie is a draw. Each player deposits the same entry, 1, 2, or 5 test tokens. Test tokens have no cash value."}
+            : "Same grid for both players. First correct finish wins. At 0:00, more correct cells wins. A tie is a draw. Each player deposits the same entry, 1, 2, or 5 Soldoku tokens. Test tokens have no cash value."}
         </p>
         {mode === "staked" && (
           <p className="choice-note">
             {staging
               ? `This is ${cluster}. After settlement or refund, the opener can close the empty match and receive its rent back.`
               : NEW_DEPOSITS_HELD
-                ? `This app is on ${cluster}. The stake is fixed when a room opens. This beta does not convert SOL. New deposits are paused, so Create and Join cannot open a paid room. A refund for a room that already has a deposit still returns those test tokens. It does not return the network fee, and this Devnet program does not return the rent that opened the match.`
-                : `This app is on ${cluster}. The stake is fixed when the room opens. This beta does not convert SOL. Deposit the test token for this room. A refund returns those test tokens. It does not return the network fee, and this Devnet program does not return the rent that opened the match. The clock starts only after both deposits confirm.`}
+                ? `This app is on ${cluster}. The stake is fixed when a room opens. This beta does not convert SOL. New deposits are paused, so Create and Join cannot open a paid room. A refund for a room that already has a deposit still returns those Soldoku tokens. It does not return the network fee, and this Devnet program does not return the rent that opened the match.`
+                : `This app is on ${cluster}. The stake is fixed when the room opens. This beta does not convert SOL. Deposit the Soldoku token for this room. A refund returns those Soldoku tokens. It does not return the network fee, and this Devnet program does not return the rent that opened the match. The clock starts only after both deposits confirm.`}
           </p>
         )}
-        {mode === "staked" && !localnet && cluster === "devnet" && !staging && <p className="badge">DEVNET · TEST TOKENS · NO CASH VALUE</p>}
-        {mode === "staked" && staging && <p className="badge">STAGING · DEVNET · TEST TOKENS · NO CASH VALUE</p>}
+        {mode === "staked" && !localnet && cluster === "devnet" && !staging && <p className="badge">DEVNET · SOLDOKU TOKENS · NO CASH VALUE</p>}
+        {mode === "staked" && staging && <p className="badge">STAGING · DEVNET · SOLDOKU TOKENS · NO CASH VALUE</p>}
         {mode === "staked" && !room && (
           <>
-            <p className="choice-note">Entry: {selectedStake} test token{selectedStake === 1 ? "" : "s"} from each player. 1, 2, and 5 are whole tokens. This choice is not a deposit yet, and both players deposit this same amount.</p>
+            <p className="choice-note">Entry: {selectedStake} Soldoku token{selectedStake === 1 ? "" : "s"} from each player. 1, 2, and 5 are whole tokens. This choice is not a deposit yet, and both players deposit this same amount.</p>
             <div className="tools" role="group" aria-label="Entry amount">
               {stakeChoices().map((choice) => (
                 <button key={choice} type="button" className={stake === choice ? "on" : ""} aria-pressed={stake === choice} onClick={() => setStake(choice)}>
@@ -869,7 +869,7 @@ export function Compete({ onExit, initialMode = "practice" }: Props) {
           <p className="choice-note">{walletBalanceCopy(balances.sol, balances.token)}</p>
         )}
         {mode === "staked" && (
-          <p className="choice-note" role="status">Card funding unavailable. Competition entry still requires a wallet-signed TEST deposit.</p>
+          <p className="choice-note" role="status">Card funding unavailable. Competition entry still requires a wallet-signed Soldoku deposit.</p>
         )}
         {mode === "staked" && import.meta.env.DEV && new URLSearchParams(window.location.search).has("fiatSandbox") && (
           <AddFunds stakeAtomic={stake} wallet={wallet} roomCode={seat?.code || codeInput || "sandbox"} />
@@ -960,7 +960,7 @@ export function Compete({ onExit, initialMode = "practice" }: Props) {
 
 function poolLabel(stake: string | null): string {
   const each = stake?.match(/\d+/)?.[0] ?? "1";
-  return `${Number(each) * 2} test tokens`;
+  return `${Number(each) * 2} Soldoku tokens`;
 }
 
 function Slider({ gate, onChange, onRelease }: { gate: Gate; onChange: (value: number) => void; onRelease: (value: number) => void }) {

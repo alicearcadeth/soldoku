@@ -67,7 +67,7 @@ export function AddFunds({ stakeAtomic, wallet, roomCode = "sandbox" }: { stakeA
     }
     save(opened.intent);
     setNote(wallet
-      ? "Preview only. Destination wallet and expected TEST are shown below. No live checkout opens."
+      ? "Preview only. Destination wallet and expected Soldoku are shown below. No live checkout opens."
       : "Preview wallet only. Connect a wallet before any future real checkout. Card funding remains unavailable.");
   }
 
@@ -118,7 +118,7 @@ export function AddFunds({ stakeAtomic, wallet, roomCode = "sandbox" }: { stakeA
     <section className="stack" aria-label="Card funding preview">
       <p className="choice-note" role="status">Card funding unavailable for live play. {caps.reason}</p>
       <p className="choice-note">
-        Destination wallet: {wallet ?? "not connected"} · Expected asset: {stakeAtomic} base units of TEST ·
+        Destination wallet: {wallet ?? "not connected"} · Expected asset: {stakeAtomic} base units of Soldoku ·
         Wallet signing remains required for competition escrow.
       </p>
       <div className="tools">

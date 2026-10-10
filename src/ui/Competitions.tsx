@@ -50,9 +50,9 @@ function durationText(ms: number) { return ms % DAY_MS === 0 ? `${ms / DAY_MS} d
 function TesterFunds({ busy, note, faucet, onRequest }: { busy: boolean; note: string | null; faucet: boolean; onRequest: () => void }) {
   return <section className="stack" aria-label="Get test funds">
     <h2>Get test funds</h2>
-    <p className="choice-note">SOL covers fees; TEST covers your stake. Both have no cash value. One request per day.</p>
+    <p className="choice-note">SOL covers fees; Soldoku covers your stake. Both have no cash value. One request per day.</p>
     <p className="choice-note">Need SOL? Try <a href="https://faucet.solana.com" target="_blank" rel="noreferrer">faucet.solana.com</a>.</p>
-    {!faucet && <p className="banner">TEST minting is not enabled on this server yet. A SOL request still runs.</p>}
+    {!faucet && <p className="banner">Soldoku minting is not enabled on this server yet. A SOL request still runs.</p>}
     <button type="button" className="secondary" disabled={busy} onClick={onRequest}>Get test funds</button>
     {note && <p role="status">{note}</p>}
   </section>;
@@ -72,8 +72,8 @@ function escrowNotice(room: CompetitionView, now: number) {
 }
 function RoomFacts({ room }: { room: CompetitionSummary }) {
   return <dl className="room-facts">
-    <div><dt>Game mode</dt><dd>Sudoku · {room.level}</dd></div><div><dt>Token</dt><dd>{room.token?.symbol ?? "None · free entry"}</dd></div>
-    <div><dt>Stake per player</dt><dd>{room.token ? `${room.stake} ${room.token.symbol}` : "0"}</dd></div><div><dt>{room.funded ? "Prize pool" : "Approx. USD"}</dt><dd>{room.funded ? `${tokenUnitsLabel((BigInt(room.funded.stakeUnits) * BigInt(room.participants)).toString(), room.funded.decimals)} TEST` : usdLabel(room.stake * (room.token?.priceUsd ?? 0))}</dd></div>
+    <div><dt>Game mode</dt><dd>Sudoku · {room.level}</dd></div><div><dt>Token</dt><dd>{room.funded ? "Soldoku (Devnet)" : room.token?.symbol ?? "None · free entry"}</dd></div>
+    <div><dt>Stake per player</dt><dd>{room.token ? `${room.stake} ${room.funded ? "Soldoku" : room.token.symbol}` : "0"}</dd></div><div><dt>{room.funded ? "Prize pool" : "Approx. USD"}</dt><dd>{room.funded ? `${tokenUnitsLabel((BigInt(room.funded.stakeUnits) * BigInt(room.participants)).toString(), room.funded.decimals)} Soldoku` : usdLabel(room.stake * (room.token?.priceUsd ?? 0))}</dd></div>
     <div><dt>{room.funded ? "Play window" : "Competition period"}</dt><dd>{durationText(room.funded ? room.endsAt - room.funded.startsAt : room.durationMs)}</dd></div><div><dt>Participants</dt><dd>{room.participants} · {room.funded ? "confirmed deposits" : "open entry"}</dd></div>
     <div><dt>Status</dt><dd>{room.funded ? room.funded.chainStatus === "pending" ? "Awaiting creator deposit" : room.funded.chainStatus === "paid" ? "Winner paid" : room.funded.chainStatus === "refunding" ? "Refunds available" : room.funded.chainStatus === "awarded" ? "Winner payout available" : Date.now() < room.funded.startsAt ? "Registration open" : room.status === "active" ? "Competition running" : "Awaiting settlement" : room.status === "active" ? "Active" : "Ended"}</dd></div><div><dt>Best completion</dt><dd>{room.bestMs === null ? "No finishes yet" : elapsedLabel(room.bestMs)}</dd></div>
   </dl>;
@@ -194,7 +194,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
       const result = await api<{ solSignature: string | null; testSignature: string | null; note: string | null }>("/api/competitions/faucet", { actor: auth.actor });
       const parts = [
         result.solSignature ? "Devnet SOL airdrop submitted." : null,
-        result.testSignature ? "20 TEST submitted to this wallet." : null,
+        result.testSignature ? "20 Soldoku submitted to this wallet." : null,
         result.note,
       ].filter((part): part is string => Boolean(part));
       setFundNote(parts.join(" ") || "Test funds requested.");
@@ -209,7 +209,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
   async function prepareCreate() {
     await action("Preparing room", async () => {
       if (mode === "tokens" && !fundingConfig) throw new Error(fundingReason);
-      if (mode === "tokens") { if (token?.mint !== fundingConfig!.mint) throw new Error("Choose TEST to create a room. Other tokens are for exploring amounts."); stakeBaseUnits(stake, fundingConfig!.decimals); }
+      if (mode === "tokens") { if (token?.mint !== fundingConfig!.mint) throw new Error("Choose Soldoku to create a room. Other tokens are for exploring amounts."); stakeBaseUnits(stake, fundingConfig!.decimals); }
       if (!Number.isInteger(period) || period < 60000 || period > 365 * DAY_MS) throw new Error("Choose a duration between 1 minute and 365 days.");
       const auth = await identity(); if (!auth) return;
       const result = await api<{ id: string; target: number }>("/api/competitions/check", { actor: auth.actor });
@@ -279,7 +279,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
       setPlayChain(prepared.cluster);
       cluster = prepared.cluster;
       expiresAtBlockHeight = prepared.expiresAtBlockHeight;
-      setBusy(kind === "deposit" ? `Approve ${target.stake} TEST deposit in your wallet` : `Approve ${kind} in your wallet`);
+      setBusy(kind === "deposit" ? `Approve ${target.stake} Soldoku deposit in your wallet` : `Approve ${kind} in your wallet`);
       let signed: Uint8Array | null;
       try { signed = await signPlayTransaction(Uint8Array.from(atob(prepared.transaction), character => character.charCodeAt(0))); }
       catch (error) {
@@ -398,8 +398,8 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
         <h3>Difficulty</h3><div className="tools" role="group" aria-label="Difficulty">{LEVELS.map(item => <button key={item} aria-pressed={item === level} className={item === level ? "on" : ""} onClick={() => setLevel(item)}>{item[0].toUpperCase() + item.slice(1)}</button>)}</div>
         <h2>2. Set the stake</h2>{mode === "tokens" ? <>
           <TokenStake onChange={changeStake} supportedMint={fundingConfig?.mint} />
-          <p className="choice-note">Devnet only · TEST deposits. Other tokens are amount previews.</p>
-          <p className="choice-note" role="status">Card funding unavailable. Competition entry still requires a wallet-signed TEST deposit.</p>
+          <p className="choice-note">Devnet only · Soldoku deposits. Other tokens are amount previews.</p>
+          <p className="choice-note" role="status">Card funding unavailable. Competition entry still requires a wallet-signed Soldoku deposit.</p>
           {fundingConfig?.paused && <p className="choice-note" role="status">New funded rooms are paused. Claims, refunds, and settlement still work. Free competitions remain available.</p>}
           {import.meta.env.DEV && new URLSearchParams(window.location.search).has("fiatSandbox") && (
             <AddFunds stakeAtomic={stakeBaseUnits(stake, fundingConfig?.decimals ?? 6)} wallet={wallet.address} roomCode={roomCode || "sandbox"} />
@@ -410,7 +410,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
         <h2>3. Set the {mode === "tokens" && fundingConfig ? "registration" : "competition"} period</h2><Duration value={period} onChange={setPeriod} funded={mode === "tokens" && Boolean(fundingConfig)} />
         <p className="choice-note">Ends approximately {Number.isFinite(period) ? new Date(now + period + (mode === "tokens" && fundingConfig ? fundingConfig.playMs + 30000 : 0)).toLocaleString() : "—"}. The creator can extend it only before another player joins.</p>
         {mode === "tokens" && !fundingConfig ? <button className="primary" disabled={Boolean(busy)} onClick={() => { setMode("free"); setError(null); }}>Switch to free competition</button> : <button className="primary" disabled={Boolean(busy) || (mode === "tokens" && (Boolean(fundingConfig?.paused) || !token || token.mint !== fundingConfig?.mint || !stake))} onClick={() => void prepareCreate()}>{mode === "tokens" && fundingConfig?.paused ? "Funded rooms paused" : "Create room"}</button>}
-        {mode === "tokens" && fundingConfig && token && token.mint !== fundingConfig.mint && <p className="choice-note" role="status">{token.symbol === "SOL" ? "SOL covers network fees. This escrow accepts TEST stakes only." : `${token.symbol} is preview only. This escrow accepts TEST stakes only.`} Choose TEST in the token picker to create a room.</p>}
+        {mode === "tokens" && fundingConfig && token && token.mint !== fundingConfig.mint && <p className="choice-note" role="status">{token.symbol === "SOL" ? "SOL covers network fees. This escrow accepts Soldoku stakes only." : `${token.symbol} is preview only. This escrow accepts Soldoku stakes only.`} Choose Soldoku in the token picker to create a room.</p>}
       </section> : <section className="stack">
         {fundingConfig && <details><summary>Need test funds?</summary><TesterFunds busy={Boolean(busy)} note={fundNote} faucet={Boolean(fundingConfig.testerFaucet)} onRequest={() => void requestTesterFunds()} /></details>}
         <h2>Competition rooms</h2><label className="check-label"><input type="checkbox" checked={showEnded} onChange={event => setShowEnded(event.target.checked)} /> Include ended competitions</label>
@@ -430,7 +430,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
         <RoomFacts room={{ ...room, status: active ? "active" : "ended" }} /><p className="choice-note">Ends {new Date(room.endsAt).toLocaleString()}. No fixed player limit.</p>
         {room.you?.completedMs != null && <><p className="banner">Finished in {elapsedLabel(room.you.completedMs)} · rank {room.you.rank}{active ? " so far. Rankings can change until the room closes." : ". Competition ended."}</p><p className="choice-note">Share this room’s code to invite others, or use Back to Rooms for another competition.</p></>}
         {!active && <p className="banner">Competition ended. {room.bestMs === null ? "No player completed the grid in time." : room.funded ? "The unique fastest verified completion wins. Exact fastest ties refund all entrants." : "The fastest verified completion is the winning time. Equal times share first place."}</p>}
-        {room.funded && <section className="stack" aria-label="Escrow competition status"><p className="choice-note">{fundingConfig?.cluster === "localnet" ? "Local validator" : "Devnet"} · TEST entry</p>{fundingConfig && <details><summary>Need test funds?</summary><TesterFunds busy={Boolean(busy)} note={fundNote} faucet={Boolean(fundingConfig.testerFaucet)} onRequest={() => void requestTesterFunds()} /></details>}<p role="status">{escrowNotice(room, now)}</p><p className="choice-note">Fastest unique finish wins the pool. Ties or no finishes refund everyone.</p>
+        {room.funded && <section className="stack" aria-label="Escrow competition status"><p className="choice-note">{fundingConfig?.cluster === "localnet" ? "Local validator" : "Devnet"} · Soldoku entry</p>{fundingConfig && <details><summary>Need test funds?</summary><TesterFunds busy={Boolean(busy)} note={fundNote} faucet={Boolean(fundingConfig.testerFaucet)} onRequest={() => void requestTesterFunds()} /></details>}<p role="status">{escrowNotice(room, now)}</p><p className="choice-note">Fastest unique finish wins the pool. Ties or no finishes refund everyone.</p>
           {room.you && <p className="banner">{room.you.claimed ? "Your claim is complete." : "Your stake is confirmed in escrow."}</p>}
           {room.participants === 1 && now >= room.funded.startsAt && <p className="banner">No opponent joined. The creator can claim a full stake refund.</p>}
           {room.funded.winner && <p>Winner wallet: <span className="token-mint">{room.funded.winner}</span></p>}
@@ -443,7 +443,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
           const observed = await checkPending(room, auth, pendingReceipt);
           throw new Error(observed === "expired" || observed === "failed" ? "The earlier transaction did not land. Its receipt is kept. You can retry if registration is still open; otherwise use a new room." : recoveryMessage(pendingReceipt, observed));
         })}>Check pending transaction</button>}
-        {canJoin && !room.you && <><p className="choice-note">Join verifies your wallet with a message signature (no deposit for free rooms). Your timer starts only when you press Start challenge.</p><button className="primary" disabled={Boolean(busy)} onClick={() => void join(room.code)}>{room.funded ? `Deposit ${room.stake} TEST to join` : "Join room"}</button></>}
+        {canJoin && !room.you && <><p className="choice-note">Join verifies your wallet with a message signature (no deposit for free rooms). Your timer starts only when you press Start challenge.</p><button className="primary" disabled={Boolean(busy)} onClick={() => void join(room.code)}>{room.funded ? `Deposit ${room.stake} Soldoku to join` : "Join room"}</button></>}
         {room.funded && !room.you && <button className="secondary" disabled={Boolean(busy)} onClick={() => void action("Checking your escrow entry", async () => {
           const auth = await identity(); if (!auth) return;
           const recovered = await api<CompetitionView>("/api/competitions/sync", { code: room.code, actor: auth.actor });

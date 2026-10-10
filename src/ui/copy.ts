@@ -1,7 +1,7 @@
 /** Player-facing labels. These do not choose amounts, accounts, or instructions. */
 
-export const HELP_FUNDED_ROOMS = "Free leaderboard rooms take no tokens. Funded rooms use Devnet TEST, which has no cash value. Other token symbols are amount previews and are not deposited.";
-export const ABOUT_FUNDED_ROOMS = "Leaderboard competitions allow open entry until the deadline. Each wallet gets one timed attempt at the same grid. Rankings stay provisional until the room closes. A creator can extend the period only before another participant joins. Free rooms take no tokens. Funded rooms use Devnet TEST. Other symbols in the token picker are amount previews.";
+export const HELP_FUNDED_ROOMS = "Free leaderboard rooms take no tokens. Funded rooms use Soldoku tokens on Devnet. These tokens have no cash value. Other token symbols are amount previews and are not deposited.";
+export const ABOUT_FUNDED_ROOMS = "Leaderboard competitions allow open entry until the deadline. Each wallet gets one timed attempt at the same grid. Rankings stay provisional until the room closes. A creator can extend the period only before another participant joins. Free rooms take no tokens. Funded rooms use Soldoku tokens on Devnet. Other symbols in the token picker are amount previews.";
 
 export function shortAddress(address: string): string {
   if (address.length <= 8) return address;
@@ -16,13 +16,13 @@ export function stakeCount(stake: string | null): string {
 export function depositActionLabel(stake: string | null, pending: boolean): string {
   if (pending) return "Check deposit";
   const amount = stakeCount(stake);
-  return `Deposit stake · approve ${amount} test token${amount === "1" ? "" : "s"}`;
+  return `Deposit stake · approve ${amount} Soldoku token${amount === "1" ? "" : "s"}`;
 }
 
 export function walletBalanceCopy(solLamports: number, tokenAtomic: string): string {
   const tokens = (Number(tokenAtomic) / 1_000_000).toFixed(0);
   const sol = (solLamports / 1_000_000_000).toFixed(3);
-  return `Wallet balance: ${tokens} test tokens and ${sol} SOL for fees. This is not a match deposit.`;
+  return `Wallet balance: ${tokens} Soldoku tokens and ${sol} SOL for fees. This is not a match deposit.`;
 }
 
 /** Explains an in-flight wallet step. Returns null for unrelated busy text. */
