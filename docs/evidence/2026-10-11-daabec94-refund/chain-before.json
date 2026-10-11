@@ -1,0 +1,26 @@
+{
+  "at": "2026-10-11T01:44:43.484Z",
+  "config": {
+    "enabled": true,
+    "paused": true,
+    "cluster": "devnet",
+    "testerFaucet": true,
+    "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+    "authority": "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N",
+    "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+    "decimals": 6,
+    "playMs": 1800000,
+    "graceMs": 3600000
+  },
+  "room": "osSqJs6YAucUHq4qMxbF5wUjki132bdotmwqmTb1PnC",
+  "wallet": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+  "claimed": false,
+  "entryWallet": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+  "entryRoom": "osSqJs6YAucUHq4qMxbF5wUjki132bdotmwqmTb1PnC",
+  "status": "refunding",
+  "entrants": "1",
+  "stake": "1000000",
+  "joinDeadline": "1791648246",
+  "vault": "1000000",
+  "balance": "20000000"
+}

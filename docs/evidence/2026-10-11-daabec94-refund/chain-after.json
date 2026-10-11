@@ -1,0 +1,79 @@
+{
+  "at": "2026-10-11T01:58:03.689Z",
+  "code": "DAABEC94",
+  "config": {
+    "enabled": true,
+    "paused": true,
+    "cluster": "devnet",
+    "testerFaucet": true,
+    "program": "6uuszYMoZ2bBX8oVccpYPUgdhW6CSvASziN2m8LpJxYs",
+    "authority": "4uBUqMExgkzqW2WWKyrq1uSoAQAi3YenKnSsXTrB6T3N",
+    "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+    "decimals": 6,
+    "playMs": 1800000,
+    "graceMs": 3600000
+  },
+  "claimed": true,
+  "vault": "0",
+  "before": "20000000",
+  "balance": "21000000",
+  "delta": "1000000",
+  "receipt": {
+    "signature": "4sN5aNXedP2JwYa5yZXXsqYQrhFJ6cpwFzexRWYn2gLzNAjpWTNeugdBuuyevgKheA39YXgwDxwWo2Qgx2xzjr9D",
+    "slot": 509743002,
+    "confirmationStatus": "finalized",
+    "preTokenBalances": [
+      {
+        "accountIndex": 1,
+        "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+        "owner": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+        "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "uiTokenAmount": {
+          "amount": "20000000",
+          "decimals": 6,
+          "uiAmount": 20,
+          "uiAmountString": "20"
+        }
+      },
+      {
+        "accountIndex": 2,
+        "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+        "owner": "osSqJs6YAucUHq4qMxbF5wUjki132bdotmwqmTb1PnC",
+        "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "uiTokenAmount": {
+          "amount": "1000000",
+          "decimals": 6,
+          "uiAmount": 1,
+          "uiAmountString": "1"
+        }
+      }
+    ],
+    "postTokenBalances": [
+      {
+        "accountIndex": 1,
+        "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+        "owner": "E3DQypoRXpB47tgSNdjdWgjvVyn3PYPHLut5j2S7DpJn",
+        "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "uiTokenAmount": {
+          "amount": "21000000",
+          "decimals": 6,
+          "uiAmount": 21,
+          "uiAmountString": "21"
+        }
+      },
+      {
+        "accountIndex": 2,
+        "mint": "BtdrgokAvXQE4yj3zS48c4ktnMSy3TGoRkHCWD5fV8U4",
+        "owner": "osSqJs6YAucUHq4qMxbF5wUjki132bdotmwqmTb1PnC",
+        "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "uiTokenAmount": {
+          "amount": "0",
+          "decimals": 6,
+          "uiAmount": null,
+          "uiAmountString": "0"
+        }
+      }
+    ],
+    "fee": 45000
+  }
+}
