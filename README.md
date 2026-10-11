@@ -1,99 +1,115 @@
+<div align="center">
+
+<img src="public/brand/soldoku-logo.png" alt="Soldoku" width="112" />
+
 # Soldoku
 
-A Sudoku app with Classic, Practice, leaderboard competitions and legacy two-player races. Funded competitions now use a separate multi-player Devnet escrow: players deposit TEST, play the same grid after registration closes, and the unique fastest server-verified finish receives the full pool. Ties and no valid finishes refund entrants.
+### One grid. Your fastest finish.
 
-The public app is a **Devnet** beta. The stake is a test token. It has **no cash value**. Mainnet staking is not enabled. New testers request Devnet SOL and TEST from the Compete screen. See [docs/testers.md](docs/testers.md).
+Sudoku for quiet solo play, friendly races, and wallet-connected competitions on Solana.
 
-The new funded competition flow passed a three-wallet browser test with real Devnet deposits, settlement and winner payout. Public receipts are recorded in [the browser evidence](docs/evidence/competition-devnet-browser.json). The implementation is pushed and deployed to the public Soldoku Worker. The production three-wallet test passed deposits, shared-grid competition, ranking, finalized settlement and full 3 TEST winner payout with an empty vault. See [production receipts](docs/evidence/competition-production-devnet.json). Local, GitHub and both public-domain assets match. See [competition setup and verification](docs/competition-devnet-build.md) for configuration, current limits and live refund tests. Funded creation stays disabled without its separate program and server authority configuration.
+[Play Soldoku](https://soldoku.com) · [Demo guide](submission/demo-script.md) · [Verification evidence](docs/evidence)
 
-## Play
+</div>
 
-- Soldoku Devnet competitions: https://soldoku.com/
-- Inert production shell: https://sudoku-mainnet.jamesbitarcade.workers.dev
+---
 
-Classic starts without a wallet. Practice starts without a wallet. Staked mode asks for a Devnet wallet and shows `DEVNET`, `TEST TOKENS`, and `NO CASH VALUE`.
+## A familiar game, a shared challenge
 
-## Legacy two-player architecture
+Soldoku brings competitive Sudoku into a simple mobile and browser experience. Players solve the same grid, record a verified finish, and see where they rank. Start with a solo puzzle, race a friend without a wallet, or enter a leaderboard competition.
 
-The browser and the Android Web Shell talk to a Cloudflare Worker. The Worker deals the puzzle, records accepted moves, and builds escrow transactions. Players sign those transactions in their own wallet. The Worker never holds the stake.
+The goal is a usable game first: clear rules, readable results, and recoverable wallet actions. Solana adds escrow and verifiable payouts to funded competitions.
 
-The escrow program stores the players, the stake, and the deadlines in the match account at open. The match authority can later submit the server's win or draw result. It cannot change the mint, the stake, the players, the deadlines, or the payout wallets. Settlement pays only the two players' token accounts. After the vault is empty, the opener can close the match and vault accounts. The rent goes back to the opener.
+## Choose how to play
 
-The production program binary is built to accept only Mainnet USDC. It is not deployed. The Devnet staging program is a separate build that accepts one test mint. The public historical Devnet program is a third identity and is not upgraded by this repository's staging flow.
+| Mode | Experience | Wallet |
+| --- | --- | --- |
+| **Classic** | Solve at your own pace; pause and continue your saved game. | None |
+| **Practice** | Race a friend on the same grid. | None |
+| **Free competition** | Join a shared leaderboard, then start your timed attempt. | Message authorization |
+| **Funded competition** | Deposit an equal stake into escrow; compete for the pool. | Signed transactions |
 
-A future funding path quotes SOL to USDC through DFlow and then deposits that USDC. That broadcast is not turned on. If the wallet already holds the stake token, the app skips the swap.
+**Devnet beta · Soldoku tokens have no cash value.** New funded rooms and deposits are currently paused; existing claims, refunds, and settlement remain available. Card execution is disabled. Mainnet and real-money play are not enabled.
 
-## Development
+## Try the demo
 
-```powershell
+1. Open **[soldoku.com](https://soldoku.com)** and choose Classic to play immediately.
+2. Choose Practice to create a free race and share its room code.
+3. Choose Compete to explore leaderboard rooms. Connect a compatible wallet, authorize the message, and press **Start challenge** when ready.
+4. Finish the puzzle to see your recorded time and ranking.
+
+On a Seeker, Soldoku connects through Mobile Wallet Adapter and Seed Vault Wallet. Desktop browsers use compatible Wallet Standard wallets. Funded testing requires a wallet configured for the app's network; wallet connection and message authorization do not deposit a stake.
+
+The Android package is a web shell that loads the hosted app. Website releases therefore update the experience without rebuilding the APK. The APK and signing keys are not distributed through this README.
+
+## Competition flow
+
+**Registration → escrow deposit → shared puzzle → verified result → settlement → claim or refund**
+
+Players choose a preset or custom stake when creating a room. The amount is fixed for that room. Confirmed entrants start together when registration closes. The unique fastest valid finish wins the pool; exact fastest ties or no valid finishes refund entrants. A solo entrant can reclaim their stake when registration closes. A settlement deadline provides a further refund path.
+
+Players sign with their own wallets. The Worker prepares and validates transactions, checks results, and runs scheduled settlement; the Solana program holds the tokens in escrow. Puzzle verification and settlement authority are server responsibilities, so this is not a fully trustless competition system.
+
+Signed transaction receipts are saved before submission. An uncertain response is reconciled against chain state before a replacement is signed. Claims and refunds remain available while new funded entry is paused.
+
+## What has been demonstrated
+
+| Journey | Evidence |
+| --- | --- |
+| Physical Seeker connection, message authorization, free play, and return | [Device evidence](docs/evidence/2026-10-09-seeker/) |
+| Physical funded deposits, winner journey, and payout | [Funded device tests](docs/evidence/2026-10-09-seeker-relay-fixed-physical/) |
+| Scheduled settlement and retained confirmation receipt | [Scheduled round](docs/evidence/2026-10-09-scheduled-devnet/) |
+| Recovery of an actual stuck Seeker receipt without clearing storage | [Recovery report](docs/evidence/2026-10-10-pending-recovery-deploy/REPORT.md) |
+| Extended-room refund: wallet +1 Soldoku, vault empty, finalized | [DAABEC94 refund](docs/evidence/2026-10-11-daabec94-refund/REPORT.md) |
+
+Evidence records the release and conditions tested. These results demonstrate the tested flows; they do not establish general production security or unattended reliability.
+
+## Architecture
+
+| Layer | Role |
+| --- | --- |
+| React + TypeScript | Game, competition screens, wallet flow, and receipt recovery |
+| Cloudflare Worker + D1 | Room state, result verification, transaction validation, and settlement cron |
+| Solana competition escrow | Stakes, competition deadlines, winner claims, and refunds |
+| Android web shell | Hosted app with Mobile Wallet Adapter handoff |
+
+The current multiplayer competition code lives in `src/competition/`. Historical two-player race code remains in the repository; it is distinct from the current leaderboard escrow flow.
+
+Card-funding foundations separate provider payment, asset delivery, and escrow entry. A future provider could fund a supported Solana asset before a player signs their entry. Provider execution and public simulation are disabled; this is architecture groundwork, not a working checkout.
+
+## Run locally
+
+Use the Node version in `.nvmrc` and install the locked dependencies:
+
+```sh
 npm ci
 npm run dev
 ```
 
-`npm run dev` serves the local app. Localnet rooms use the test settlement mint and a disposable browser key. They are not Devnet and not Mainnet.
+Validate a change:
 
-Useful checks:
-
-```powershell
-npx tsc --noEmit
+```sh
 npm test
+npm run build
 ```
 
-On this machine `npx` is optional. `node node_modules/typescript/bin/tsc --noEmit` and `node node_modules/vitest/vitest.mjs run` are the same checks.
+The latest copy change passed **316 tests**, with **6 opt-in integration tests skipped**, and a TypeScript/Vite build. Skipped tests are not verified results. Local development does not authorize deployment or enable payments.
 
-## Legacy two-player program
+For Android setup, see [`android/`](android/) and [private setup instructions](docs/PRIVATE_SETUP.md). Keep wallet keys, signing credentials, and provider secrets outside the repository.
 
-The escrow crate is `programs/match-escrow`. A production build has no `test-settlement` feature and embeds the Mainnet USDC mint. A staging or localnet build uses `--features test-settlement` and the fixture mint. Do not load the production binary on localnet, and do not deploy either binary to Mainnet from these scripts.
+## Release and operations
 
-Solana CLI in this environment is the WSL install. `scripts/build-escrow-once.sh` builds the test binary, then the production binary. Run it only when you intend to rebuild. The deploy helper in `src/solana/productionDeploy.ts` refuses Devnet identities and never sets execute mode.
+The hosted version is identified by [`/api/release`](https://soldoku.com/api/release). GitHub main can include changes that have not been deployed. The public Worker configuration is `wrangler.soldoku.jsonc`.
 
-## Devnet staging
+- [Deployment and financial-state recovery](docs/deploy-devnet.md)
+- [Free competition pilot guide](docs/pilot/FREE-COMPETITION-PILOT.md)
+- [Card-funding architecture](docs/adr/0001-card-funding-foundations.md)
+- [Submission materials](submission/)
 
-Staging is a private rehearsal of the production instruction set on Devnet. It is not the public site. Start it only with Devnet RPC and the staging authority key in the environment:
+Remaining work includes dependency security findings, a live D1 restore rehearsal, stronger solver/collusion resistance, and external payment-provider approval. The Worker funding pause does not freeze direct on-chain joins. These limits must be addressed before broader financial operation.
 
-```powershell
-$env:SUDOKU_STAGING = "1"
-$env:SUDOKU_ESCROW_PROGRAM_ID = "GTJ68bR2Fwkc9JcYefH9Eas9gvHnR6AkZ3TincmJsst4"
-$env:SUDOKU_MINT = "7VaC5xJULHGQzsZsyUCaZ7BbLGNDENLjXiPbfbbRY84j"
-$env:SOLANA_CLUSTER = "devnet"
-$env:SOLANA_RPC = "<your devnet RPC>"
-$env:SUDOKU_AUTHORITY_KEY = Get-Content "$env:USERPROFILE\.config\solana\sudoku-staging-upgrade.json" -Raw
-node scripts/start-staging-server.mjs
-```
+## Built by Alice
 
-`scripts/staging-devnet-rehearse.mjs` runs the CLI lifecycle. It spends Devnet SOL on fees. It does not spend Mainnet assets.
+Created and maintained by **[Alice Arcade · alicearcadeth](https://github.com/alicearcadeth)**.
 
-## Android
-
-The Web Shell lives in `android/`, package `com.sudoku.game`. The release shell loads https://soldoku.com/. Build it with JDK 17 (`JAVA_HOME` set to that JDK) and an Android SDK (`ANDROID_HOME`):
-
-```powershell
-cd android
-.\gradlew.bat assembleRelease
-```
-
-Release signing uses the existing keystore outside this repo. Set `SOLANA_MOBILE_KEYSTORE_PATH`, `SOLANA_MOBILE_KEYSTORE_ALIAS`, `SOLANA_MOBILE_KEYSTORE_PASSWORD`, and `SOLANA_MOBILE_KEY_PASSWORD`. This repository does not contain the keystore or its password. See `docs/PRIVATE_SETUP.md`. A debug build can point at a local staging origin with `-PSOLANA_MOBILE_URL=http://10.0.2.2:5174` for the emulator. That debug build is not the submission APK.
-
-The shell opens `solana-wallet` links in a Mobile Wallet Adapter app. On a physical Seeker, Seed Vault Wallet has connected and signed a message. A Devnet deposit was blocked by the wallet before signing, with the warning “Scam site detected.” That deposit is not verified, and new deposits are paused in the public UI until support identifies the check. Classic, Practice, and refunds of an already funded room stay available.
-
-## Worker and database
-
-Public Worker config: `wrangler.jsonc`. Production config: `wrangler.production.jsonc`. Production D1 is empty of match rows. Do not copy Devnet rows into it. Recovery steps are in `docs/production-recovery.md`.
-
-The production worker returns 403 for financial routes until the owner sets the approval phrase. Do not set that phrase as part of ordinary development. `SUDOKU_FUNDING_PAUSED=1` refuses new paid rooms and still allows practice, moves, refund, settlement, and close for a room that is already open.
-
-## Test tokens
-
-Devnet stakes are TEST. A new tester connects a wallet on https://soldoku.com/ and uses **Get Devnet SOL and TEST**. That requests 1 SOL when the fee balance is under 0.05 SOL, and 20 TEST when the TEST balance is under 5. Each wallet can do this once per day. If Devnet refuses the airdrop, use https://faucet.solana.com for the same wallet. Details are in [docs/testers.md](docs/testers.md).
-
-A desktop staging session can create a disposable key in the browser. That key is not a personal wallet. Fund it only from the staging authority on Devnet. The public site expects a normal Devnet wallet.
-
-## Legacy two-player limits
-
-An outside Sudoku solver can still be used. The server rejects impossible move sequences and very fast finishes, and it flags a fast finish for review. It does not take the stake because of that flag. See `docs/fair-play.md`.
-
-The public Devnet program does not have the Close instruction. Staging and the undeployed production build do. Historical public rooms stay on the program that opened them.
-
-Mainnet deployment, a real DFlow swap, real USDC, a paid RPC provider, and the dApp Store submission are not part of this beta.
-
-New Devnet deposits are paused in the public UI after Seed Vault Wallet blocked one attempt. The escrow rules are unchanged. The pause is in the page, so it is not a server-wide block unless `SUDOKU_FUNDING_PAUSED` is also set. Set `NEW_DEPOSITS_HELD` in `src/ui/depositHold.ts` to `false` only after that warning has an official explanation. Do not treat the warning as a false positive without that explanation. The Android shell loads the hosted site, so a web deploy changes the installed app without a new APK.
+For judges: use the live app, demo guide, source, and dated evidence together. Submission acceptance and store publication are separate from the verified product flows above.
