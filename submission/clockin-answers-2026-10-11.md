@@ -35,7 +35,7 @@ We built Soldoku within the last three months to turn a familiar solo puzzle int
 No active SKR integration. Funded tests use a separate Soldoku Devnet token; it is not SKR. SKR is not used for staking, rewards or access in the submitted build.
 
 ## DECK URL
-https://github.com/alicearcadeth/soldoku/releases/download/submission/clockin-2026-10-11/soldoku-clockin-pitch-2026-10-11-v2.pdf
+https://github.com/alicearcadeth/soldoku/releases/download/submission/clockin-2026-10-11/soldoku-clockin-pitch-2026-10-11-v4.pdf
 
 ## DEMO VIDEO URL
 See FINAL-UPLOADS.md. The form accepts YouTube, Loom or a public Google Drive link. A GitHub MP4 link alone is not a replacement for this field.
@@ -50,4 +50,5 @@ https://github.com/alicearcadeth/soldoku/releases/download/submission/clockin-20
 Open https://soldoku.com for Classic and Practice without a wallet. Free leaderboard rooms use a wallet message and then Start challenge. The APK loads the hosted site and uses Mobile Wallet Adapter on Seeker. Funded entry is paused, so use the supplied evidence; do not expect to open a new funded room. Existing claims and refunds remain available. Solana Devnet beta; tokens have no cash value. Mainnet and card execution are disabled.
 
 The demo includes current recorded navigation and clearly labeled historical funded outcomes. Assisted Classic moves and automated navigation demonstrate mechanics, not human solving skill. No new funded competition was staged for this video. See DEMO-PROVENANCE.md and the transcript.
+
 
