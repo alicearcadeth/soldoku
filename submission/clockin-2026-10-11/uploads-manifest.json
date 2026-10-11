@@ -1,0 +1,22 @@
+[
+  {
+    "name": "soldoku-clockin.apk",
+    "bytes": 2091487,
+    "sha256": "bf4276273dc43f1609c464171180676dbf0f933c3da79f767eede8fb352a200c"
+  },
+  {
+    "name": "soldoku-clockin-demo-2026-10-11.mp4",
+    "bytes": 2129580,
+    "sha256": "8e0bb67fc464aefb24f04e7efd5bb388f075d20ba42603b01d0b0f460bdad35d"
+  },
+  {
+    "name": "soldoku-clockin-pitch-2026-10-11.pdf",
+    "bytes": 652765,
+    "sha256": "aae0d17a894b2c1fd3ebbe7f8a9621ad800e992949e5c8c360c296809e831c39"
+  },
+  {
+    "name": "soldoku-clockin-pitch-2026-10-11.pptx",
+    "bytes": 729228,
+    "sha256": "564dd743e9022034e5abc241f728e2fd15c5a73b2c03a3cca56c8652e6d7a929"
+  }
+]

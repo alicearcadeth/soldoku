@@ -1,76 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Sudoku — CLOCK IN</title>
-  <style>
-    body { margin: 0; font-family: Georgia, "Times New Roman", serif; color: #1c1915; background: #f4f0e6; }
-    section { min-height: 100vh; padding: 64px 72px; box-sizing: border-box; border-bottom: 1px solid #ddd4c4; }
-    h1 { font-size: 64px; line-height: 1; margin: 0 0 16px; }
-    h2 { font-size: 40px; margin: 0 0 20px; }
-    p, li { font-size: 24px; line-height: 1.4; max-width: 900px; }
-    .kicker { letter-spacing: 0.14em; text-transform: uppercase; font-family: "Segoe UI", sans-serif; font-size: 14px; color: #6d6458; }
-    img { max-width: 320px; border: 1px solid #ddd4c4; border-radius: 12px; }
-    @media print { section { break-after: page; } }
-  </style>
-</head>
-<body>
-  <section>
-    <p class="kicker">Solana Mobile · CLOCK IN</p>
-    <h1>Sudoku</h1>
-    <p>A two-player race on one puzzle. The stake sits in a Solana vault that neither player can rewrite.</p>
-  </section>
-  <section>
-    <h2>The problem</h2>
-    <p>People already play Sudoku. A wager between two players usually means one of them holds the money. That fails with a stranger, on a phone, or when someone walks away.</p>
-  </section>
-  <section>
-    <h2>The match</h2>
-    <p>Both players see the same givens. The first correct finish wins. At the clock, the fuller correct board wins. A tie splits the vault.</p>
-  </section>
-  <section>
-    <h2>Free, then staked</h2>
-    <p>Classic is a solo puzzle. Practice is a free race. Neither asks for a wallet. Compete is the separate choice, and the screen says the tokens have no cash value.</p>
-    <img src="screenshots/home-current.png" alt="Current Sudoku home with Classic, Practice, and Compete" />
-  </section>
-  <section>
-    <h2>The vault</h2>
-    <p>Each player signs a deposit into a program account. The server can submit the result. It cannot change the mint, the stake, the players, or the deadlines after the room opens. Payouts go only to the two players.</p>
-  </section>
-  <section>
-    <h2>The phone wallet</h2>
-    <p>The Android app is a Web Shell. It hands wallet requests to the Mobile Wallet Adapter. The app does not keep the key. A desktop browser can be the second player.</p>
-  </section>
-  <section>
-    <h2>Devnet, today</h2>
-    <p>The public beta uses Devnet test tokens. A physical Seeker has opened the app, connected Seed Vault Wallet, and signed a message. A physical deposit was blocked by that wallet before any signature, with the warning “Scam site detected.” No deposit was broadcast. The cause of that warning is unknown. New deposits are paused in the public app until wallet support identifies the check. Refunds for a room that already has a deposit still work.</p>
-    <p>Earlier Devnet escrow tests, including a staging program, have completed a winner, a draw, an unmatched refund, a deadline refund, and close. Those runs are not the blocked physical deposit. The close screenshot is a real staging transaction, not a mock and not a physical Seeker deposit.</p>
-    <img src="screenshots/compete-paused.png" alt="Compete on Devnet with new deposits paused" />
-    <img src="screenshots/staging-close.png" alt="Staging close confirmed" />
-  </section>
-  <section>
-    <h2>Working now</h2>
-    <p>The Android APK loads the public site, so a later web deploy is what the installed app shows. Classic, Practice, and Settings have been used on a physical Seeker. Seed Vault Wallet has connected and signed a message there. A complete free Practice match was played by two clients on the public site: both received the same puzzle, one finish decided the race, and a refresh kept the result. Escrow, refund, and settlement have run in Devnet test environments other than the blocked physical deposit. DFlow can return a quote and an unsigned swap. None of this moves Mainnet value.</p>
-  </section>
-  <section>
-    <h2>Not live yet</h2>
-    <p>The physical Seeker deposit and refund are not verified. Seed Vault Wallet blocked the attempt. The latest Classic clock was checked in the browser, not on the phone, because the Seeker was not attached for that pass. The Mainnet financial program is not deployed. No Mainnet DFlow swap has been broadcast. Real-value staking is off. The app is not published on the Solana dApp Store. Card funding through MoonPay stays paused.</p>
-  </section>
-  <section>
-    <h2>Mainnet, later</h2>
-    <p>The production program is built to accept only Mainnet USDC. A player could deposit USDC, or swap SOL to USDC through DFlow and then deposit. That program is not deployed. No real swap has been sent. The production site refuses financial calls.</p>
-  </section>
-  <section>
-    <h2>When something breaks</h2>
-    <p>A missed opponent or an unfinished match refunds after the deadline. If a send is uncertain, the app looks up that signature instead of sending a second transaction. New paid rooms can be paused without freezing a refund of a room that is already open.</p>
-  </section>
-  <section>
-    <h2>What it does not claim</h2>
-    <p>An outside solver can still be used. A fast finish is flagged for review and is not grounds to take the stake. A physical Seeker deposit has not succeeded. Test tokens are not money. The scam-site warning has not been classified as a false positive.</p>
-  </section>
-  <section>
-    <h2>From here</h2>
-    <p>Public Devnet now. Then, only with the owner's approval: deploy the USDC program, one real swap, one real match, an external review, and a published fair-play rule before anyone can stake real value.</p>
-  </section>
-</body>
-</html>
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Soldoku — CLOCK IN</title><style>@page{size:1280px 720px;margin:0}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#101e1b}.slide{width:1280px;height:720px;position:relative;page-break-after:always;background:#f4f0e6;color:#17251f;padding:56px 72px}.dark{background:#101e1b;color:#f4f0e6}.copy{width:704px}.title{font-size:26px;font-weight:700;color:#526359}.dark .title{color:#b8c9c0}.brand{font-size:64px;color:inherit!important}h1{font-size:49px;line-height:1.1;margin:56px 0 36px;font-weight:700}p{font-size:26px;line-height:1.26;white-space:pre-line;margin:0}img{position:absolute;left:854px;top:65px;width:280px;height:565px;object-fit:contain}footer{position:absolute;left:72px;bottom:30px;font-size:17px;color:#526359;width:1110px}.dark footer{color:#b8c9c0}.slide:first-child h1{font-size:66px;margin:54px 0 38px}.slide:first-child p{font-size:30px}.slide:last-child .copy{width:1100px}@media screen{.slide{margin:20px auto}}</style><section class="slide dark"><div class="copy"><div class="title brand">Soldoku</div><h1>One grid. Your fastest finish.</h1><p>Sudoku for solo play, friendly races, and Solana competitions.</p></div><img src="clockin-2026-10-11/home.png" alt="Actual Soldoku screenshot"><footer>CLOCK IN · Alice Arcade · 11 October 2026</footer></section>
+<section class="slide "><div class="copy"><div class="title ">Give a familiar puzzle a shared finish</div><h1>A reason to play again</h1><p>Sudoku is usually a private score. Soldoku gives friends a shared grid, a recorded finish, and a leaderboard to compare.
+
+Our next product test is whether recurring rooms and shared results bring players back. Retention is not yet measured.</p></div><img src="clockin-2026-10-11/classic.png" alt="Actual Soldoku screenshot"><footer>Product hypothesis, not a traction claim.</footer></section>
+<section class="slide "><div class="copy"><div class="title ">Choose your challenge</div><h1>Start without a wallet</h1><p>CLASSIC
+Solo puzzles, notes, hints, pause and resume.
+
+PRACTICE
+Create a free race and share its room code.
+
+COMPETE
+Authorize a wallet message, start an attempt, and rank.</p></div><img src="clockin-2026-10-11/practice.png" alt="Actual Soldoku screenshot"><footer>Free competition messages do not transfer tokens.</footer></section>
+<section class="slide "><div class="copy"><div class="title ">An entry players can inspect</div><h1>The stake goes into escrow</h1><p>Choose a preset or custom amount.
+
+Confirmed entrants solve the same grid when registration closes.
+
+The unique fastest valid finish claims the pool. Ties or no finishes refund entrants.</p></div><img src="clockin-2026-10-11/stake.png" alt="Actual Soldoku screenshot"><footer>The server verifies gameplay and authorizes settlement; Solana holds the deposits.</footer></section>
+<section class="slide "><div class="copy"><div class="title ">Built and tested on Seeker</div><h1>The wallet stays in Seed Vault</h1><p>The Android shell loads Soldoku and hands wallet requests to Mobile Wallet Adapter.
+
+Connection, message authorization, transaction approval, background return, cancellation and recovery were exercised on a physical device.</p></div><img src="clockin-2026-10-11/phone-home.png" alt="Actual Soldoku screenshot"><footer>The app does not hold the player's private key.</footer></section>
+<section class="slide "><div class="copy"><div class="title ">A completed financial loop</div><h1>Deposits, payout and refunds</h1><p>Physical winner test: two 1-token deposits; 2-token prize claimed; vault empty.
+
+Scheduled cron retained finalized settlement receipts.
+
+DAABEC94: refund returned 1 token; wallet 20 to 21; vault empty.</p></div><img src="clockin-2026-10-11/phone-refund.png" alt="Actual Soldoku screenshot"><footer>Funded tests and the 11 October refund are documented in the public repository.</footer></section>
+<section class="slide "><div class="copy"><div class="title ">A usable demo with clear boundaries</div><h1>Play today. Broader funding comes later.</h1><p>Classic, Practice and free competitions are available.
+
+New funded entry is paused; existing claims and refunds remain available.
+
+Before wider financial operation: security triage, database restore rehearsal, and stronger fair-play controls. Card execution is disabled.</p></div><img src="clockin-2026-10-11/winner-leaderboard.png" alt="Actual Soldoku screenshot"><footer>Devnet beta · Soldoku tokens have no cash value. Mainnet is not enabled.</footer></section>
+<section class="slide dark"><div class="copy"><div class="title ">Try Soldoku</div><h1>soldoku.com</h1><p>Play a puzzle. Share a race. Compare a finish.
+
+Source and dated verification evidence:
+github.com/alicearcadeth/soldoku
+
+Built by Alice Arcade</p></div><footer>CLOCK IN · Solana Mobile</footer></section></html>
