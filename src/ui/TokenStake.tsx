@@ -38,7 +38,7 @@ export function TokenStake({ onChange, supportedMint }: { onChange: (token: Mark
   useEffect(() => {
     let stop = false;
     if (mint === supportedMint) {
-      setToken({ mint, symbol: "TEST", name: "Soldoku Token (Devnet)", priceUsd: 0, updatedAt: 0 });
+      setToken({ mint, symbol: "TEST", name: "Soldoku Token", priceUsd: 0, updatedAt: 0 });
       setError(null); setLoading(false); return;
     }
     const controller = new AbortController();
@@ -82,8 +82,8 @@ export function TokenStake({ onChange, supportedMint }: { onChange: (token: Mark
   function select(next: MarketToken) { setToken(next); setMint(next.mint); setOpen(false); setError(null); }
   return <section className="stack stake-section" aria-label="Token entry">
     <button className="secondary token-picker" onClick={() => setOpen(true)}><span>Choose token</span><strong>{isTest ? "Soldoku Token" : token?.symbol ?? "Choose token"} ▾</strong></button>
-    {token && <div className="quote-line"><strong>{token.name} · {displaySymbol}</strong><span>{price > 0 ? `${usdLabel(price)} per token` : isTest ? "No cash value" : "Price unavailable"}</span></div>}
-    <div className="tools stake-presets" role="group" aria-label="Entry amount">{[1, 2, 5].map(value => <button key={value} aria-pressed={kind === "tokens" && Number(input) === value} className={kind === "tokens" && Number(input) === value ? "on" : ""} onClick={() => { setKind("tokens"); setInput(String(value)); }}><strong>{value} {displaySymbol}</strong><span>{price > 0 ? `≈ ${usdLabel(value * price)}` : isTest ? "No cash value" : "USD unavailable"}</span></button>)}</div>
+    {token && <div className="quote-line"><strong>{isTest ? "Soldoku Token" : `${token.name} · ${displaySymbol}`}</strong>{!isTest && <span>{price > 0 ? `${usdLabel(price)} per token` : "Price unavailable"}</span>}</div>}
+    <div className="tools stake-presets" role="group" aria-label="Entry amount">{[1, 2, 5].map(value => <button key={value} aria-pressed={kind === "tokens" && Number(input) === value} className={kind === "tokens" && Number(input) === value ? "on" : ""} onClick={() => { setKind("tokens"); setInput(String(value)); }}><strong>{value} {displaySymbol}</strong>{!isTest && <span>{price > 0 ? `≈ ${usdLabel(value * price)}` : "USD unavailable"}</span>}</button>)}</div>
     <p className="choice-note">Choose a preset or enter your own amount, such as 3 or 10.</p>
     <div className="amount-fields">
       <label>Custom token amount<input type="number" inputMode="decimal" step="any" min="0" aria-label="Token amount" value={kind === "tokens" ? input : amount > 0 ? amountText : ""} onChange={event => { setKind("tokens"); setInput(event.target.value); }} /></label>
@@ -94,7 +94,7 @@ export function TokenStake({ onChange, supportedMint }: { onChange: (token: Mark
     {error && <p className="alert" role="alert">{error}</p>}
     {open && <DialogFrame id="token-title" onClose={() => setOpen(false)}>
       <div className="token-dialog-nav"><button className="secondary" onClick={() => setOpen(false)}>← Back</button><h2 id="token-title">Choose token</h2></div>
-      {supportedMint && <><button className="secondary" onClick={() => { setMint(supportedMint); setToken({ mint: supportedMint, symbol: "TEST", name: "Soldoku Token (Devnet)", priceUsd: 0, updatedAt: 0 }); setKind("tokens"); setOpen(false); }}>Soldoku Token (Devnet) · available</button><details className="token-address"><summary>Show token address</summary><small>{supportedMint}</small></details></>}
+      {supportedMint && <><button className="secondary" onClick={() => { setMint(supportedMint); setToken({ mint: supportedMint, symbol: "TEST", name: "Soldoku Token", priceUsd: 0, updatedAt: 0 }); setKind("tokens"); setOpen(false); }}>Soldoku Token · available</button><details className="token-address"><summary>Show token address</summary><small>{supportedMint}</small></details></>}
       <label htmlFor="token-search">Search by name, symbol, or mint address</label>
       <input id="token-search" className="form-input" value={search} onChange={event => setSearch(event.target.value)} placeholder="Token name, symbol, or mint" />
       <div className="tools">{[["SOL", SOL_MINT], ["USDC", USDC_MINT]].map(([symbol, address]) => <button key={symbol} onClick={() => { if (mint !== address) { setMint(address); setToken(null); } setOpen(false); }}>{symbol}</button>)}</div>

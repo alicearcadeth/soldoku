@@ -50,7 +50,7 @@ function durationText(ms: number) { return ms % DAY_MS === 0 ? `${ms / DAY_MS} d
 function TesterFunds({ busy, note, faucet, onRequest }: { busy: boolean; note: string | null; faucet: boolean; onRequest: () => void }) {
   return <section className="stack" aria-label="Get test funds">
     <h2>Get test funds</h2>
-    <p className="choice-note">SOL covers fees; Soldoku covers your stake. Both have no cash value. One request per day.</p>
+    <p className="choice-note">SOL covers fees; Soldoku covers your stake. One request per day.</p>
     <p className="choice-note">Need SOL? Try <a href="https://faucet.solana.com" target="_blank" rel="noreferrer">faucet.solana.com</a>.</p>
     {!faucet && <p className="banner">Soldoku minting is not enabled on this server yet. A SOL request still runs.</p>}
     <button type="button" className="secondary" disabled={busy} onClick={onRequest}>Get test funds</button>
@@ -72,7 +72,7 @@ function escrowNotice(room: CompetitionView, now: number) {
 }
 function RoomFacts({ room }: { room: CompetitionSummary }) {
   return <dl className="room-facts">
-    <div><dt>Game mode</dt><dd>Sudoku · {room.level}</dd></div><div><dt>Token</dt><dd>{room.funded ? "Soldoku (Devnet)" : room.token?.symbol ?? "None · free entry"}</dd></div>
+    <div><dt>Game mode</dt><dd>Sudoku · {room.level}</dd></div><div><dt>Token</dt><dd>{room.funded ? "Soldoku" : room.token?.symbol ?? "None · free entry"}</dd></div>
     <div><dt>Stake per player</dt><dd>{room.token ? `${room.stake} ${room.funded ? "Soldoku" : room.token.symbol}` : "0"}</dd></div><div><dt>{room.funded ? "Prize pool" : "Approx. USD"}</dt><dd>{room.funded ? `${tokenUnitsLabel((BigInt(room.funded.stakeUnits) * BigInt(room.participants)).toString(), room.funded.decimals)} Soldoku` : usdLabel(room.stake * (room.token?.priceUsd ?? 0))}</dd></div>
     <div><dt>{room.funded ? "Play window" : "Competition period"}</dt><dd>{durationText(room.funded ? room.endsAt - room.funded.startsAt : room.durationMs)}</dd></div><div><dt>Participants</dt><dd>{room.participants} · {room.funded ? "confirmed deposits" : "open entry"}</dd></div>
     <div><dt>Status</dt><dd>{room.funded ? room.funded.chainStatus === "pending" ? "Awaiting creator deposit" : room.funded.chainStatus === "paid" ? "Winner paid" : room.funded.chainStatus === "refunding" ? "Refunds available" : room.funded.chainStatus === "awarded" ? "Winner payout available" : Date.now() < room.funded.startsAt ? "Registration open" : room.status === "active" ? "Competition running" : "Awaiting settlement" : room.status === "active" ? "Active" : "Ended"}</dd></div><div><dt>Best completion</dt><dd>{room.bestMs === null ? "No finishes yet" : elapsedLabel(room.bestMs)}</dd></div>
@@ -398,7 +398,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
         <h3>Difficulty</h3><div className="tools" role="group" aria-label="Difficulty">{LEVELS.map(item => <button key={item} aria-pressed={item === level} className={item === level ? "on" : ""} onClick={() => setLevel(item)}>{item[0].toUpperCase() + item.slice(1)}</button>)}</div>
         <h2>2. Set the stake</h2>{mode === "tokens" ? <>
           <TokenStake onChange={changeStake} supportedMint={fundingConfig?.mint} />
-          <p className="choice-note">Devnet only · Soldoku deposits. Other tokens are amount previews.</p>
+          <p className="choice-note">Devnet beta · Soldoku tokens have no cash value.</p>
           <p className="choice-note" role="status">Card funding unavailable. Competition entry still requires a wallet-signed Soldoku deposit.</p>
           {fundingConfig?.paused && <p className="choice-note" role="status">New funded rooms are paused. Claims, refunds, and settlement still work. Free competitions remain available.</p>}
           {import.meta.env.DEV && new URLSearchParams(window.location.search).has("fiatSandbox") && (
@@ -430,7 +430,7 @@ export function Competitions({ onHome, onLegacy }: { onHome: () => void; onLegac
         <RoomFacts room={{ ...room, status: active ? "active" : "ended" }} /><p className="choice-note">Ends {new Date(room.endsAt).toLocaleString()}. No fixed player limit.</p>
         {room.you?.completedMs != null && <><p className="banner">Finished in {elapsedLabel(room.you.completedMs)} · rank {room.you.rank}{active ? " so far. Rankings can change until the room closes." : ". Competition ended."}</p><p className="choice-note">Share this room’s code to invite others, or use Back to Rooms for another competition.</p></>}
         {!active && <p className="banner">Competition ended. {room.bestMs === null ? "No player completed the grid in time." : room.funded ? "The unique fastest verified completion wins. Exact fastest ties refund all entrants." : "The fastest verified completion is the winning time. Equal times share first place."}</p>}
-        {room.funded && <section className="stack" aria-label="Escrow competition status"><p className="choice-note">{fundingConfig?.cluster === "localnet" ? "Local validator" : "Devnet"} · Soldoku entry</p>{fundingConfig && <details><summary>Need test funds?</summary><TesterFunds busy={Boolean(busy)} note={fundNote} faucet={Boolean(fundingConfig.testerFaucet)} onRequest={() => void requestTesterFunds()} /></details>}<p role="status">{escrowNotice(room, now)}</p><p className="choice-note">Fastest unique finish wins the pool. Ties or no finishes refund everyone.</p>
+        {room.funded && <section className="stack" aria-label="Escrow competition status"><p className="choice-note">{fundingConfig?.cluster === "localnet" ? "Local validator · Soldoku entry" : "Devnet beta · Soldoku tokens have no cash value."}</p>{fundingConfig && <details><summary>Need test funds?</summary><TesterFunds busy={Boolean(busy)} note={fundNote} faucet={Boolean(fundingConfig.testerFaucet)} onRequest={() => void requestTesterFunds()} /></details>}<p role="status">{escrowNotice(room, now)}</p><p className="choice-note">Fastest unique finish wins the pool. Ties or no finishes refund everyone.</p>
           {room.you && <p className="banner">{room.you.claimed ? "Your claim is complete." : "Your stake is confirmed in escrow."}</p>}
           {room.participants === 1 && now >= room.funded.startsAt && <p className="banner">No opponent joined. The creator can claim a full stake refund.</p>}
           {room.funded.winner && <p>Winner wallet: <span className="token-mint">{room.funded.winner}</span></p>}

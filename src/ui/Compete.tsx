@@ -817,19 +817,19 @@ export function Compete({ onExit, initialMode = "practice" }: Props) {
         <p className="lede">
           {mode === "practice"
             ? "Practice races are free. No wallet required. The clock starts when a second player joins, and no tokens move."
-            : "Same grid for both players. First correct finish wins. At 0:00, more correct cells wins. A tie is a draw. Each player deposits the same entry, 1, 2, or 5 Soldoku tokens. Test tokens have no cash value."}
+            : "Same grid for both players. First correct finish wins. At 0:00, more correct cells wins. A tie is a draw. Each player deposits the same entry, 1, 2, or 5 Soldoku tokens."}
         </p>
         {mode === "staked" && (
           <p className="choice-note">
             {staging
               ? `This is ${cluster}. After settlement or refund, the opener can close the empty match and receive its rent back.`
               : NEW_DEPOSITS_HELD
-                ? `This app is on ${cluster}. The stake is fixed when a room opens. This beta does not convert SOL. New deposits are paused, so Create and Join cannot open a paid room. A refund for a room that already has a deposit still returns those Soldoku tokens. It does not return the network fee, and this Devnet program does not return the rent that opened the match.`
-                : `This app is on ${cluster}. The stake is fixed when the room opens. This beta does not convert SOL. Deposit the Soldoku token for this room. A refund returns those Soldoku tokens. It does not return the network fee, and this Devnet program does not return the rent that opened the match. The clock starts only after both deposits confirm.`}
+                ? `The stake is fixed when a room opens. This beta does not convert SOL. New deposits are paused, so Create and Join cannot open a paid room. A refund for a room that already has a deposit still returns those Soldoku tokens. It does not return the network fee, and this program does not return the rent that opened the match.`
+                : `The stake is fixed when the room opens. This beta does not convert SOL. Deposit the Soldoku token for this room. A refund returns those Soldoku tokens. It does not return the network fee, and this program does not return the rent that opened the match. The clock starts only after both deposits confirm.`}
           </p>
         )}
-        {mode === "staked" && !localnet && cluster === "devnet" && !staging && <p className="badge">DEVNET · SOLDOKU TOKENS · NO CASH VALUE</p>}
-        {mode === "staked" && staging && <p className="badge">STAGING · DEVNET · SOLDOKU TOKENS · NO CASH VALUE</p>}
+        {mode === "staked" && !localnet && cluster === "devnet" && !staging && <p className="badge">Devnet beta · Soldoku tokens have no cash value.</p>}
+        {mode === "staked" && staging && <p className="badge">Staging · Devnet beta · Soldoku tokens have no cash value.</p>}
         {mode === "staked" && !room && (
           <>
             <p className="choice-note">Entry: {selectedStake} Soldoku token{selectedStake === 1 ? "" : "s"} from each player. 1, 2, and 5 are whole tokens. This choice is not a deposit yet, and both players deposit this same amount.</p>

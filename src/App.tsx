@@ -39,7 +39,7 @@ function AppContent() {
   const [help, setHelp] = useState(false);
   const [newGame, setNewGame] = useState(false);
   const [confirmLevel, setConfirmLevel] = useState<Level | null>(null);
-  const [disclosure, setDisclosure] = useState("DEVNET · SOLDOKU TOKENS · NO CASH VALUE");
+  const [disclosure, setDisclosure] = useState("Devnet beta · Soldoku tokens have no cash value.");
   const [route, setRoute] = useState<Route>(() => {
     if (roomCodeFromUrl(location.href)) return { name: "competitions" };
     if (localStorage.getItem("sudoku.seat")) return { name: "compete", mode: "practice" };
@@ -70,8 +70,8 @@ function AppContent() {
       .then((data: { localnet?: boolean; staging?: boolean; cluster?: string }) => {
         if (stop) return;
         if (data.localnet) setDisclosure("");
-        else if (data.staging) setDisclosure("STAGING · DEVNET · SOLDOKU TOKENS · NO CASH VALUE");
-        else if (data.cluster === "devnet") setDisclosure("DEVNET · SOLDOKU TOKENS · NO CASH VALUE");
+        else if (data.staging) setDisclosure("Staging · Devnet beta · Soldoku tokens have no cash value.");
+        else if (data.cluster === "devnet") setDisclosure("Devnet beta · Soldoku tokens have no cash value.");
         else setDisclosure("");
       })
       .catch(() => undefined);
@@ -300,8 +300,8 @@ function About({ onClose }: { onClose: () => void }) {
         <p>Classic is a solo Sudoku game on this device. No wallet.</p>
         <p>{ABOUT_FUNDED_ROOMS}</p>
         <p>Practice is a free race. Create a room and share the code, or use Quick Match. No tokens move. A listed room leaves the public list after 20 minutes if nobody joins. A private code lasts about two hours.</p>
-        <p>Previous two-player token races lock the same entry for both players: 1, 2, or 5 Devnet Soldoku tokens. Those tokens have no cash value. A Seeker uses the mobile wallet. A desktop browser can connect a wallet that supports the Wallet Standard. The entry is fixed when the room opens. If the other player never deposits, a refund opens when the join window ends. If a match cannot finish, either player can refund after the settle deadline, and both entries return. There is no conversion on this beta: deposit the Soldoku token for this room. A quote is not a deposit.</p>
-        <p className="choice-note">This is a Devnet beta. It is not real-money play, a store release, or a security audit.</p>
+        <p>Previous two-player token races lock the same entry for both players: 1, 2, or 5 Soldoku tokens. A Seeker uses the mobile wallet. A desktop browser can connect a wallet that supports the Wallet Standard. The entry is fixed when the room opens. If the other player never deposits, a refund opens when the join window ends. If a match cannot finish, either player can refund after the settle deadline, and both entries return. There is no conversion on this beta: deposit the Soldoku token for this room. A quote is not a deposit.</p>
+        <p className="choice-note">Devnet beta · Soldoku tokens have no cash value.</p>
         <label htmlFor="beta-note">Report a problem</label>
         <textarea id="beta-note" className="note-box" maxLength={400} value={note} placeholder="What happened?" onChange={(event) => setNote(event.target.value)} />
         <button className="primary" type="button" disabled={sending || note.trim().length < 8} onClick={() => void send()}>

@@ -10,11 +10,11 @@ describe("player-facing money labels", () => {
     expect(walletBalanceCopy(1_500_000_000, "3000000")).toContain("3 Soldoku tokens");
   });
 
-  it("describes funded rooms as Soldoku tokens on Devnet and other symbols as previews", () => {
-    expect(HELP_FUNDED_ROOMS).toMatch(/Soldoku tokens on Devnet/);
+  it("describes funded rooms as Soldoku tokens and other symbols as previews", () => {
+    expect(HELP_FUNDED_ROOMS).toMatch(/Devnet beta · Soldoku tokens have no cash value/);
     expect(HELP_FUNDED_ROOMS).toMatch(/amount previews/);
     expect(HELP_FUNDED_ROOMS).not.toMatch(/not enabled/);
-    expect(ABOUT_FUNDED_ROOMS).toMatch(/Soldoku tokens on Devnet/);
+    expect(ABOUT_FUNDED_ROOMS).toMatch(/Funded rooms use Soldoku tokens/);
     expect(ABOUT_FUNDED_ROOMS).toMatch(/amount previews/);
   });
 

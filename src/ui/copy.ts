@@ -1,7 +1,7 @@
 /** Player-facing labels. These do not choose amounts, accounts, or instructions. */
 
-export const HELP_FUNDED_ROOMS = "Free leaderboard rooms take no tokens. Funded rooms use Soldoku tokens on Devnet. These tokens have no cash value. Other token symbols are amount previews and are not deposited.";
-export const ABOUT_FUNDED_ROOMS = "Leaderboard competitions allow open entry until the deadline. Each wallet gets one timed attempt at the same grid. Rankings stay provisional until the room closes. A creator can extend the period only before another participant joins. Free rooms take no tokens. Funded rooms use Soldoku tokens on Devnet. Other symbols in the token picker are amount previews.";
+export const HELP_FUNDED_ROOMS = "Free leaderboard rooms take no tokens. Devnet beta · Soldoku tokens have no cash value. Funded rooms use Soldoku tokens. Other token symbols are amount previews and are not deposited.";
+export const ABOUT_FUNDED_ROOMS = "Leaderboard competitions allow open entry until the deadline. Each wallet gets one timed attempt at the same grid. Rankings stay provisional until the room closes. A creator can extend the period only before another participant joins. Free rooms take no tokens. Funded rooms use Soldoku tokens. Other symbols in the token picker are amount previews.";
 
 export function shortAddress(address: string): string {
   if (address.length <= 8) return address;
